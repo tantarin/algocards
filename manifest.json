@@ -1,0 +1,16 @@
+{
+  "name": "AlgoCards",
+  "short_name": "AlgoCards",
+  "description": "Изучай алгоритмические паттерны в игровом формате",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c3aed'/><text x='50' y='62' text-anchor='middle' font-size='50' fill='white'>A</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

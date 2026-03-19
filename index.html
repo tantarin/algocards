@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#7c3aed">
+<link rel="manifest" href="manifest.json">
+<title>AlgoCards</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--text:#e2e8f0;--dim:#94a3b8;--radius:16px}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;-webkit-user-select:none;user-select:none}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid #ffffff12;padding:8px 0 env(safe-area-inset-bottom,8px);z-index:99}
+.tab{flex:1;text-align:center;padding:6px 0;font-size:11px;color:var(--dim);cursor:pointer;transition:.2s}
+.tab.active{color:var(--purple)}
+.tab svg{display:block;margin:0 auto 2px;width:24px;height:24px}
+.screen{display:none;padding:16px;padding-top:env(safe-area-inset-top,16px)}
+.screen.active{display:block}
+h1{font-size:28px;margin:8px 0 16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pcard{background:var(--card);border-radius:var(--radius);padding:14px;cursor:pointer;transition:transform .15s}
+.pcard:active{transform:scale(.97)}
+.pcard .name{font-size:14px;font-weight:700;margin:6px 0 2px}
+.pcard .desc{font-size:11px;color:var(--dim)}
+.pcard .cnt{font-size:11px;color:var(--purple);margin-top:6px}
+.back-btn{background:none;border:none;color:var(--purple);font-size:16px;cursor:pointer;padding:8px 0;display:flex;align-items:center;gap:4px}
+.problem-card{background:var(--card);border-radius:var(--radius);padding:16px;margin:10px 0;cursor:pointer}
+.problem-card .title{font-size:15px;font-weight:600}
+.problem-card .diff{font-size:12px;margin-top:4px}
+.detail-section{background:var(--card);border-radius:var(--radius);padding:16px;margin:10px 0}
+.detail-section h3{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.detail-section pre{font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;background:var(--card2);padding:12px;border-radius:10px;margin-top:8px}
+.spoiler-btn{background:var(--card2);border:none;color:var(--purple);width:100%;padding:12px;border-radius:var(--radius);font-size:15px;cursor:pointer;margin:8px 0}
+.quiz-option{background:var(--card);border:2px solid transparent;border-radius:12px;padding:14px;margin:8px 0;cursor:pointer;font-size:15px;transition:.2s}
+.quiz-option.correct{border-color:var(--green);background:#22c55e20}
+.quiz-option.wrong{border-color:var(--red);background:#ef444420}
+.quiz-option.reveal{border-color:var(--green)}
+.big-btn{background:var(--purple);color:#fff;border:none;border-radius:var(--radius);padding:14px;width:100%;font-size:16px;font-weight:600;cursor:pointer;margin:12px 0}
+.flashcard{background:var(--card);border-radius:20px;min-height:300px;padding:24px;margin:16px 0;cursor:pointer;transition:transform .4s;transform-style:preserve-3d;position:relative}
+.flashcard.flipped{transform:rotateY(180deg)}
+.fc-face{backface-visibility:hidden;position:absolute;top:0;left:0;right:0;bottom:0;padding:24px;overflow-y:auto}
+.fc-back{transform:rotateY(180deg)}
+.fc-nav{display:flex;justify-content:center;gap:32px;margin-top:12px}
+.fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer}
+.counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
+.progress-bar{height:6px;background:var(--card2);border-radius:3px;margin:8px 0;overflow:hidden}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--purple),#6366f1);border-radius:3px;transition:width .3s}
+</style>
+</head>
+<body>
+
+<div id="patterns" class="screen active">
+  <h1>AlgoCards</h1>
+  <div class="grid" id="patternsGrid"></div>
+</div>
+
+<div id="patternDetail" class="screen">
+  <button class="back-btn" onclick="showScreen('patterns')">← Назад</button>
+  <h1 id="pdTitle"></h1>
+  <div id="pdList"></div>
+</div>
+
+<div id="problemDetail" class="screen">
+  <button class="back-btn" id="pdBack">← Назад</button>
+  <h1 id="probTitle" style="font-size:20px"></h1>
+  <div id="probContent"></div>
+</div>
+
+<div id="quiz" class="screen">
+  <h1>Квиз</h1>
+  <div id="quizArea"></div>
+</div>
+
+<div id="cards" class="screen">
+  <h1>Карточки</h1>
+  <div id="cardsArea"></div>
+</div>
+
+<nav class="tabs">
+  <div class="tab active" onclick="showScreen('patterns')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Паттерны</div>
+  <div class="tab" onclick="showScreen('quiz')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 115.12 2.13c-.73.58-1.12 1.3-1.12 2.12V14"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>Квиз</div>
+  <div class="tab" onclick="showScreen('cards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="4" y="2" width="16" height="16" rx="2" opacity=".4"/></svg>Карточки</div>
+</nav>
+
+<script>
+const P=[
+{id:"bt1",t:"Generate Parentheses",p:"Backtracking",d:"средне",desc:"Дано n. Сгенерировать все правильные скобочные последовательности длины 2n.\n\nВвод: n=3\nВывод: [\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]",hint:"Два счётчика: open и close. open<n → ставим '(', close<open → ставим ')'",code:"void gen(int o,int c,int n,StringBuilder sb,List<String> r){\n  if(sb.length()==2*n){r.add(sb.toString());return;}\n  if(o<n){sb.append('(');gen(o+1,c,n,sb,r);sb.deleteCharAt(sb.length()-1);}\n  if(c<o){sb.append(')');gen(o,c+1,n,sb,r);sb.deleteCharAt(sb.length()-1);}\n}",expl:"Backtracking с двумя счётчиками. close никогда не превышает open."},
+{id:"bs1",t:"Поиск в повернутом массиве",p:"Binary Search",d:"средне",desc:"Отсортированный массив повёрнут ([4,5,6,7,0,1,2]). Найти target за O(log n).\n\nВвод: nums=[4,5,6,7,0,1,2], target=0\nВывод: 4",hint:"Определи какая половина отсортирована, проверь попадает ли target в неё",code:"int search(int[] a,int t){\n  int lo=0,hi=a.length-1;\n  while(lo<=hi){\n    int m=lo+(hi-lo)/2;\n    if(a[m]==t)return m;\n    if(a[lo]<=a[m]){\n      if(t>=a[lo]&&t<a[m])hi=m-1; else lo=m+1;\n    }else{\n      if(t>a[m]&&t<=a[hi])lo=m+1; else hi=m-1;\n    }\n  }return -1;\n}",expl:"Одна из половин всегда отсортирована. Определяем какая и сужаем поиск."},
+{id:"gop1",t:"Best Time to Buy and Sell Stock II",p:"Greedy",d:"легко",desc:"Цены акций по дням. Сколько угодно сделок. Макс прибыль.\n\nВвод: [7,1,5,3,6,4]\nВывод: 7",hint:"Собираем все подъёмы: если prices[i]>prices[i-1] — добавляем разницу",code:"int maxProfit(int[] p){\n  int r=0;\n  for(int i=1;i<p.length;i++)\n    if(p[i]>p[i-1]) r+=p[i]-p[i-1];\n  return r;\n}",expl:"Greedy: сумма всех положительных разностей = максимальная прибыль."},
+{id:"hf1",t:"Группировка анаграмм",p:"HashMap",d:"средне",desc:"Дан массив строк. Сгруппируйте анаграммы.\n\nВвод: [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]\nВывод: [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]",hint:"Ключ = отсортированная строка. HashMap<ключ, список>",code:"Map<String,List<String>> m=new HashMap<>();\nfor(String s:strs){\n  char[] a=s.toCharArray();\n  Arrays.sort(a);\n  m.computeIfAbsent(new String(a),k->new ArrayList<>()).add(s);\n}",expl:"Все анаграммы дают одинаковый ключ при сортировке символов."},
+{id:"hpq1",t:"K частых элементов",p:"Heap / PQ",d:"средне",desc:"Дан массив и k. Вернуть k самых частых элементов.\n\nВвод: nums=[1,1,1,2,2,3], k=2\nВывод: [1,2]",hint:"Частоты через HashMap, затем min-heap размера k",code:"PriorityQueue<Integer> heap=new PriorityQueue<>(\n  (a,b)->freq.get(a)-freq.get(b));\nfor(int key:freq.keySet()){\n  heap.add(key);\n  if(heap.size()>k)heap.poll();\n}",expl:"Min-heap размера k: добавляем, если >k — удаляем минимум."},
+{id:"iss1",t:"Merge Intervals",p:"Intervals Sweep",d:"средне",desc:"Слить перекрывающиеся интервалы.\n\nВвод: [[1,3],[2,6],[8,10],[15,18]]\nВывод: [[1,6],[8,10],[15,18]]",hint:"Сортируй по началу. Расширяй текущий или начинай новый.",code:"Arrays.sort(intervals,(a,b)->a[0]-b[0]);\nList<int[]> r=new ArrayList<>();\nint[] cur=intervals[0];\nfor(int i=1;i<intervals.length;i++){\n  if(intervals[i][0]<=cur[1]) cur[1]=Math.max(cur[1],intervals[i][1]);\n  else{r.add(cur);cur=intervals[i];}\n}\nr.add(cur);",expl:"Сортировка + sweep: начало ≤ конец текущего — расширяем, иначе новый."},
+{id:"ll1",t:"Reverse Linked List",p:"Linked List",d:"легко",desc:"Развернуть односвязный список.\n\nВвод: 1→2→3→4→5\nВывод: 5→4→3→2→1",hint:"Три указателя: prev, curr, next. Перенаправляем curr.next на prev.",code:"ListNode prev=null,curr=head;\nwhile(curr!=null){\n  ListNode next=curr.next;\n  curr.next=prev;\n  prev=curr;\n  curr=next;\n}\nreturn prev;",expl:"Итеративный разворот. O(n) время, O(1) память."},
+{id:"ps1",t:"Subarray Sum Equals K",p:"Prefix Sum",d:"средне",desc:"Количество подмассивов с суммой k.\n\nВвод: nums=[1,1,1], k=2\nВывод: 2",hint:"Prefix sum + HashMap: ищем prefixSum-k в мапе",code:"Map<Integer,Integer> m=new HashMap<>();\nm.put(0,1); int sum=0,cnt=0;\nfor(int x:nums){\n  sum+=x;\n  cnt+=m.getOrDefault(sum-k,0);\n  m.merge(sum,1,Integer::sum);\n}",expl:"prefixSum[j]-prefixSum[i]=k → subarray [i+1..j] имеет сумму k."},
+{id:"sw1",t:"Minimum Window Substring",p:"Sliding Window",d:"сложно",desc:"Минимальная подстрока s, содержащая все символы t.\n\nВвод: s=\"ADOBECODEBANC\", t=\"ABC\"\nВывод: \"BANC\"",hint:"Расширяем правую границу пока не покроем t, затем сжимаем левую",code:"int[] need=new int[128];\nfor(char c:t.toCharArray())need[c]++;\nint miss=t.length(),l=0,start=0,min=Integer.MAX_VALUE;\nfor(int r=0;r<s.length();r++){\n  if(need[s.charAt(r)]-->0)miss--;\n  while(miss==0){\n    if(r-l+1<min){min=r-l+1;start=l;}\n    if(++need[s.charAt(l++)]>0)miss++;\n  }\n}",expl:"Два указателя: правый расширяет, левый сжимает для минимума."},
+{id:"st1",t:"Valid Parentheses",p:"Stack",d:"легко",desc:"Проверить валидность скобочной последовательности (){}[].\n\nВвод: \"([{}])\"\nВывод: true",hint:"Открывающую — в стек, закрывающую — сверяем с вершиной",code:"Stack<Character> s=new Stack<>();\nfor(char c:str.toCharArray()){\n  if(c=='(')s.push(')');\n  else if(c=='{')s.push('}');\n  else if(c=='[')s.push(']');\n  else if(s.isEmpty()||s.pop()!=c)return false;\n}\nreturn s.isEmpty();",expl:"Стек: кладём ожидаемую закрывающую. При закрывающей — сверяем."},
+{id:"tr1",t:"Number of Islands",p:"Trees / DFS",d:"средне",desc:"2D-сетка из '1' и '0'. Посчитать количество островов.\n\nВвод: [[1,1,0],[1,0,0],[0,0,1]]\nВывод: 2",hint:"При нахождении '1' запускаем DFS, затапливаем весь остров",code:"int count=0;\nfor(int i=0;i<g.length;i++)\n for(int j=0;j<g[0].length;j++)\n  if(g[i][j]=='1'){dfs(g,i,j);count++;}\n// dfs меняет '1'->'0' и идёт в 4 стороны",expl:"DFS flood fill: затапливаем остров при нахождении, +1 к счётчику."},
+{id:"tp1",t:"Container With Most Water",p:"Two Pointers",d:"средне",desc:"Массив высот. Найти контейнер с максимумом воды.\n\nВвод: [1,8,6,2,5,4,8,3,7]\nВывод: 49",hint:"Два указателя. Двигаем тот, чья высота меньше.",code:"int l=0,r=h.length-1,max=0;\nwhile(l<r){\n  max=Math.max(max,Math.min(h[l],h[r])*(r-l));\n  if(h[l]<h[r])l++; else r--;\n}",expl:"Двигаем меньший указатель: сдвиг большего точно не увеличит площадь."},
+{id:"uf1",t:"Количество компонент связности",p:"Union-Find",d:"средне",desc:"Дан граф рёбрами. Количество компонент связности.\n\nВвод: n=5, edges=[[0,1],[1,2],[3,4]]\nВывод: 2",hint:"Union-Find: объединяй вершины, считай уникальные корни",code:"int[] p=new int[n];\nfor(int i=0;i<n;i++)p[i]=i;\nint comp=n;\nfor(int[] e:edges){\n  int a=find(p,e[0]),b=find(p,e[1]);\n  if(a!=b){p[a]=b;comp--;}\n}",expl:"Union-Find с path compression: объединяем, считаем корни."},
+{id:"dp1",t:"Longest Palindromic Substring",p:"Dynamic Prog.",d:"средне",desc:"Найти самую длинную подстроку-палиндром.\n\nВвод: \"babad\"\nВывод: \"bab\"",hint:"Expand around center: расширяйся влево-вправо пока совпадает",code:"for(int i=0;i<s.length();i++){\n  int l1=expand(s,i,i);\n  int l2=expand(s,i,i+1);\n  // обновляем max\n}\nint expand(String s,int l,int r){\n  while(l>=0&&r<s.length()&&s.charAt(l)==s.charAt(r)){l--;r++;}\n  return r-l-1;\n}",expl:"O(n²). Для каждого центра расширяемся пока совпадает."}
+];
+
+const patterns={};
+P.forEach(p=>{if(!patterns[p.p])patterns[p.p]=[];patterns[p.p].push(p)});
+const patNames=Object.keys(patterns);
+let curPat=null,curScreen='patterns';
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',['patterns','quiz','cards'][i]===id);
+  });
+  curScreen=id;
+  if(id==='quiz')initQuiz();
+  if(id==='cards')initCards();
+}
+
+// PATTERNS
+function renderPatterns(){
+  const g=document.getElementById('patternsGrid');
+  g.innerHTML=patNames.map(name=>`
+    <div class="pcard" onclick="openPattern('${name}')">
+      <div class="name">${name}</div>
+      <div class="desc">${patterns[name].length} задач</div>
+    </div>`).join('');
+}
+function openPattern(name){
+  curPat=name;
+  document.getElementById('pdTitle').textContent=name;
+  document.getElementById('pdList').innerHTML=patterns[name].map(p=>`
+    <div class="problem-card" onclick="openProblem('${p.id}','patternDetail')">
+      <div class="title">${p.d==='легко'?'🟢':p.d==='средне'?'🟡':'🔴'} ${p.t}</div>
+      <div class="diff">${p.d}</div>
+    </div>`).join('');
+  showScreen('patternDetail');
+}
+function openProblem(id,from){
+  const p=P.find(x=>x.id===id);
+  document.getElementById('pdBack').onclick=()=>showScreen(from);
+  document.getElementById('probTitle').textContent=p.t;
+  document.getElementById('probContent').innerHTML=`
+    <span class="tag" style="background:${p.d==='легко'?'#22c55e30;color:#22c55e':p.d==='средне'?'#f59e0b30;color:#f59e0b':'#ef444430;color:#ef4444'}">${p.d}</span>
+    <span class="tag" style="background:#7c3aed30;color:#7c3aed;margin-left:4px">${p.p}</span>
+    <div class="detail-section"><h3>📝 Условие</h3><div style="white-space:pre-wrap">${esc(p.desc)}</div></div>
+    <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">💡 Показать подсказку</button>
+    <div class="detail-section" style="display:none"><h3>💡 Подсказка</h3>${esc(p.hint)}</div>
+    <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">👨‍💻 Показать решение</button>
+    <div class="detail-section" style="display:none"><h3>👨‍💻 Код</h3><pre>${esc(p.code)}</pre></div>
+    <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">🧠 Показать объяснение</button>
+    <div class="detail-section" style="display:none"><h3>🧠 Объяснение</h3>${esc(p.expl)}</div>`;
+  showScreen('problemDetail');
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// QUIZ
+let qIdx=0,qList=[],qAnswered=false,qScore=0,qTotal=5;
+function initQuiz(){
+  qIdx=0;qScore=0;qList=shuffle([...P]).slice(0,qTotal);
+  document.getElementById('quizArea').innerHTML=`
+    <p style="color:var(--dim);margin-bottom:12px">Прочитай условие — угадай паттерн</p>
+    <button class="big-btn" onclick="nextQ()">Начать</button>`;
+}
+function nextQ(){
+  if(qIdx>=qTotal){
+    document.getElementById('quizArea').innerHTML=`
+      <div style="text-align:center;margin-top:40px">
+        <div style="font-size:48px">${qScore>=4?'⭐':'🔄'}</div>
+        <h2 style="margin:12px 0">${qScore} из ${qTotal}</h2>
+        <button class="big-btn" onclick="initQuiz()">Ещё раз</button>
+      </div>`;
+    return;
+  }
+  qAnswered=false;
+  const p=qList[qIdx];
+  const correct=p.p;
+  let opts=patNames.filter(n=>n!==correct);
+  opts=shuffle(opts).slice(0,3);
+  opts.push(correct);
+  opts=shuffle(opts);
+  const area=document.getElementById('quizArea');
+  area.innerHTML=`
+    <div class="counter">${qIdx+1} / ${qTotal}</div>
+    <div class="progress-bar"><div class="fill" style="width:${qIdx/qTotal*100}%"></div></div>
+    <div class="detail-section"><strong>${p.t}</strong><div style="white-space:pre-wrap;margin-top:8px;font-size:14px">${esc(p.desc)}</div></div>
+    <p style="font-weight:600;margin:8px 0">Какой паттерн?</p>
+    ${opts.map(o=>`<div class="quiz-option" data-v="${o}" onclick="pickAnswer(this,'${esc2(correct)}')">${o}</div>`).join('')}`;
+}
+function pickAnswer(el,correct){
+  if(qAnswered)return;
+  qAnswered=true;
+  const v=el.dataset.v;
+  document.querySelectorAll('.quiz-option').forEach(o=>{
+    if(o.dataset.v===correct)o.classList.add('correct');
+    else if(o===el)o.classList.add('wrong');
+    else o.classList.add('reveal');
+  });
+  if(v===correct)qScore++;
+  qIdx++;
+  setTimeout(nextQ,1200);
+}
+function esc2(s){return s.replace(/'/g,"\\'")}
+
+// FLASHCARDS
+let fcIdx=0,fcFlipped=false,fcList=[];
+function initCards(){
+  fcList=shuffle([...P]);fcIdx=0;fcFlipped=false;
+  renderCard();
+}
+function renderCard(){
+  const p=fcList[fcIdx];
+  const area=document.getElementById('cardsArea');
+  area.innerHTML=`
+    <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+    <div class="flashcard${fcFlipped?' flipped':''}" onclick="flipCard()">
+      <div class="fc-face">
+        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.d}</span>
+        <h3 style="margin:12px 0">${p.t}</h3>
+        <div style="white-space:pre-wrap;font-size:14px">${esc(p.desc)}</div>
+        <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть</div>
+      </div>
+      <div class="fc-face fc-back">
+        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.p}</span>
+        <div style="margin:10px 0;color:var(--orange);font-size:14px">${esc(p.hint)}</div>
+        <pre style="font-size:11px;background:var(--card2);padding:10px;border-radius:10px;overflow-x:auto">${esc(p.code)}</pre>
+        <div style="margin-top:8px;font-size:13px;color:var(--dim)">${esc(p.expl)}</div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button onclick="fcPrev()">←</button>
+      <button onclick="fcShuffle()">🔀</button>
+      <button onclick="fcNext()">→</button>
+    </div>`;
+}
+function flipCard(){fcFlipped=!fcFlipped;renderCard()}
+function fcNext(){fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
+function fcPrev(){fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
+function fcShuffle(){fcFlipped=false;fcList=shuffle([...P]);fcIdx=0;renderCard()}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+renderPatterns();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>

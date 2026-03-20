@@ -3513,38 +3513,51 @@ desc:`Дана строка s. Найти самую длинную ==подст
 
 Ввод: s = "cbbd"
 Вывод: "bb"`,
-hint:`Expand around center: для каждого символа (и пары) расширяемся влево-вправо пока символы совпадают.`,
+hint:`Алгоритм Манакера: вставляем разделители между символами, используем массив радиусов палиндромов и зеркальное свойство.`,
 code:`class Solution {
     public String longestPalindrome(String s) {
-        int start = 0, maxLen = 0;
-
+        char[] t = new char[2 * s.length() + 3];
+        t[0] = '^'; t[1] = '#';
         for (int i = 0; i < s.length(); i++) {
-            int len1 = expand(s, i, i);
-            int len2 = expand(s, i, i + 1);
-            int len = Math.max(len1, len2);
-            if (len > maxLen) {
-                maxLen = len;
-                start = i - (len - 1) / 2;
+            t[2 * i + 2] = s.charAt(i);
+            t[2 * i + 3] = '#';
+        }
+        t[t.length - 1] = '\$';
+
+        int[] p = new int[t.length];
+        int center = 0, right = 0;
+
+        for (int i = 1; i < t.length - 1; i++) {
+            int mirror = 2 * center - i;
+            if (i < right)
+                p[i] = Math.min(right - i, p[mirror]);
+
+            while (t[i + p[i] + 1] == t[i - p[i] - 1])
+                p[i]++;
+
+            if (i + p[i] > right) {
+                center = i;
+                right = i + p[i];
             }
         }
 
+        int maxLen = 0, bestCenter = 0;
+        for (int i = 1; i < t.length - 1; i++) {
+            if (p[i] > maxLen) {
+                maxLen = p[i];
+                bestCenter = i;
+            }
+        }
+        int start = (bestCenter - maxLen) / 2;
         return s.substring(start, start + maxLen);
     }
-
-    private int expand(String s, int l, int r) {
-        while (l >= 0 && r < s.length()
-               && s.charAt(l) == s.charAt(r)) {
-            l--;
-            r++;
-        }
-        return r - l - 1;
-    }
 }`,
-steps:`1. Для каждого центра i: палиндром нечётной (i,i) и чётной (i,i+1) длины.
-2. Expand: пока символы равны, расширяем l и r.
-3. Запоминаем максимальную длину и начало.`,
-complexity:`Время: O(n²), Память: O(1)`,
-expl:`O(n²) время, O(1) память. Для каждого центра (n для нечётных, n-1 для чётных) расширяемся пока символы совпадают. Запоминаем лучший результат.`},
+steps:`1. Вставляем '#' между символами и граничные '^', '\$'.
+2. Для каждой позиции i: берём зеркало mirror = 2·center−i, начальный радиус min(right−i, p[mirror]).
+3. Расширяем пока символы совпадают; обновляем center и right.
+4. Находим позицию с максимальным p[i] и восстанавливаем подстроку.`,
+complexity:`Время: O(n), Память: O(n)`,
+expl:`Алгоритм Манакера. Строим расширенную строку с разделителями '#'. Для каждой позиции используем зеркальное свойство: если i внутри правой границы текущего палиндрома, начальный радиус берём из зеркала. Затем расширяем. Итого O(n) за счёт того, что правая граница сдвигается только вправо.`},
 
 // ===== STACK (продолжение) =====
 {id:"st6",t:"Скобочная грамматика",p:"Stack",d:"средне",

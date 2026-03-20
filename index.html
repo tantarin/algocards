@@ -39,10 +39,9 @@ h1{font-size:28px;margin:8px 0 16px}
 .quiz-option.wrong{border-color:var(--red);background:#ef444420}
 .quiz-option.reveal{border-color:var(--green)}
 .big-btn{background:var(--purple);color:#fff;border:none;border-radius:var(--radius);padding:14px;width:100%;font-size:16px;font-weight:600;cursor:pointer;margin:12px 0}
-.flashcard{background:var(--card);border-radius:20px;min-height:360px;padding:0;margin:16px 0;cursor:pointer;transition:transform .4s;transform-style:preserve-3d;position:relative}
-.flashcard.flipped{transform:rotateY(180deg)}
-.fc-face{backface-visibility:hidden;position:absolute;top:0;left:0;right:0;bottom:0;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.fc-back{transform:rotateY(180deg)}
+.flashcard{background:var(--card);border-radius:20px;padding:24px;margin:16px 0;cursor:pointer}
+.fc-face{display:none}
+.fc-face.visible{display:block}
 .fc-nav{display:flex;justify-content:center;gap:32px;margin-top:12px}
 .fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer}
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
@@ -829,14 +828,14 @@ function renderCard(){
   const p=fcList[fcIdx];
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
-    <div class="flashcard${fcFlipped?' flipped':''}" onclick="flipCard()">
-      <div class="fc-face">
+    <div class="flashcard" onclick="flipCard()">
+      <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.d}</span>
         <h3 style="margin:12px 0">${esc(p.t)}</h3>
         <div style="white-space:pre-wrap;font-size:14px;line-height:1.6">${esc(p.desc)}</div>
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
-      <div class="fc-face fc-back">
+      <div class="fc-face${fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
         <div style="margin:10px 0;color:var(--orange);font-size:14px;white-space:pre-wrap">${esc(p.hint)}</div>
         <pre style="font-size:11px;background:var(--card2);padding:12px;border-radius:10px;overflow-x:auto;line-height:1.5">${esc(p.code)}</pre>

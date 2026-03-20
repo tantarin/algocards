@@ -38,6 +38,9 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
+.code-wrap{position:relative;margin-top:10px}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
+.copy-btn:active{background:var(--purple);color:#fff}
 .edit-toggle{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid #ffffff20;color:var(--dim);width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:.2s}
 .edit-toggle.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 .edit-field{width:100%;background:var(--card2);color:var(--text);border:1px solid #ffffff20;border-radius:8px;padding:8px;font-size:13px;font-family:monospace;resize:vertical;line-height:1.5;margin-top:6px}
@@ -215,7 +218,10 @@ function renderCard(){
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
-        <pre style="margin-top:10px;border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="event.stopPropagation();copyCode(this)">Копировать</button>
+          <pre style="border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+        </div>
         ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
           <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
           ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
@@ -229,6 +235,16 @@ function renderCard(){
       <button onclick="fcNext()">→</button>
     </div>`;
   document.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
+}
+
+function copyCode(btn){
+  const code=btn.parentElement.querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent='Скопировано ✓';
+    btn.style.background='var(--green)';
+    btn.style.color='#000';
+    setTimeout(()=>{btn.textContent='Копировать';btn.style.background='';btn.style.color=''},1500);
+  });
 }
 
 function flipCard(){fcFlipped=!fcFlipped;renderCard()}

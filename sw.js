@@ -1,4 +1,4 @@
-const CACHE = 'algocards-v9';
+const CACHE = 'algocards-v10';
 const ASSETS = ['./index.html', './problems.js', './manifest.json'];
 
 self.addEventListener('install', e => {

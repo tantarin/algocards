@@ -205,7 +205,10 @@ function renderCard(){
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
-        <div style="white-space:pre-wrap;font-size:14px;line-height:1.6">${esc(p.desc)}</div>
+        <div class="code-wrap" style="margin-top:4px">
+          <button class="copy-btn" onclick="event.stopPropagation();copyDesc(this)">Условие</button>
+          <div class="desc-copy-body" style="white-space:pre-wrap;font-size:14px;line-height:1.6;padding-top:32px">${esc(p.desc)}</div>
+        </div>
         <div class="spoiler-row">
           <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
           <div class="hint-text" style="display:none">${esc(p.hint)}</div>
@@ -244,7 +247,18 @@ function copyCode(btn){
     btn.style.background='var(--green)';
     btn.style.color='#000';
     setTimeout(()=>{btn.textContent='Копировать';btn.style.background='';btn.style.color=''},1500);
-  });
+  }).catch(()=>{btn.textContent='Ошибка'});
+}
+
+function copyDesc(btn){
+  const body=btn.parentElement.querySelector('.desc-copy-body');
+  const text=body?body.innerText:'';
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Скопировано ✓';
+    btn.style.background='var(--green)';
+    btn.style.color='#000';
+    setTimeout(()=>{btn.textContent='Условие';btn.style.background='';btn.style.color=''},1500);
+  }).catch(()=>{btn.textContent='Ошибка'});
 }
 
 function flipCard(){fcFlipped=!fcFlipped;renderCard()}

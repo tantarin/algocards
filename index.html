@@ -51,6 +51,7 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 <script src="problems.js" charset="UTF-8"></script>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
+function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
 const allPatterns=[...new Set(P.map(p=>p.p))].sort();
@@ -111,7 +112,7 @@ function renderCard(){
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
-        <pre style="margin-top:10px;border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${esc(p.code)}</code></pre>
+        <pre style="margin-top:10px;border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
       </div>
     </div>

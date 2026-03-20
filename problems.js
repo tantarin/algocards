@@ -3008,5 +3008,1553 @@ code:`class Solution {
         return r - l - 1;
     }
 }`,
-expl:`O(n²) время, O(1) память. Для каждого центра (n для нечётных, n-1 для чётных) расширяемся пока символы совпадают. Запоминаем лучший результат.`}
+expl:`O(n²) время, O(1) память. Для каждого центра (n для нечётных, n-1 для чётных) расширяемся пока символы совпадают. Запоминаем лучший результат.`},
+
+// ===== STACK (продолжение) =====
+{id:"st6",t:"Скобочная грамматика",p:"Stack",d:"средне",
+desc:`(term)[n] — повторить term n раз. Вложенность возможна.
+
+Пример:
+Ввод: "a(b(c)[2])[3]"
+Вывод: "abccbccbcc"
+
+Ввод: "(ab)[2]"
+Вывод: "abab"
+
+Ввод: "x(y)[3]z"
+Вывод: "xyyyz"`,
+hint:`Два стека: один для строк (StringBuilder), один для чисел. При ( — push текущую строку и начать новую. При ] — pop и повторить.`,
+code:`class Solution {
+    public String decode(String s) {
+        Deque<StringBuilder> strStack = new ArrayDeque<>();
+        Deque<Integer> numStack = new ArrayDeque<>();
+        StringBuilder current = new StringBuilder();
+        int i = 0;
+
+        while (i < s.length()) {
+            char c = s.charAt(i);
+
+            if (c == '(') {
+                strStack.push(current);
+                current = new StringBuilder();
+                i++;
+            } else if (c == ')') {
+                i++;
+                i++; // skip '['
+                int num = 0;
+                while (i < s.length()
+                    && Character.isDigit(s.charAt(i))) {
+                    num = num * 10
+                        + (s.charAt(i) - '0');
+                    i++;
+                }
+                i++; // skip ']'
+                numStack.push(num);
+                StringBuilder prev = strStack.pop();
+                int repeat = numStack.pop();
+                String repeated = current.toString();
+                for (int r = 0; r < repeat; r++) {
+                    prev.append(repeated);
+                }
+                current = prev;
+            } else {
+                current.append(c);
+                i++;
+            }
+        }
+
+        return current.toString();
+    }
+}`,
+expl:`Стек строк хранит накопленные prefix-ы. При открывающей скобке — push текущего контекста и начинаем новую строку. При закрытии ] достаём prefix и повторяем текущую строку n раз. O(n × суммарная длина результата).`},
+
+// ===== TWO POINTERS (продолжение) =====
+{id:"tp13",t:"Ближайший митинг",p:"Two Pointers",d:"средне",
+desc:`Два человека имеют списки свободных интервалов (отсортированных). Найти первый общий слот длительностью >= duration.
+
+Пример:
+Ввод:
+  person1 = [[9,12],[14,16],[18,21]]
+  person2 = [[10,13],[15,17],[19,22]]
+  duration = 2
+Вывод: [10,12] (пересечение [10,12] длиной 2)
+
+Ввод:
+  person1 = [[1,5],[8,10]]
+  person2 = [[3,7],[9,12]]
+  duration = 2
+Вывод: [3,5]`,
+hint:`Two pointers по двум спискам интервалов. Ищем пересечение >= duration. Двигаем указатель, чей интервал заканчивается раньше.`,
+code:`class Solution {
+    public int[] meetingTime(int[][] a, int[][] b,
+                             int duration) {
+        int i = 0, j = 0;
+
+        while (i < a.length && j < b.length) {
+            int start = Math.max(a[i][0], b[j][0]);
+            int end = Math.min(a[i][1], b[j][1]);
+
+            if (end - start >= duration) {
+                return new int[]{start,
+                    start + duration};
+            }
+
+            if (a[i][1] < b[j][1]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return new int[]{};
+    }
+}`,
+expl:`Считаем пересечение: min(end1,end2) - max(start1,start2). Если >= duration — нашли слот. Двигаем указатель, чей интервал заканчивается раньше. O(n+m).`},
+
+// ===== PREFIX SUM EXT. (продолжение) =====
+{id:"pse3",t:"Общий префикс без учёта кратности",p:"Prefix Sum Ext.",d:"средне",
+desc:`Даны два массива A и B одинаковой длины n, содержащие числа от 1 до n.
+Для каждого i найти количество уникальных чисел, которые встречались хотя бы раз и в A[0..i], и в B[0..i].
+
+Пример:
+Ввод: A = [1,3,2,4], B = [3,1,2,4]
+Вывод: [0,2,3,4]
+Объяснение:
+  i=0: A={1}, B={3} → общих 0
+  i=1: A={1,3}, B={3,1} → общих 2
+  i=2: A={1,3,2}, B={3,1,2} → общих 3
+  i=3: A={1,3,2,4}, B={3,1,2,4} → общих 4`,
+hint:`Массив count[1..n]. При встрече числа в A или B увеличиваем count. Когда count == 2 — число есть в обоих.`,
+code:`class Solution {
+    public int[] findCommonPrefix(int[] A, int[] B) {
+        int n = A.length;
+        int[] count = new int[n + 1];
+        int[] result = new int[n];
+        int common = 0;
+
+        for (int i = 0; i < n; i++) {
+            count[A[i]]++;
+            if (count[A[i]] == 2) common++;
+
+            count[B[i]]++;
+            if (count[B[i]] == 2) common++;
+
+            result[i] = common;
+        }
+
+        return result;
+    }
+}`,
+expl:`Массив count[v] хранит, сколько раз число v встречено (в A, в B, или в обоих). Когда count == 2 — число есть в обоих массивах. Не учитываем кратность (число входит максимум 1 раз в каждый массив). O(n).`},
+
+{id:"pse4",t:"Общий префикс с учётом кратности",p:"Prefix Sum Ext.",d:"средне",
+desc:`Даны два массива A и B одинаковой длины n. Для каждого i найти количество общих чисел в A[0..i] и B[0..i] с учётом кратности (если число встречается 2 раза в A и 3 раза в B, общих — 2).
+
+Пример:
+Ввод: A = [1,1,2,2], B = [1,2,1,2]
+Вывод: [1,1,2,4]
+Объяснение:
+  i=0: A={1}, B={1} → min(1,1) = 1
+  i=1: A={1,1}, B={1,2} → min(2,1)+min(0,1) = 1
+  i=2: A={1,1,2}, B={1,2,1} → min(2,2)+min(1,1) = 3
+  i=3: A={1,1,2,2}, B={1,2,1,2} → min(2,2)+min(2,2) = 4`,
+hint:`Два массива частот countA[], countB[]. При обновлении числа v проверяем: если min увеличился — common++.`,
+code:`class Solution {
+    public int[] commonPrefixWithMultiplicity(
+            int[] A, int[] B) {
+        int n = A.length;
+        Map<Integer, Integer> countA = new HashMap<>();
+        Map<Integer, Integer> countB = new HashMap<>();
+        int[] result = new int[n];
+        int common = 0;
+
+        for (int i = 0; i < n; i++) {
+            int ca = countA.merge(A[i], 1, Integer::sum);
+            int cb = countB.getOrDefault(A[i], 0);
+            if (ca <= cb) common++;
+
+            int cb2 = countB.merge(B[i], 1, Integer::sum);
+            int ca2 = countA.getOrDefault(B[i], 0);
+            if (cb2 <= ca2) common++;
+
+            result[i] = common;
+        }
+
+        return result;
+    }
+}`,
+expl:`При добавлении A[i]: если countA[v] <= countB[v] (т.е. после инкремента новый min увеличился), то common++. Аналогично для B[i]. O(n) при HashMap.`},
+
+{id:"pse5",t:"Prefix Common Array (2657)",p:"Prefix Sum Ext.",d:"средне",
+desc:`Даны две перестановки A и B длины n (числа от 1 до n). Найти массив C, где C[i] = количество чисел, которые присутствуют и в A[0..i], и в B[0..i].
+
+LeetCode 2657.
+
+Пример:
+Ввод: A = [1,3,2,4], B = [3,1,2,4]
+Вывод: [0,2,3,4]
+
+Ввод: A = [2,3,1], B = [3,1,2]
+Вывод: [0,1,3]`,
+hint:`Массив freq[1..n]. При встрече числа в A или B увеличиваем freq. Когда freq == 2 — число встретилось в обоих.`,
+code:`class Solution {
+    public int[] findThePrefixCommonArray(
+            int[] A, int[] B) {
+        int n = A.length;
+        int[] freq = new int[n + 1];
+        int[] result = new int[n];
+        int common = 0;
+
+        for (int i = 0; i < n; i++) {
+            freq[A[i]]++;
+            if (freq[A[i]] == 2) common++;
+
+            freq[B[i]]++;
+            if (freq[B[i]] == 2) common++;
+
+            result[i] = common;
+        }
+
+        return result;
+    }
+}`,
+expl:`Так как A и B — перестановки, каждое число встречается ровно по 1 разу в каждом. freq[v] считает сколько раз v встретилось суммарно. Когда freq == 2 — число есть и в A[0..i], и в B[0..i]. O(n) время, O(n) память.`},
+
+{id:"tp14",t:"Сжатие значений счётчика",p:"Two Pointers",d:"легко",
+desc:`Дан отсортированный массив. Заменить каждый элемент его рангом (1-based). Одинаковые значения получают одинаковый ранг.
+
+Пример:
+Ввод: [10, 20, 20, 30]
+Вывод: [1, 2, 2, 3]
+
+Ввод: [5, 5, 5]
+Вывод: [1, 1, 1]`,
+hint:`Отсортировать уникальные значения, назначить ранги. Или пройти один раз, увеличивая ранг при смене значения.`,
+code:`class Solution {
+    public int[] compress(int[] arr) {
+        int n = arr.length;
+        int[] sorted = arr.clone();
+        Arrays.sort(sorted);
+
+        Map<Integer, Integer> rank = new HashMap<>();
+        int r = 1;
+        for (int i = 0; i < n; i++) {
+            if (!rank.containsKey(sorted[i])) {
+                rank.put(sorted[i], r++);
+            }
+        }
+
+        int[] result = new int[n];
+        for (int i = 0; i < n; i++) {
+            result[i] = rank.get(arr[i]);
+        }
+
+        return result;
+    }
+}`,
+expl:`Сортируем копию массива. Назначаем ранги уникальным значениям (1, 2, 3, ...). Затем заменяем каждый элемент его рангом. O(n log n).`},
+
+// ===== MATH / SIMULATION (продолжение) =====
+{id:"ms5",t:"Скалярное произведение векторов",p:"Math / Simulation",d:"легко",
+desc:`Даны два вектора одинаковой длины. Вычислить скалярное произведение: a[0]*b[0] + a[1]*b[1] + ... + a[n-1]*b[n-1].
+
+Пример:
+Ввод: a = [1, 2, 3], b = [4, 5, 6]
+Вывод: 32 (1*4 + 2*5 + 3*6 = 4 + 10 + 18)
+
+Ввод: a = [0, 1], b = [1, 0]
+Вывод: 0`,
+hint:`Один проход: суммируем произведения соответствующих элементов.`,
+code:`class Solution {
+    public long dotProduct(int[] a, int[] b) {
+        long result = 0;
+
+        for (int i = 0; i < a.length; i++) {
+            result += (long) a[i] * b[i];
+        }
+
+        return result;
+    }
+}`,
+expl:`Линейный проход: складываем a[i] * b[i]. Используем long для предотвращения переполнения. O(n) время, O(1) память.`},
+
+// ===== SLIDING WINDOW (продолжение) =====
+{id:"sw11",t:"Подсчёт пар индексов",p:"Sliding Window",d:"средне",
+desc:`Дан массив nums и целое число k. Посчитать количество пар (i, j), где i < j и nums[i] + nums[j] >= k.
+
+Пример:
+Ввод: nums = [1, 3, 5, 2, 4], k = 6
+Вывод: 4 (пары: (1,5), (3,5), (3,4), (5,4) по значениям → (1,2), (0,2), (0,4), (2,4) по индексам)
+
+Ввод: nums = [1, 1, 1], k = 3
+Вывод: 0`,
+hint:`Сортируем массив. Два указателя с краёв: если a[l]+a[r] >= k, то все пары (l..r-1, r) подходят → добавляем (r-l), r--. Иначе l++.`,
+code:`class Solution {
+    public long countPairs(int[] nums, int k) {
+        Arrays.sort(nums);
+        long count = 0;
+        int l = 0, r = nums.length - 1;
+
+        while (l < r) {
+            if (nums[l] + nums[r] >= k) {
+                count += (r - l);
+                r--;
+            } else {
+                l++;
+            }
+        }
+
+        return count;
+    }
+}`,
+expl:`Сортируем массив. Если nums[l] + nums[r] >= k, то все элементы между l и r в паре с r тоже подойдут (массив отсортирован) → count += (r-l). O(n log n).`},
+
+{id:"tp15",t:"Поиск K ближайших элементов",p:"Two Pointers",d:"сложно",
+desc:`Дан отсортированный массив arr и два числа k и x. Найти k ближайших к x элементов. Вернуть в отсортированном порядке.
+
+Пример:
+Ввод: arr = [1,2,3,4,5], k = 4, x = 3
+Вывод: [1,2,3,4]
+
+Ввод: arr = [1,2,3,4,5], k = 4, x = -1
+Вывод: [1,2,3,4]`,
+hint:`Бинарный поиск начала окна размером k. Сравниваем расстояния x - arr[mid] и arr[mid+k] - x.`,
+code:`class Solution {
+    public List<Integer> findClosestElements(
+            int[] arr, int k, int x) {
+        int left = 0;
+        int right = arr.length - k;
+
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (x - arr[mid] > arr[mid + k] - x) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+
+        List<Integer> result = new ArrayList<>();
+        for (int i = left; i < left + k; i++) {
+            result.add(arr[i]);
+        }
+
+        return result;
+    }
+}`,
+expl:`Бинарный поиск левой границы окна размером k. Если расстояние до arr[mid] больше, чем до arr[mid+k], сдвигаем окно вправо. O(log(n-k) + k).`},
+
+{id:"tp16",t:"К ближайших чисел",p:"Two Pointers",d:"средне",
+desc:`Дан отсортированный массив и число target. Найти k ближайших к target чисел. Если расстояния равны — меньший элемент предпочтительнее.
+
+Пример:
+Ввод: arr = [1, 3, 5, 7, 9], target = 6, k = 3
+Вывод: [5, 7, 3] (расстояния: 1, 1, 3 — ближайшие)
+
+Ввод: arr = [2, 4, 5, 6, 9], target = 4, k = 2
+Вывод: [4, 5]`,
+hint:`Бинарный поиск ближайшего, затем два указателя расширяются влево и вправо.`,
+code:`class Solution {
+    public List<Integer> kClosest(int[] arr,
+                                  int target, int k) {
+        int pos = binarySearch(arr, target);
+        int left = pos - 1;
+        int right = pos;
+        List<Integer> result = new ArrayList<>();
+
+        while (result.size() < k) {
+            if (left < 0) {
+                result.add(arr[right++]);
+            } else if (right >= arr.length) {
+                result.add(arr[left--]);
+            } else if (Math.abs(arr[left] - target)
+                    <= Math.abs(arr[right] - target)) {
+                result.add(arr[left--]);
+            } else {
+                result.add(arr[right++]);
+            }
+        }
+
+        return result;
+    }
+
+    private int binarySearch(int[] arr, int target) {
+        int lo = 0, hi = arr.length;
+        while (lo < hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (arr[mid] < target) lo = mid + 1;
+            else hi = mid;
+        }
+        return lo;
+    }
+}`,
+expl:`Бинарный поиск позиции ближайшей к target. Два указателя расходятся от этой позиции: выбираем ближайший из arr[left] и arr[right]. O(log n + k).`},
+
+{id:"tp17",t:"Минимальная разность",p:"Two Pointers",d:"легко",
+desc:`Даны два отсортированных массива. Найти минимальную абсолютную разность между элементами из разных массивов.
+
+Пример:
+Ввод: a = [1, 3, 15, 25], b = [2, 6, 18, 28]
+Вывод: 1 (|1-2| = 1)
+
+Ввод: a = [1, 10, 20], b = [5, 15, 25]
+Вывод: 4 (|1-5|=4)`,
+hint:`Два указателя. Считаем |a[i]-b[j]|. Двигаем указатель на меньший элемент.`,
+code:`class Solution {
+    public int minDifference(int[] a, int[] b) {
+        int i = 0, j = 0;
+        int minDiff = Integer.MAX_VALUE;
+
+        while (i < a.length && j < b.length) {
+            int diff = Math.abs(a[i] - b[j]);
+            minDiff = Math.min(minDiff, diff);
+
+            if (a[i] < b[j]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return minDiff;
+    }
+}`,
+expl:`Два указателя на отсортированных массивах. Двигаем указатель на меньший элемент — это приближает значения друг к другу. O(n+m) время, O(1) память.`},
+
+// ===== HASHMAP (продолжение) =====
+{id:"hf7",t:"Группировка чисел-анаграмм",p:"HashMap",d:"средне",
+desc:`Сгруппировать числа, чьи цифры являются анаграммами друг друга.
+
+Пример:
+Ввод: [123, 321, 213, 45, 54, 100]
+Вывод: [[123, 321, 213], [45, 54], [100]]
+
+Ввод: [11, 22, 11]
+Вывод: [[11, 11], [22]]`,
+hint:`Ключ в HashMap — отсортированные цифры числа. Группируем числа с одинаковым ключом.`,
+code:`class Solution {
+    public List<List<Integer>> groupAnagramNumbers(
+            int[] nums) {
+        Map<String, List<Integer>> map = new HashMap<>();
+
+        for (int num : nums) {
+            char[] digits = String.valueOf(num)
+                .toCharArray();
+            Arrays.sort(digits);
+            String key = new String(digits);
+            map.computeIfAbsent(key,
+                k -> new ArrayList<>()).add(num);
+        }
+
+        return new ArrayList<>(map.values());
+    }
+}`,
+expl:`Для каждого числа сортируем его цифры — это ключ в HashMap. Числа с одинаковым ключом — анаграммы. O(n × d log d), где d — кол-во цифр.`},
+
+{id:"tp18",t:"Односторонняя разница",p:"Two Pointers",d:"легко",
+desc:`Дан отсортированный массив и число k >= 0. Посчитать количество пар (i, j), где i < j и nums[j] - nums[i] == k.
+
+Пример:
+Ввод: nums = [1, 2, 3, 4, 5], k = 2
+Вывод: 3 (пары: (1,3), (2,4), (3,5))
+
+Ввод: nums = [1, 1, 1], k = 0
+Вывод: 3`,
+hint:`Два указателя. Если разница < k — двигаем правый. Если > k — двигаем левый. Если == k — считаем.`,
+code:`class Solution {
+    public int countPairsWithDiff(int[] nums, int k) {
+        Arrays.sort(nums);
+        int count = 0;
+        int left = 0, right = 1;
+
+        while (right < nums.length) {
+            int diff = nums[right] - nums[left];
+
+            if (diff == k) {
+                count++;
+                int lv = nums[left];
+                int rv = nums[right];
+                int lc = 0, rc = 0;
+                while (left < nums.length
+                    && nums[left] == lv) {
+                    left++; lc++;
+                }
+                while (right < nums.length
+                    && nums[right] == rv) {
+                    right++; rc++;
+                }
+                if (k == 0) {
+                    count += lc * (lc - 1) / 2 - 1;
+                } else {
+                    count += lc * rc - 1;
+                }
+            } else if (diff < k) {
+                right++;
+            } else {
+                left++;
+                if (left == right) right++;
+            }
+        }
+
+        return count;
+    }
+}`,
+expl:`Сортируем массив. Два указателя: если diff < k — right++, если diff > k — left++. При diff == k считаем количество дубликатов и переходим дальше. O(n log n).`},
+
+{id:"tp19",t:"Подсчёт пар с разницей >= К",p:"Two Pointers",d:"средне",
+desc:`Дан массив nums и число k. Посчитать количество пар (i, j), где i < j и |nums[i] - nums[j]| >= k.
+
+Пример:
+Ввод: nums = [1, 3, 7, 2], k = 4
+Вывод: 3 (пары: (1,7), (3,7), (7,2) → разницы: 6, 4, 5)
+
+Ввод: nums = [1, 5, 3, 9], k = 5
+Вывод: 3`,
+hint:`Сортируем. Два указателя: если nums[r] - nums[l] >= k, то все пары (l, l+1..r) для r подходят.`,
+code:`class Solution {
+    public long countPairs(int[] nums, int k) {
+        Arrays.sort(nums);
+        long count = 0;
+        int n = nums.length;
+
+        for (int r = 1; r < n; r++) {
+            int lo = 0, hi = r - 1, pos = r;
+            while (lo <= hi) {
+                int mid = lo + (hi - lo) / 2;
+                if (nums[r] - nums[mid] >= k) {
+                    pos = mid;
+                    lo = mid + 1;
+                } else {
+                    hi = mid - 1;
+                }
+            }
+            if (pos < r
+                && nums[r] - nums[pos] >= k) {
+                count += (r - pos);
+            }
+        }
+
+        return count;
+    }
+}`,
+expl:`Сортируем массив. Для каждого r бинарным поиском находим самый правый l, где nums[r] - nums[l] >= k. Все элементы от l до r-1 образуют подходящие пары. O(n log n).`},
+
+{id:"tp20",t:"Рост акций компании",p:"Two Pointers",d:"средне",
+desc:`Дан массив цен акций по дням. Найти максимальную прибыль от одной покупки и одной продажи (купить раньше, продать позже).
+
+Пример:
+Ввод: [7, 1, 5, 3, 6, 4]
+Вывод: 5 (купить за 1, продать за 6)
+
+Ввод: [7, 6, 4, 3, 1]
+Вывод: 0 (цена только падает)`,
+hint:`Отслеживаем минимальную цену слева. На каждом шаге обновляем максимальную прибыль.`,
+code:`class Solution {
+    public int maxProfit(int[] prices) {
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
+
+        for (int price : prices) {
+            if (price < minPrice) {
+                minPrice = price;
+            } else {
+                maxProfit = Math.max(maxProfit,
+                    price - minPrice);
+            }
+        }
+
+        return maxProfit;
+    }
+}`,
+expl:`Один проход: отслеживаем минимальную цену. Для каждого дня — потенциальная прибыль = price - minPrice. Обновляем максимум. O(n) время, O(1) память.`},
+
+{id:"tp21",t:"URL-ификация строки",p:"Two Pointers",d:"средне",
+desc:`Заменить все пробелы в строке на "%20". Дана строка с дополнительным местом в конце и реальная длина.
+
+Пример:
+Ввод: "Mr John Smith    ", trueLength = 13
+Вывод: "Mr%20John%20Smith"
+
+Ввод: "hello world  ", trueLength = 11
+Вывод: "hello%20world"`,
+hint:`Считаем пробелы → вычисляем новую длину. Два указателя с конца: копируем символы или записываем %20.`,
+code:`class Solution {
+    public String urlify(char[] str, int trueLength) {
+        int spaceCount = 0;
+        for (int i = 0; i < trueLength; i++) {
+            if (str[i] == ' ') spaceCount++;
+        }
+
+        int newLen = trueLength + spaceCount * 2;
+        int w = newLen - 1;
+
+        for (int i = trueLength - 1; i >= 0; i--) {
+            if (str[i] == ' ') {
+                str[w--] = '0';
+                str[w--] = '2';
+                str[w--] = '%';
+            } else {
+                str[w--] = str[i];
+            }
+        }
+
+        return new String(str, 0, newLen);
+    }
+}`,
+expl:`Два прохода: считаем пробелы, затем заполняем с конца. Каждый пробел заменяется на '%20' (3 символа вместо 1). O(n) время, O(1) дополнительная память.`},
+
+{id:"tp22",t:"Самый большой контейнер (11)",p:"Two Pointers",d:"средне",
+desc:`Дан массив heights. Найти два столбца, которые вместе с осью X образуют контейнер с наибольшим количеством воды.
+
+Вода = min(height[l], height[r]) × (r - l)
+
+Пример:
+Ввод: [1, 8, 6, 2, 5, 4, 8, 3, 7]
+Вывод: 49
+
+Ввод: [1, 1]
+Вывод: 1`,
+hint:`Два указателя с краёв. Сдвигаем тот, чья высота меньше.`,
+code:`class Solution {
+    public int maxArea(int[] height) {
+        int left = 0;
+        int right = height.length - 1;
+        int maxWater = 0;
+
+        while (left < right) {
+            int water = Math.min(height[left],
+                height[right]) * (right - left);
+            maxWater = Math.max(maxWater, water);
+
+            if (height[left] < height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+
+        return maxWater;
+    }
+}`,
+expl:`Жадный подход с двумя указателями. Сдвигаем меньший столбец — сдвиг большего не может увеличить площадь (высота ограничена меньшим). O(n) время, O(1) память.`},
+
+{id:"tp23",t:"Выпилить смайлики из текста",p:"Two Pointers",d:"средне",
+desc:`Удалить все смайлики из строки. Смайлик — последовательность: двоеточие, минус, одна или несколько скобок ) или (.
+
+Примеры смайликов: :-) :-( :-)))) :-((
+
+Пример:
+Ввод: "Hello:-) World:-("
+Вывод: "Hello World"
+
+Ввод: ":-)))test:-(("
+Вывод: "test"`,
+hint:`Указатель записи. При обнаружении ':' проверяем, начинается ли смайлик. Если да — пропускаем, иначе записываем.`,
+code:`class Solution {
+    public String removeSmileys(String s) {
+        char[] arr = s.toCharArray();
+        int w = 0;
+
+        int i = 0;
+        while (i < arr.length) {
+            if (i + 2 < arr.length
+                && arr[i] == ':'
+                && arr[i + 1] == '-'
+                && (arr[i + 2] == ')'
+                    || arr[i + 2] == '(')) {
+                i += 2;
+                while (i < arr.length
+                    && (arr[i] == ')'
+                        || arr[i] == '(')) {
+                    i++;
+                }
+            } else {
+                arr[w++] = arr[i++];
+            }
+        }
+
+        return new String(arr, 0, w);
+    }
+}`,
+expl:`Указатель записи w. При обнаружении паттерна ':' + '-' + скобки — пропускаем весь смайлик (включая повторяющиеся скобки). Иначе копируем символ. O(n).`},
+
+// ===== TREES / DFS (продолжение) =====
+{id:"tr5",t:"Поиск ближайшего значения в BST",p:"Trees / DFS",d:"средне",
+desc:`Найти значение в BST, ближайшее к заданному target (double).
+
+Пример:
+Дерево: [4, 2, 5, 1, 3], target = 3.7
+Вывод: 4
+
+Дерево: [1], target = 4.5
+Вывод: 1`,
+hint:`Спускаемся по BST: если target < node.val — идём влево, иначе вправо. На каждом шаге обновляем ближайший.`,
+code:`class Solution {
+    public int closestValue(TreeNode root,
+                            double target) {
+        int closest = root.val;
+
+        while (root != null) {
+            if (Math.abs(root.val - target)
+                < Math.abs(closest - target)) {
+                closest = root.val;
+            }
+
+            root = target < root.val
+                ? root.left : root.right;
+        }
+
+        return closest;
+    }
+}`,
+expl:`Итеративный спуск по BST. На каждом шаге обновляем closest, если текущий узел ближе к target. Идём влево если target < val, иначе вправо. O(h) время, O(1) память.`},
+
+{id:"tr6",t:"Обход дерева зигзагом",p:"Trees / DFS",d:"легко",
+desc:`BFS по уровням, но нечётные уровни обходить справа налево.
+
+Пример:
+Дерево:
+    3
+   / \\
+  9  20
+    /  \\
+   15   7
+Вывод: [[3], [20, 9], [15, 7]]`,
+hint:`BFS с очередью. На чётных уровнях добавляем в конец списка, на нечётных — в начало (или reverse).`,
+code:`class Solution {
+    public List<List<Integer>> zigzagLevelOrder(
+            TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) return result;
+
+        Deque<TreeNode> queue = new ArrayDeque<>();
+        queue.add(root);
+        boolean leftToRight = true;
+
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            LinkedList<Integer> level =
+                new LinkedList<>();
+
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                if (leftToRight) {
+                    level.addLast(node.val);
+                } else {
+                    level.addFirst(node.val);
+                }
+                if (node.left != null)
+                    queue.add(node.left);
+                if (node.right != null)
+                    queue.add(node.right);
+            }
+
+            result.add(level);
+            leftToRight = !leftToRight;
+        }
+
+        return result;
+    }
+}`,
+expl:`BFS по уровням. Чередуем направление: чётные уровни — addLast, нечётные — addFirst (LinkedList как deque). O(n) время и память.`},
+
+{id:"tr7",t:"Same Tree (100)",p:"Trees / DFS",d:"легко",
+desc:`Проверить, одинаковы ли два бинарных дерева (структура и значения совпадают).
+
+Пример:
+p = [1, 2, 3], q = [1, 2, 3] → true
+p = [1, 2], q = [1, null, 2] → false`,
+hint:`Рекурсивно сравниваем: оба null → true, один null → false, значения разные → false. Иначе проверяем детей.`,
+code:`class Solution {
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) return true;
+        if (p == null || q == null) return false;
+        if (p.val != q.val) return false;
+
+        return isSameTree(p.left, q.left)
+            && isSameTree(p.right, q.right);
+    }
+}`,
+expl:`Рекурсия: базовые случаи — оба null (true), один null (false), значения разные (false). Иначе рекурсивно проверяем левые и правые поддеревья. O(n) время, O(h) стек.`},
+
+{id:"tr8",t:"Balanced Binary Tree (110)",p:"Trees / DFS",d:"легко",
+desc:`Проверить, является ли бинарное дерево сбалансированным по высоте (разница высот поддеревьев любого узла ≤ 1).
+
+Пример:
+    3
+   / \\
+  9  20
+    /  \\
+   15   7  → true
+
+      1
+     / \\
+    2   2
+   / \\
+  3   3
+ / \\
+4   4  → false`,
+hint:`Рекурсивная функция возвращает высоту или -1 (если несбалансировано). Проверяем |left - right| <= 1.`,
+code:`class Solution {
+    public boolean isBalanced(TreeNode root) {
+        return height(root) != -1;
+    }
+
+    private int height(TreeNode node) {
+        if (node == null) return 0;
+
+        int left = height(node.left);
+        if (left == -1) return -1;
+
+        int right = height(node.right);
+        if (right == -1) return -1;
+
+        if (Math.abs(left - right) > 1) return -1;
+
+        return Math.max(left, right) + 1;
+    }
+}`,
+expl:`Возвращаем -1 как сигнал несбалансированности. Для каждого узла проверяем |leftH - rightH| <= 1. Рано прерываемся при -1. O(n) время, O(h) стек.`},
+
+{id:"tr9",t:"Path Sum II (113)",p:"Trees / DFS",d:"средне",
+desc:`Найти все пути от корня до листа, где сумма значений узлов равна targetSum.
+
+Пример:
+Дерево:
+       5
+      / \\
+     4   8
+    /   / \\
+   11  13  4
+  /  \\    / \\
+ 7    2  5   1
+targetSum = 22
+Вывод: [[5,4,11,2], [5,8,4,5]]`,
+hint:`DFS с backtracking: добавляем узел в путь, при листе проверяем сумму, при возврате удаляем последний.`,
+code:`class Solution {
+    private List<List<Integer>> result =
+        new ArrayList<>();
+
+    public List<List<Integer>> pathSum(TreeNode root,
+                                       int targetSum) {
+        dfs(root, targetSum, new ArrayList<>());
+        return result;
+    }
+
+    private void dfs(TreeNode node, int remaining,
+                     List<Integer> path) {
+        if (node == null) return;
+
+        path.add(node.val);
+        remaining -= node.val;
+
+        if (node.left == null && node.right == null
+            && remaining == 0) {
+            result.add(new ArrayList<>(path));
+        } else {
+            dfs(node.left, remaining, path);
+            dfs(node.right, remaining, path);
+        }
+
+        path.remove(path.size() - 1);
+    }
+}`,
+expl:`DFS + backtracking. На каждом узле: добавляем в путь, вычитаем из remaining. На листе: если remaining == 0 — нашли путь. При возврате удаляем последний элемент. O(n) обход, O(n²) для копирования путей.`},
+
+{id:"tr10",t:"Lowest Common Ancestor III (1650)",p:"Trees / DFS",d:"средне",
+desc:`Найти наименьшего общего предка (LCA) двух узлов p и q в бинарном дереве. Узлы могут отсутствовать в дереве.
+
+Пример:
+Дерево: [3, 5, 1, 6, 2, 0, 8]
+p = 5, q = 1 → LCA = 3
+p = 5, q = 4 → null (4 нет в дереве)`,
+hint:`DFS возвращает найденный узел. Если оба найдены в разных поддеревьях — текущий узел и есть LCA. Дополнительно проверяем, что оба узла найдены.`,
+code:`class Solution {
+    private boolean foundP = false;
+    private boolean foundQ = false;
+
+    public TreeNode lowestCommonAncestor(
+            TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode lca = dfs(root, p, q);
+        return (foundP && foundQ) ? lca : null;
+    }
+
+    private TreeNode dfs(TreeNode node,
+                         TreeNode p, TreeNode q) {
+        if (node == null) return null;
+
+        TreeNode left = dfs(node.left, p, q);
+        TreeNode right = dfs(node.right, p, q);
+
+        if (node == p) { foundP = true; return node; }
+        if (node == q) { foundQ = true; return node; }
+
+        if (left != null && right != null)
+            return node;
+
+        return left != null ? left : right;
+    }
+}`,
+expl:`DFS обходит всё дерево (не останавливается рано). Флаги foundP/foundQ подтверждают, что оба узла найдены. Если один в левом поддереве, другой в правом — текущий узел = LCA. O(n).`},
+
+{id:"tr11",t:"Повторяющиеся поддеревья (652)",p:"Trees / DFS",d:"средне",
+desc:`Найти все повторяющиеся поддеревья в бинарном дереве. Вернуть корневые узлы дубликатов.
+
+Пример:
+Дерево:
+    1
+   / \\
+  2   3
+ /   / \\
+4   2   4
+   /
+  4
+Вывод: [[2, 4], [4]] (поддерево "4" и поддерево "2->4" повторяются)`,
+hint:`Сериализуем каждое поддерево в строку. HashMap считает количество одинаковых сериализаций.`,
+code:`class Solution {
+    private Map<String, Integer> count =
+        new HashMap<>();
+    private List<TreeNode> result = new ArrayList<>();
+
+    public List<TreeNode> findDuplicateSubtrees(
+            TreeNode root) {
+        serialize(root);
+        return result;
+    }
+
+    private String serialize(TreeNode node) {
+        if (node == null) return "#";
+
+        String s = node.val + ","
+            + serialize(node.left) + ","
+            + serialize(node.right);
+
+        int c = count.merge(s, 1, Integer::sum);
+        if (c == 2) result.add(node);
+
+        return s;
+    }
+}`,
+expl:`Сериализуем каждое поддерево в строку (preorder). HashMap считает вхождения каждой сериализации. При count == 2 — добавляем в результат (ровно один раз). O(n²) из-за конкатенации строк.`},
+
+{id:"tr12",t:"Поиск k-ого наибольшего в BST",p:"Trees / DFS",d:"средне",
+desc:`Найти k-й наибольший элемент в BST.
+
+Пример:
+Дерево: [5, 3, 6, 2, 4, null, null, 1]
+k = 3 → Вывод: 4 (в порядке убывания: 6, 5, 4, 3, 2, 1)
+
+Дерево: [3, 1, 4, null, 2]
+k = 1 → Вывод: 4`,
+hint:`Обратный inorder (right → node → left) даёт убывающий порядок. Останавливаемся на k-м.`,
+code:`class Solution {
+    private int count = 0;
+    private int result = 0;
+
+    public int kthLargest(TreeNode root, int k) {
+        reverseInorder(root, k);
+        return result;
+    }
+
+    private void reverseInorder(TreeNode node, int k) {
+        if (node == null || count >= k) return;
+
+        reverseInorder(node.right, k);
+
+        count++;
+        if (count == k) {
+            result = node.val;
+            return;
+        }
+
+        reverseInorder(node.left, k);
+    }
+}`,
+expl:`Обратный inorder-обход (right → node → left) выдаёт элементы BST в убывающем порядке. Останавливаемся на k-м элементе. O(H + k) время.`},
+
+{id:"tr13",t:"Проверка всех листьев",p:"Trees / DFS",d:"легко",
+desc:`Проверить, что все листья бинарного дерева находятся на одной глубине.
+
+Пример:
+    1
+   / \\
+  2   3
+ / \\   \\
+4   5   6  → true (все листья на глубине 2)
+
+    1
+   / \\
+  2   3
+ /
+4  → false (лист 3 на глубине 1, лист 4 на глубине 2)`,
+hint:`DFS, запоминаем глубину первого листа. Все остальные листья должны иметь ту же глубину.`,
+code:`class Solution {
+    private int leafDepth = -1;
+
+    public boolean checkLeaves(TreeNode root) {
+        return dfs(root, 0);
+    }
+
+    private boolean dfs(TreeNode node, int depth) {
+        if (node == null) return true;
+
+        if (node.left == null
+            && node.right == null) {
+            if (leafDepth == -1) {
+                leafDepth = depth;
+            }
+            return depth == leafDepth;
+        }
+
+        return dfs(node.left, depth + 1)
+            && dfs(node.right, depth + 1);
+    }
+}`,
+expl:`DFS с отслеживанием глубины. Первый лист задаёт эталонную глубину. Все остальные листья должны совпадать. O(n) время, O(h) стек.`},
+
+{id:"tr14",t:"Сумма от корня до листа",p:"Trees / DFS",d:"средне",
+desc:`Каждый путь от корня до листа формирует число (корень — старший разряд). Найти сумму всех таких чисел.
+
+Пример:
+    1
+   / \\
+  2   3
+Числа: 12, 13
+Вывод: 25
+
+    4
+   / \\
+  9   0
+ / \\
+5   1
+Числа: 495, 491, 40
+Вывод: 1026`,
+hint:`DFS: на каждом узле currentNum = currentNum * 10 + node.val. На листе — добавляем к сумме.`,
+code:`class Solution {
+    public int sumNumbers(TreeNode root) {
+        return dfs(root, 0);
+    }
+
+    private int dfs(TreeNode node, int currentNum) {
+        if (node == null) return 0;
+
+        currentNum = currentNum * 10 + node.val;
+
+        if (node.left == null
+            && node.right == null) {
+            return currentNum;
+        }
+
+        return dfs(node.left, currentNum)
+            + dfs(node.right, currentNum);
+    }
+}`,
+expl:`DFS: на каждом узле формируем число currentNum * 10 + val. На листе возвращаем число. Суммируем все пути. O(n) время, O(h) стек.`},
+
+// ===== HASHMAP (продолжение 2) =====
+{id:"hf8",t:"Count Pairs With Absolute Diff K (2006)",p:"HashMap",d:"легко",
+desc:`Дан массив nums и число k. Посчитать количество пар (i, j), где i < j и |nums[i] - nums[j]| == k.
+
+Пример:
+Ввод: nums = [1, 2, 2, 1], k = 1
+Вывод: 4
+
+Ввод: nums = [1, 3], k = 3
+Вывод: 0`,
+hint:`HashMap для подсчёта. Для каждого элемента ищем count(val - k) и count(val + k).`,
+code:`class Solution {
+    public int countKDifference(int[] nums, int k) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        int count = 0;
+
+        for (int num : nums) {
+            count += freq.getOrDefault(num - k, 0);
+            count += freq.getOrDefault(num + k, 0);
+            freq.merge(num, 1, Integer::sum);
+        }
+
+        return count;
+    }
+}`,
+expl:`Для каждого num ищем в HashMap сколько раз встречались num-k и num+k ранее. Добавляем к count. O(n) время, O(n) память.`},
+
+{id:"hf9",t:"Intersection of Two Arrays II (350)",p:"HashMap",d:"легко",
+desc:`Найти пересечение двух массивов с учётом кратности (каждый элемент в результате появляется столько раз, сколько он встречается в обоих).
+
+Пример:
+Ввод: nums1 = [1,2,2,1], nums2 = [2,2]
+Вывод: [2,2]
+
+Ввод: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+Вывод: [4,9] (порядок не важен)`,
+hint:`HashMap с частотами первого массива. Проходим второй — при наличии записи добавляем в результат и уменьшаем.`,
+code:`class Solution {
+    public int[] intersect(int[] nums1, int[] nums2) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        for (int num : nums1) {
+            freq.merge(num, 1, Integer::sum);
+        }
+
+        List<Integer> result = new ArrayList<>();
+        for (int num : nums2) {
+            int count = freq.getOrDefault(num, 0);
+            if (count > 0) {
+                result.add(num);
+                freq.put(num, count - 1);
+            }
+        }
+
+        return result.stream()
+            .mapToInt(Integer::intValue).toArray();
+    }
+}`,
+expl:`HashMap хранит частоты nums1. Для каждого элемента nums2: если freq > 0 — добавляем в результат и уменьшаем freq. O(n+m) время, O(min(n,m)) память.`},
+
+// ===== SLIDING WINDOW (продолжение 2) =====
+{id:"sw12",t:"Minimum Size Subarray Sum (209)",p:"Sliding Window",d:"средне",
+desc:`Дан массив положительных чисел nums и число target. Найти минимальную длину непрерывного подмассива с суммой >= target. Если такого нет — вернуть 0.
+
+Пример:
+Ввод: target = 7, nums = [2,3,1,2,4,3]
+Вывод: 2 (подмассив [4,3])
+
+Ввод: target = 4, nums = [1,4,4]
+Вывод: 1
+
+Ввод: target = 11, nums = [1,1,1,1,1]
+Вывод: 0`,
+hint:`Скользящее окно: расширяем правый край, пока сумма < target. Затем сжимаем левый, обновляя минимум.`,
+code:`class Solution {
+    public int minSubArrayLen(int target, int[] nums) {
+        int left = 0;
+        int sum = 0;
+        int minLen = Integer.MAX_VALUE;
+
+        for (int right = 0; right < nums.length;
+             right++) {
+            sum += nums[right];
+
+            while (sum >= target) {
+                minLen = Math.min(minLen,
+                    right - left + 1);
+                sum -= nums[left];
+                left++;
+            }
+        }
+
+        return minLen == Integer.MAX_VALUE
+            ? 0 : minLen;
+    }
+}`,
+expl:`Скользящее окно: расширяем правый край, добавляя к сумме. Когда sum >= target — сжимаем слева, обновляя минимальную длину. Каждый элемент добавляется и удаляется один раз → O(n).`},
+
+// ===== WINDOW + DEQUE (продолжение) =====
+{id:"swd2",t:"Sliding Window Maximum (239)",p:"Window + Deque",d:"сложно",
+desc:`Дан массив nums и размер окна k. Для каждой позиции окна вернуть максимум.
+
+Пример:
+Ввод: nums = [1,3,-1,-3,5,3,6,7], k = 3
+Вывод: [3,3,5,5,6,7]
+
+Объяснение:
+Окно [1,3,-1] → 3
+Окно [3,-1,-3] → 3
+Окно [-1,-3,5] → 5
+Окно [-3,5,3] → 5
+Окно [5,3,6] → 6
+Окно [3,6,7] → 7`,
+hint:`Монотонный убывающий дек. Голова — индекс максимума в окне. Удаляем из хвоста элементы <= текущего.`,
+code:`class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int n = nums.length;
+        int[] result = new int[n - k + 1];
+        Deque<Integer> deque = new ArrayDeque<>();
+
+        for (int i = 0; i < n; i++) {
+            while (!deque.isEmpty()
+                && deque.peekFirst() < i - k + 1) {
+                deque.pollFirst();
+            }
+
+            while (!deque.isEmpty()
+                && nums[deque.peekLast()]
+                    <= nums[i]) {
+                deque.pollLast();
+            }
+
+            deque.addLast(i);
+
+            if (i >= k - 1) {
+                result[i - k + 1] =
+                    nums[deque.peekFirst()];
+            }
+        }
+
+        return result;
+    }
+}`,
+expl:`Монотонный убывающий дек хранит индексы. Голова = индекс максимума окна. При добавлении нового элемента удаляем из хвоста все меньшие/равные. Удаляем из головы вышедшие за окно. Каждый элемент push/pop один раз → O(n).`},
+
+// ===== TWO POINTERS (продолжение 2) =====
+{id:"tp24",t:"One Edit Distance (161)",p:"Two Pointers",d:"средне",
+desc:`Проверить, находятся ли две строки на расстоянии ровно одной правки (вставка, удаление или замена одного символа).
+
+Пример:
+Ввод: s = "ab", t = "acb" → true (вставка 'c')
+Ввод: s = "cab", t = "ad" → false
+Ввод: s = "", t = "" → false (0 правок, не 1)
+Ввод: s = "a", t = "A" → true (замена)`,
+hint:`Если длины равны — ищем ровно одну замену. Если разница 1 — ищем одну вставку. Иначе false.`,
+code:`class Solution {
+    public boolean isOneEditDistance(String s,
+                                     String t) {
+        int ns = s.length(), nt = t.length();
+        if (Math.abs(ns - nt) > 1) return false;
+        if (ns > nt)
+            return isOneEditDistance(t, s);
+
+        for (int i = 0; i < ns; i++) {
+            if (s.charAt(i) != t.charAt(i)) {
+                if (ns == nt) {
+                    return s.substring(i + 1)
+                        .equals(t.substring(i + 1));
+                } else {
+                    return s.substring(i)
+                        .equals(t.substring(i + 1));
+                }
+            }
+        }
+
+        return ns + 1 == nt;
+    }
+}`,
+expl:`Если длины равны — при первом расхождении проверяем, что остальные совпадают (замена). Если разница 1 — пропускаем символ в длинной строке (вставка/удаление). O(n).`},
+
+{id:"tp25",t:"Longest Palindrome Two Letter Words (2131)",p:"Two Pointers",d:"средне",
+desc:`Дан массив слов из двух букв. Найти длину самого длинного палиндрома, который можно составить из этих слов.
+
+Пример:
+Ввод: ["lc","cl","gg"]
+Вывод: 6 ("lc" + "gg" + "cl" = "lcggcl")
+
+Ввод: ["ab","ty","gy","ba"]
+Вывод: 4 ("ab" + "ba" = "abba")
+
+Ввод: ["cc","ll","xx"]
+Вывод: 2 (одно слово-палиндром в центре)`,
+hint:`HashMap для подсчёта. Для каждого слова ищем его реверс. Слова-палиндромы (aa, bb) обрабатываем отдельно: пары + один в центре.`,
+code:`class Solution {
+    public int longestPalindrome(String[] words) {
+        Map<String, Integer> freq = new HashMap<>();
+        int length = 0;
+        boolean centerUsed = false;
+
+        for (String w : words) {
+            freq.merge(w, 1, Integer::sum);
+        }
+
+        for (String w : freq.keySet()) {
+            String rev = "" + w.charAt(1) + w.charAt(0);
+            if (w.equals(rev)) {
+                int cnt = freq.get(w);
+                length += (cnt / 2) * 4;
+                if (cnt % 2 == 1 && !centerUsed) {
+                    length += 2;
+                    centerUsed = true;
+                }
+            } else if (w.compareTo(rev) < 0
+                && freq.containsKey(rev)) {
+                int pairs = Math.min(freq.get(w),
+                    freq.get(rev));
+                length += pairs * 4;
+            }
+        }
+
+        return length;
+    }
+}`,
+expl:`Для пар (ab, ba): берём min(count) пар, каждая даёт +4. Для палиндромов (aa): пары дают +4, один нечётный можно в центр (+2). O(n) время.`},
+
+{id:"tp26",t:"Shortest Word Distance (243)",p:"Two Pointers",d:"легко",
+desc:`Дан массив слов и два слова word1, word2. Найти минимальное расстояние (разница индексов) между ними.
+
+Пример:
+Ввод: words = ["practice","makes","perfect","coding","makes"], word1 = "coding", word2 = "practice"
+Вывод: 3
+
+Ввод: words = ["a","b","c","d","b"], word1 = "a", word2 = "b"
+Вывод: 1`,
+hint:`Один проход: запоминаем последнюю позицию word1 и word2. При обновлении любой — считаем расстояние.`,
+code:`class Solution {
+    public int shortestDistance(String[] words,
+            String word1, String word2) {
+        int pos1 = -1, pos2 = -1;
+        int minDist = Integer.MAX_VALUE;
+
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(word1)) {
+                pos1 = i;
+            } else if (words[i].equals(word2)) {
+                pos2 = i;
+            }
+
+            if (pos1 != -1 && pos2 != -1) {
+                minDist = Math.min(minDist,
+                    Math.abs(pos1 - pos2));
+            }
+        }
+
+        return minDist;
+    }
+}`,
+expl:`Один проход: обновляем позицию при нахождении word1 или word2. Если обе позиции известны — считаем расстояние. O(n) время, O(1) память.`},
+
+{id:"tp27",t:"Shortest Distance to Character (821)",p:"Two Pointers",d:"легко",
+desc:`Дана строка s и символ c (гарантированно есть в s). Для каждой позиции найти расстояние до ближайшего вхождения c.
+
+Пример:
+Ввод: s = "loveleetcode", c = 'e'
+Вывод: [3,2,1,0,1,0,0,1,2,2,1,0]`,
+hint:`Два прохода: слева направо (расстояние от последнего c слева) и справа налево (от ближайшего c справа). Берём минимум.`,
+code:`class Solution {
+    public int[] shortestToChar(String s, char c) {
+        int n = s.length();
+        int[] result = new int[n];
+        int prev = -n;
+
+        for (int i = 0; i < n; i++) {
+            if (s.charAt(i) == c) prev = i;
+            result[i] = i - prev;
+        }
+
+        prev = 2 * n;
+        for (int i = n - 1; i >= 0; i--) {
+            if (s.charAt(i) == c) prev = i;
+            result[i] = Math.min(result[i],
+                prev - i);
+        }
+
+        return result;
+    }
+}`,
+expl:`Два прохода: слева→ записываем расстояние от последнего c. Справа→ обновляем минимумом с расстоянием от ближайшего c справа. O(n) время, O(1) доп. память.`},
+
+// ===== INTERVALS SWEEP (продолжение) =====
+{id:"iss6",t:"Missing Ranges (163)",p:"Intervals Sweep",d:"легко",
+desc:`Дан отсортированный массив уникальных чисел и границы [lower, upper]. Найти все пропущенные диапазоны.
+
+Пример:
+Ввод: nums = [0, 1, 3, 50, 75], lower = 0, upper = 99
+Вывод: ["2", "4->49", "51->74", "76->99"]
+
+Ввод: nums = [], lower = 1, upper = 1
+Вывод: ["1"]`,
+hint:`Идём по массиву, отслеживая ожидаемое следующее число. Если nums[i] > expected — формируем диапазон.`,
+code:`class Solution {
+    public List<String> findMissingRanges(
+            int[] nums, int lower, int upper) {
+        List<String> result = new ArrayList<>();
+        long next = lower;
+
+        for (int num : nums) {
+            if (num > next) {
+                result.add(formatRange(next,
+                    (long) num - 1));
+            }
+            next = (long) num + 1;
+        }
+
+        if (next <= upper) {
+            result.add(formatRange(next, upper));
+        }
+
+        return result;
+    }
+
+    private String formatRange(long from, long to) {
+        if (from == to) return String.valueOf(from);
+        return from + "->" + to;
+    }
+}`,
+expl:`Отслеживаем следующее ожидаемое число (next). Если текущий элемент > next — есть пропуск. Форматируем одиночное число или диапазон. O(n) время.`},
+
+{id:"iss7",t:"Summary Ranges (228)",p:"Intervals Sweep",d:"легко",
+desc:`Дан отсортированный массив без дубликатов. Свернуть последовательные числа в диапазоны "a->b".
+
+Пример:
+Ввод: [0, 1, 2, 4, 5, 7]
+Вывод: ["0->2", "4->5", "7"]
+
+Ввод: [0, 2, 3, 4, 6, 8, 9]
+Вывод: ["0", "2->4", "6", "8->9"]`,
+hint:`Два указателя: start и i расширяют диапазон последовательных чисел.`,
+code:`class Solution {
+    public List<String> summaryRanges(int[] nums) {
+        List<String> result = new ArrayList<>();
+        int i = 0;
+
+        while (i < nums.length) {
+            int start = nums[i];
+            while (i + 1 < nums.length
+                && nums[i + 1] == nums[i] + 1) {
+                i++;
+            }
+
+            if (start == nums[i]) {
+                result.add(String.valueOf(start));
+            } else {
+                result.add(start + "->" + nums[i]);
+            }
+            i++;
+        }
+
+        return result;
+    }
+}`,
+expl:`Группируем последовательные числа (nums[i+1] == nums[i] + 1). Одиночные — как число, диапазоны — как "start->end". O(n) время, O(1) доп. память.`},
+
+{id:"iss8",t:"Interval List Intersections (986)",p:"Intervals Sweep",d:"средне",
+desc:`Даны два списка непересекающихся отсортированных интервалов. Найти их пересечения.
+
+Пример:
+Ввод:
+  A = [[0,2],[5,10],[13,23],[24,25]]
+  B = [[1,5],[8,12],[15,24],[25,26]]
+Вывод: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]`,
+hint:`Два указателя. Пересечение: [max(start1,start2), min(end1,end2)]. Двигаем указатель с меньшим end.`,
+code:`class Solution {
+    public int[][] intervalIntersection(
+            int[][] firstList, int[][] secondList) {
+        List<int[]> result = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < firstList.length
+            && j < secondList.length) {
+            int lo = Math.max(firstList[i][0],
+                secondList[j][0]);
+            int hi = Math.min(firstList[i][1],
+                secondList[j][1]);
+
+            if (lo <= hi) {
+                result.add(new int[]{lo, hi});
+            }
+
+            if (firstList[i][1] < secondList[j][1]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return result.toArray(new int[result.size()][]);
+    }
+}`,
+expl:`Два указателя по спискам. Пересечение = [max(starts), min(ends)], если lo <= hi. Двигаем указатель, чей интервал заканчивается раньше. O(n+m) время.`},
+
+// ===== PREFIX SUM (продолжение) =====
+{id:"ps3",t:"Prefix Common Array (2657)",p:"Prefix Sum",d:"средне",
+desc:`Даны две перестановки A и B длины n (числа от 1 до n). Найти массив C, где C[i] = количество чисел, которые присутствуют и в A[0..i], и в B[0..i].
+
+LeetCode 2657. (Аналогичен pse5, но категория Prefix Sum.)
+
+Пример:
+Ввод: A = [1,3,2,4], B = [3,1,2,4]
+Вывод: [0,2,3,4]
+
+Ввод: A = [2,3,1], B = [3,1,2]
+Вывод: [0,1,3]`,
+hint:`Массив freq[1..n]. При встрече числа увеличиваем freq. Когда freq[v] == 2 — число есть в обоих префиксах.`,
+code:`class Solution {
+    public int[] findThePrefixCommonArray(
+            int[] A, int[] B) {
+        int n = A.length;
+        int[] freq = new int[n + 1];
+        int[] C = new int[n];
+        int common = 0;
+
+        for (int i = 0; i < n; i++) {
+            freq[A[i]]++;
+            if (freq[A[i]] == 2) common++;
+
+            freq[B[i]]++;
+            if (freq[B[i]] == 2) common++;
+
+            C[i] = common;
+        }
+
+        return C;
+    }
+}`,
+expl:`Перестановки содержат числа 1..n по одному разу. freq[v] считает суммарные вхождения. Когда freq == 2 — число встречено в обоих массивах. O(n) время и память.`},
+
+// ===== SLIDING WINDOW (продолжение 3) =====
+{id:"sw13",t:"Longest Continuous Increasing Subsequence (674)",p:"Sliding Window",d:"легко",
+desc:`Найти длину самой длинной непрерывно возрастающей подпоследовательности (подмассива).
+
+Пример:
+Ввод: [1, 3, 5, 4, 7]
+Вывод: 3 (подмассив [1, 3, 5])
+
+Ввод: [2, 2, 2, 2]
+Вывод: 1`,
+hint:`Один проход: считаем длину текущей возрастающей серии. При нарушении — сбрасываем.`,
+code:`class Solution {
+    public int findLengthOfLCIS(int[] nums) {
+        if (nums.length == 0) return 0;
+        int maxLen = 1, curLen = 1;
+
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > nums[i - 1]) {
+                curLen++;
+                maxLen = Math.max(maxLen, curLen);
+            } else {
+                curLen = 1;
+            }
+        }
+
+        return maxLen;
+    }
+}`,
+expl:`Один проход: если nums[i] > nums[i-1] — увеличиваем текущую длину. Иначе сбрасываем в 1. Отслеживаем максимум. O(n) время, O(1) память.`},
+
+// ===== MATH / SIMULATION (продолжение 2) =====
+{id:"ms6",t:"Умножение строк (43)",p:"Math / Simulation",d:"средне",
+desc:`Даны два неотрицательных числа в виде строк. Вернуть их произведение в виде строки. Нельзя использовать BigInteger или встроенное умножение.
+
+Пример:
+Ввод: num1 = "2", num2 = "3"
+Вывод: "6"
+
+Ввод: num1 = "123", num2 = "456"
+Вывод: "56088"`,
+hint:`Умножение столбиком: result[i+j+1] += digit1 × digit2. Затем обработка переносов.`,
+code:`class Solution {
+    public String multiply(String num1, String num2) {
+        int m = num1.length(), n = num2.length();
+        int[] result = new int[m + n];
+
+        for (int i = m - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                int mul = (num1.charAt(i) - '0')
+                    * (num2.charAt(j) - '0');
+                int p1 = i + j;
+                int p2 = i + j + 1;
+                int sum = mul + result[p2];
+
+                result[p2] = sum % 10;
+                result[p1] += sum / 10;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int digit : result) {
+            if (!(sb.length() == 0 && digit == 0)) {
+                sb.append(digit);
+            }
+        }
+
+        return sb.length() == 0 ? "0" : sb.toString();
+    }
+}`,
+expl:`Умножение столбиком: произведение цифр num1[i] и num2[j] попадает в позиции [i+j] и [i+j+1]. Обработка переноса встроена. Ведущие нули удаляются. O(m×n) время.`}
 ];

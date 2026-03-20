@@ -13,7 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--orange:#f59e0b;--text:#e2e8f0;--dim:#94a3b8;--radius:16px}
+:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--text:#e2e8f0;--dim:#94a3b8;--radius:16px}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;padding-top:env(safe-area-inset-top,16px);-webkit-user-select:none;user-select:none}
 h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:14px}
@@ -38,6 +38,24 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
+.edit-toggle{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid #ffffff20;color:var(--dim);width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:.2s}
+.edit-toggle.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.edit-field{width:100%;background:var(--card2);color:var(--text);border:1px solid #ffffff20;border-radius:8px;padding:8px;font-size:13px;font-family:monospace;resize:vertical;line-height:1.5;margin-top:6px}
+.edit-field:focus{border-color:var(--purple);outline:none}
+.edit-label{font-size:11px;color:var(--dim);margin-top:10px;text-transform:uppercase;letter-spacing:.5px}
+.edit-save{background:var(--green);color:#000;border:none;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;width:100%}
+.edit-save:disabled{opacity:.5;cursor:not-allowed}
+.edit-status{text-align:center;font-size:12px;margin-top:8px;min-height:18px}
+.token-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+.token-box{background:var(--card);border-radius:16px;padding:24px;max-width:360px;width:100%}
+.token-box h3{margin-bottom:12px;font-size:16px}
+.token-box p{font-size:13px;color:var(--dim);margin-bottom:12px;line-height:1.5}
+.token-box input{width:100%;padding:10px;border-radius:8px;border:1px solid #ffffff20;background:var(--card2);color:var(--text);font-size:14px;font-family:monospace}
+.token-box input:focus{border-color:var(--purple);outline:none}
+.token-btns{display:flex;gap:8px;margin-top:14px}
+.token-btns button{flex:1;padding:10px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.token-ok{background:var(--purple);color:#fff}
+.token-cancel{background:var(--card2);color:var(--dim)}
 </style>
 </head>
 <body>
@@ -47,6 +65,8 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>
+<button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
+<div id="tokenModal" class="token-modal" style="display:none"></div>
 
 <script src="problems.js" charset="UTF-8"></script>
 <script>
@@ -54,10 +74,58 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
+const REPO='tantarin/algocards';
+const FILE_PATH='problems.js';
 const allPatterns=[...new Set(P.map(p=>p.p))].sort();
 let activeFilter=null;
 let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
+let editMode=false;
+
+function getToken(){return localStorage.getItem('gh_token')}
+function setToken(t){localStorage.setItem('gh_token',t)}
+
+function toggleEdit(){
+  if(!editMode){
+    const token=getToken();
+    if(!token){showTokenModal();return}
+    editMode=true;
+    document.getElementById('editToggle').classList.add('active');
+    renderCard();
+  } else {
+    editMode=false;
+    document.getElementById('editToggle').classList.remove('active');
+    renderCard();
+  }
+}
+
+function showTokenModal(){
+  const m=document.getElementById('tokenModal');
+  m.style.display='flex';
+  m.innerHTML=`<div class="token-box">
+    <h3>🔑 GitHub Token</h3>
+    <p>Нужен Personal Access Token с правом <b>repo</b> для пуша изменений.<br>
+    <a href="https://github.com/settings/tokens/new?scopes=repo&description=AlgoCards" target="_blank" style="color:var(--purple)">Создать токен →</a></p>
+    <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+    <div class="token-btns">
+      <button class="token-cancel" onclick="closeTokenModal()">Отмена</button>
+      <button class="token-ok" onclick="saveToken()">Сохранить</button>
+    </div>
+  </div>`;
+  setTimeout(()=>document.getElementById('tokenInput').focus(),100);
+}
+
+function closeTokenModal(){document.getElementById('tokenModal').style.display='none'}
+
+function saveToken(){
+  const v=document.getElementById('tokenInput').value.trim();
+  if(!v)return;
+  setToken(v);
+  closeTokenModal();
+  editMode=true;
+  document.getElementById('editToggle').classList.add('active');
+  renderCard();
+}
 
 function getFiltered(){
   let list=activeFilter?P.filter(p=>p.p===activeFilter):[...P];
@@ -89,9 +157,44 @@ function setFilter(pat){
   renderCard();
 }
 
+const EDIT_FIELDS=[
+  {key:'t',label:'Название'},
+  {key:'desc',label:'Условие',rows:8},
+  {key:'hint',label:'Подсказка',rows:2},
+  {key:'steps',label:'Схема решения',rows:4},
+  {key:'code',label:'Код (Java)',rows:12},
+  {key:'complexity',label:'Сложность',rows:1},
+  {key:'complexityExpl',label:'Объяснение сложности',rows:2},
+  {key:'expl',label:'Объяснение алгоритма',rows:3}
+];
+
+function renderEditCard(){
+  const p=fcList[fcIdx];
+  let fields=EDIT_FIELDS.map(f=>`
+    <div class="edit-label">${f.label}</div>
+    <textarea class="edit-field" data-key="${f.key}" rows="${f.rows||3}">${p[f.key]||''}</textarea>
+  `).join('');
+
+  document.getElementById('cardsArea').innerHTML=`
+    <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+    <div class="flashcard" style="cursor:default">
+      <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
+      <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:4px">${esc(p.d)}</span>
+      ${fields}
+      <button class="edit-save" id="saveBtn" onclick="saveCard()">💾 Сохранить и запушить</button>
+      <div class="edit-status" id="editStatus"></div>
+    </div>
+    <div class="fc-nav">
+      <button onclick="fcPrev()">←</button>
+      <button onclick="fcShuffle()">🔀</button>
+      <button onclick="fcNext()">→</button>
+    </div>`;
+}
+
 function renderCard(){
   document.getElementById('info').textContent=fcList.length+' задач';
   if(!fcList.length){document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';return;}
+  if(editMode){renderEditCard();return}
   const p=fcList[fcIdx];
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
@@ -132,6 +235,97 @@ function flipCard(){fcFlipped=!fcFlipped;renderCard()}
 function fcNext(){fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
 function fcPrev(){fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
 function fcShuffle(){fcFlipped=false;fcList=shuffle(getFiltered());fcIdx=0;renderCard()}
+
+function buildProblemsJs(){
+  const escVal=s=>{
+    if(s==null)return '';
+    return s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  };
+  let out='const P = [\n';
+  let prevPat='';
+  P.forEach((p,i)=>{
+    if(p.p!==prevPat){
+      out+='// ===== '+p.p.toUpperCase()+' =====\n';
+      prevPat=p.p;
+    }
+    out+='{id:"'+p.id+'",t:"'+p.t.replace(/"/g,'\\"')+'",p:"'+p.p.replace(/"/g,'\\"')+'",d:"'+p.d.replace(/"/g,'\\"')+'",\n';
+    out+='desc:`'+escVal(p.desc)+'`,\n';
+    out+='hint:`'+escVal(p.hint)+'`,\n';
+    out+='code:`'+escVal(p.code)+'`,\n';
+    out+='steps:`'+escVal(p.steps)+'`,\n';
+    out+='complexity:`'+escVal(p.complexity)+'`,\n';
+    out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
+    out+='expl:`'+escVal(p.expl)+'`}';
+    if(i<P.length-1)out+=',';
+    out+='\n\n';
+  });
+  out+='];\n';
+  return out;
+}
+
+async function saveCard(){
+  const p=fcList[fcIdx];
+  const btn=document.getElementById('saveBtn');
+  const status=document.getElementById('editStatus');
+  
+  document.querySelectorAll('.edit-field').forEach(el=>{
+    p[el.dataset.key]=el.value;
+  });
+
+  btn.disabled=true;
+  status.style.color='var(--dim)';
+  status.textContent='Генерация файла...';
+
+  const content=buildProblemsJs();
+  const encoded=btoa(unescape(encodeURIComponent(content)));
+  
+  status.textContent='Получение SHA текущего файла...';
+  const token=getToken();
+  
+  try{
+    const meta=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,{
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!meta.ok){
+      if(meta.status===401){
+        status.style.color='var(--red)';
+        status.textContent='Неверный токен. Нажмите ✏️ чтобы обновить.';
+        localStorage.removeItem('gh_token');
+        editMode=false;
+        document.getElementById('editToggle').classList.remove('active');
+        btn.disabled=false;
+        return;
+      }
+      throw new Error('GitHub API: '+meta.status);
+    }
+    const metaJson=await meta.json();
+    const sha=metaJson.sha;
+
+    status.textContent='Пушим в GitHub...';
+    const put=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:'Update '+p.id+': '+p.t,
+        content:encoded,
+        sha:sha
+      })
+    });
+    
+    if(!put.ok){
+      const err=await put.json();
+      throw new Error(err.message||'PUT failed: '+put.status);
+    }
+    
+    status.style.color='var(--green)';
+    status.textContent='✅ Сохранено и запушено!';
+    btn.disabled=false;
+  }catch(e){
+    status.style.color='var(--red)';
+    status.textContent='❌ '+e.message;
+    btn.disabled=false;
+  }
+}
 
 renderFilters();
 fcList=shuffle(getFiltered());

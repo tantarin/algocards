@@ -113,6 +113,10 @@ function renderCard(){
       <div class="fc-face${fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
         <pre style="margin-top:10px;border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+        ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
+          <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
+          ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
+        </div>`:''}
         <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
       </div>
     </div>

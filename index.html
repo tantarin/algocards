@@ -23,6 +23,9 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
 .filter-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
+#search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none;margin-bottom:8px}
+#search::placeholder{color:var(--dim)}
+#search:focus{border-color:var(--purple)}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 </style>
@@ -31,6 +34,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 
 <h1>AlgoCards</h1>
 <div class="subtitle" id="info"></div>
+<input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>
 
@@ -41,10 +45,23 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 
 const allPatterns=[...new Set(P.map(p=>p.p))].sort();
 let activeFilter=null;
+let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
 
 function getFiltered(){
-  return activeFilter?P.filter(p=>p.p===activeFilter):[...P];
+  let list=activeFilter?P.filter(p=>p.p===activeFilter):[...P];
+  if(searchQuery){
+    const q=searchQuery.toLowerCase();
+    list=list.filter(p=>(p.t+' '+p.desc).toLowerCase().includes(q));
+  }
+  return list;
+}
+
+function applySearch(){
+  searchQuery=document.getElementById('search').value.trim();
+  fcList=searchQuery?getFiltered():shuffle(getFiltered());
+  fcIdx=0;fcFlipped=false;
+  renderCard();
 }
 
 function renderFilters(){

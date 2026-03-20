@@ -31,16 +31,17 @@ h1{font-size:28px;margin:8px 0 16px}
 .problem-card .diff{font-size:12px;margin-top:4px}
 .detail-section{background:var(--card);border-radius:var(--radius);padding:16px;margin:10px 0}
 .detail-section h3{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.detail-section pre{font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;background:var(--card2);padding:12px;border-radius:10px;margin-top:8px}
+.detail-section pre{font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;background:var(--card2);padding:12px;border-radius:10px;margin-top:8px;line-height:1.5}
+.detail-section .body{white-space:pre-wrap;font-size:14px;line-height:1.6}
 .spoiler-btn{background:var(--card2);border:none;color:var(--purple);width:100%;padding:12px;border-radius:var(--radius);font-size:15px;cursor:pointer;margin:8px 0}
 .quiz-option{background:var(--card);border:2px solid transparent;border-radius:12px;padding:14px;margin:8px 0;cursor:pointer;font-size:15px;transition:.2s}
 .quiz-option.correct{border-color:var(--green);background:#22c55e20}
 .quiz-option.wrong{border-color:var(--red);background:#ef444420}
 .quiz-option.reveal{border-color:var(--green)}
 .big-btn{background:var(--purple);color:#fff;border:none;border-radius:var(--radius);padding:14px;width:100%;font-size:16px;font-weight:600;cursor:pointer;margin:12px 0}
-.flashcard{background:var(--card);border-radius:20px;min-height:300px;padding:24px;margin:16px 0;cursor:pointer;transition:transform .4s;transform-style:preserve-3d;position:relative}
+.flashcard{background:var(--card);border-radius:20px;min-height:360px;padding:0;margin:16px 0;cursor:pointer;transition:transform .4s;transform-style:preserve-3d;position:relative}
 .flashcard.flipped{transform:rotateY(180deg)}
-.fc-face{backface-visibility:hidden;position:absolute;top:0;left:0;right:0;bottom:0;padding:24px;overflow-y:auto}
+.fc-face{backface-visibility:hidden;position:absolute;top:0;left:0;right:0;bottom:0;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .fc-back{transform:rotateY(180deg)}
 .fc-nav{display:flex;justify-content:center;gap:32px;margin-top:12px}
 .fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer}
@@ -48,6 +49,7 @@ h1{font-size:28px;margin:8px 0 16px}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
 .progress-bar{height:6px;background:var(--card2);border-radius:3px;margin:8px 0;overflow:hidden}
 .progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--purple),#6366f1);border-radius:3px;transition:width .3s}
+.highlight{color:var(--orange);font-weight:600}
 </style>
 </head>
 <body>
@@ -87,45 +89,667 @@ h1{font-size:28px;margin:8px 0 16px}
 
 <script>
 const P=[
-{id:"bt1",t:"Generate Parentheses",p:"Backtracking",d:"средне",desc:"Дано n. Сгенерировать все правильные скобочные последовательности длины 2n.\n\nВвод: n=3\nВывод: [\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]",hint:"Два счётчика: open и close. open<n → ставим '(', close<open → ставим ')'",code:"void gen(int o,int c,int n,StringBuilder sb,List<String> r){\n  if(sb.length()==2*n){r.add(sb.toString());return;}\n  if(o<n){sb.append('(');gen(o+1,c,n,sb,r);sb.deleteCharAt(sb.length()-1);}\n  if(c<o){sb.append(')');gen(o,c+1,n,sb,r);sb.deleteCharAt(sb.length()-1);}\n}",expl:"Backtracking с двумя счётчиками. close никогда не превышает open."},
-{id:"bs1",t:"Поиск в повернутом массиве",p:"Binary Search",d:"средне",desc:"Отсортированный массив повёрнут ([4,5,6,7,0,1,2]). Найти target за O(log n).\n\nВвод: nums=[4,5,6,7,0,1,2], target=0\nВывод: 4",hint:"Определи какая половина отсортирована, проверь попадает ли target в неё",code:"int search(int[] a,int t){\n  int lo=0,hi=a.length-1;\n  while(lo<=hi){\n    int m=lo+(hi-lo)/2;\n    if(a[m]==t)return m;\n    if(a[lo]<=a[m]){\n      if(t>=a[lo]&&t<a[m])hi=m-1; else lo=m+1;\n    }else{\n      if(t>a[m]&&t<=a[hi])lo=m+1; else hi=m-1;\n    }\n  }return -1;\n}",expl:"Одна из половин всегда отсортирована. Определяем какая и сужаем поиск."},
-{id:"gop1",t:"Best Time to Buy and Sell Stock II",p:"Greedy",d:"легко",desc:"Цены акций по дням. Сколько угодно сделок. Макс прибыль.\n\nВвод: [7,1,5,3,6,4]\nВывод: 7",hint:"Собираем все подъёмы: если prices[i]>prices[i-1] — добавляем разницу",code:"int maxProfit(int[] p){\n  int r=0;\n  for(int i=1;i<p.length;i++)\n    if(p[i]>p[i-1]) r+=p[i]-p[i-1];\n  return r;\n}",expl:"Greedy: сумма всех положительных разностей = максимальная прибыль."},
-{id:"hf1",t:"Группировка анаграмм",p:"HashMap",d:"средне",desc:"Дан массив строк. Сгруппируйте анаграммы.\n\nВвод: [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]\nВывод: [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]",hint:"Ключ = отсортированная строка. HashMap<ключ, список>",code:"Map<String,List<String>> m=new HashMap<>();\nfor(String s:strs){\n  char[] a=s.toCharArray();\n  Arrays.sort(a);\n  m.computeIfAbsent(new String(a),k->new ArrayList<>()).add(s);\n}",expl:"Все анаграммы дают одинаковый ключ при сортировке символов."},
-{id:"hpq1",t:"K частых элементов",p:"Heap / PQ",d:"средне",desc:"Дан массив и k. Вернуть k самых частых элементов.\n\nВвод: nums=[1,1,1,2,2,3], k=2\nВывод: [1,2]",hint:"Частоты через HashMap, затем min-heap размера k",code:"PriorityQueue<Integer> heap=new PriorityQueue<>(\n  (a,b)->freq.get(a)-freq.get(b));\nfor(int key:freq.keySet()){\n  heap.add(key);\n  if(heap.size()>k)heap.poll();\n}",expl:"Min-heap размера k: добавляем, если >k — удаляем минимум."},
-{id:"iss1",t:"Merge Intervals",p:"Intervals Sweep",d:"средне",desc:"Слить перекрывающиеся интервалы.\n\nВвод: [[1,3],[2,6],[8,10],[15,18]]\nВывод: [[1,6],[8,10],[15,18]]",hint:"Сортируй по началу. Расширяй текущий или начинай новый.",code:"Arrays.sort(intervals,(a,b)->a[0]-b[0]);\nList<int[]> r=new ArrayList<>();\nint[] cur=intervals[0];\nfor(int i=1;i<intervals.length;i++){\n  if(intervals[i][0]<=cur[1]) cur[1]=Math.max(cur[1],intervals[i][1]);\n  else{r.add(cur);cur=intervals[i];}\n}\nr.add(cur);",expl:"Сортировка + sweep: начало ≤ конец текущего — расширяем, иначе новый."},
-{id:"ll1",t:"Reverse Linked List",p:"Linked List",d:"легко",desc:"Развернуть односвязный список.\n\nВвод: 1→2→3→4→5\nВывод: 5→4→3→2→1",hint:"Три указателя: prev, curr, next. Перенаправляем curr.next на prev.",code:"ListNode prev=null,curr=head;\nwhile(curr!=null){\n  ListNode next=curr.next;\n  curr.next=prev;\n  prev=curr;\n  curr=next;\n}\nreturn prev;",expl:"Итеративный разворот. O(n) время, O(1) память."},
-{id:"ps1",t:"Subarray Sum Equals K",p:"Prefix Sum",d:"средне",desc:"Количество подмассивов с суммой k.\n\nВвод: nums=[1,1,1], k=2\nВывод: 2",hint:"Prefix sum + HashMap: ищем prefixSum-k в мапе",code:"Map<Integer,Integer> m=new HashMap<>();\nm.put(0,1); int sum=0,cnt=0;\nfor(int x:nums){\n  sum+=x;\n  cnt+=m.getOrDefault(sum-k,0);\n  m.merge(sum,1,Integer::sum);\n}",expl:"prefixSum[j]-prefixSum[i]=k → subarray [i+1..j] имеет сумму k."},
-{id:"sw1",t:"Minimum Window Substring",p:"Sliding Window",d:"сложно",desc:"Минимальная подстрока s, содержащая все символы t.\n\nВвод: s=\"ADOBECODEBANC\", t=\"ABC\"\nВывод: \"BANC\"",hint:"Расширяем правую границу пока не покроем t, затем сжимаем левую",code:"int[] need=new int[128];\nfor(char c:t.toCharArray())need[c]++;\nint miss=t.length(),l=0,start=0,min=Integer.MAX_VALUE;\nfor(int r=0;r<s.length();r++){\n  if(need[s.charAt(r)]-->0)miss--;\n  while(miss==0){\n    if(r-l+1<min){min=r-l+1;start=l;}\n    if(++need[s.charAt(l++)]>0)miss++;\n  }\n}",expl:"Два указателя: правый расширяет, левый сжимает для минимума."},
-{id:"st1",t:"Valid Parentheses",p:"Stack",d:"легко",desc:"Проверить валидность скобочной последовательности (){}[].\n\nВвод: \"([{}])\"\nВывод: true",hint:"Открывающую — в стек, закрывающую — сверяем с вершиной",code:"Stack<Character> s=new Stack<>();\nfor(char c:str.toCharArray()){\n  if(c=='(')s.push(')');\n  else if(c=='{')s.push('}');\n  else if(c=='[')s.push(']');\n  else if(s.isEmpty()||s.pop()!=c)return false;\n}\nreturn s.isEmpty();",expl:"Стек: кладём ожидаемую закрывающую. При закрывающей — сверяем."},
-{id:"tr1",t:"Number of Islands",p:"Trees / DFS",d:"средне",desc:"2D-сетка из '1' и '0'. Посчитать количество островов.\n\nВвод: [[1,1,0],[1,0,0],[0,0,1]]\nВывод: 2",hint:"При нахождении '1' запускаем DFS, затапливаем весь остров",code:"int count=0;\nfor(int i=0;i<g.length;i++)\n for(int j=0;j<g[0].length;j++)\n  if(g[i][j]=='1'){dfs(g,i,j);count++;}\n// dfs меняет '1'->'0' и идёт в 4 стороны",expl:"DFS flood fill: затапливаем остров при нахождении, +1 к счётчику."},
-{id:"tp1",t:"Container With Most Water",p:"Two Pointers",d:"средне",desc:"Массив высот. Найти контейнер с максимумом воды.\n\nВвод: [1,8,6,2,5,4,8,3,7]\nВывод: 49",hint:"Два указателя. Двигаем тот, чья высота меньше.",code:"int l=0,r=h.length-1,max=0;\nwhile(l<r){\n  max=Math.max(max,Math.min(h[l],h[r])*(r-l));\n  if(h[l]<h[r])l++; else r--;\n}",expl:"Двигаем меньший указатель: сдвиг большего точно не увеличит площадь."},
-{id:"uf1",t:"Количество компонент связности",p:"Union-Find",d:"средне",desc:"Дан граф рёбрами. Количество компонент связности.\n\nВвод: n=5, edges=[[0,1],[1,2],[3,4]]\nВывод: 2",hint:"Union-Find: объединяй вершины, считай уникальные корни",code:"int[] p=new int[n];\nfor(int i=0;i<n;i++)p[i]=i;\nint comp=n;\nfor(int[] e:edges){\n  int a=find(p,e[0]),b=find(p,e[1]);\n  if(a!=b){p[a]=b;comp--;}\n}",expl:"Union-Find с path compression: объединяем, считаем корни."},
-{id:"dp1",t:"Longest Palindromic Substring",p:"Dynamic Prog.",d:"средне",desc:"Найти самую длинную подстроку-палиндром.\n\nВвод: \"babad\"\nВывод: \"bab\"",hint:"Expand around center: расширяйся влево-вправо пока совпадает",code:"for(int i=0;i<s.length();i++){\n  int l1=expand(s,i,i);\n  int l2=expand(s,i,i+1);\n  // обновляем max\n}\nint expand(String s,int l,int r){\n  while(l>=0&&r<s.length()&&s.charAt(l)==s.charAt(r)){l--;r++;}\n  return r-l-1;\n}",expl:"O(n²). Для каждого центра расширяемся пока совпадает."}
+{id:"bt1",t:"Generate Parentheses (22)",p:"Backtracking",d:"средне",
+desc:`На вход получаем число n.
+Необходимо сгенерировать все допустимые комбинации скобок, заданные n парами.
+
+Допустимая комбинация означает:
+- Каждой открывающей скобке ( соответствует закрывающая )
+- При чтении слева направо количество закрывающих никогда не превышает количество открывающих
+
+Пример:
+n = 1 → "()"
+n = 2 → "(())", "()()"
+n = 3 → "((()))", "(()())", "(())()", "()(())", "()()()"`,
+hint:"На каждом шаге добавляем ( или ). Открывающих должно быть больше чем закрывающих. По сути перебирай все варианты, но соблюдай ограничения.",
+code:`class Solution {
+    private List<String> result = new ArrayList<>();
+    private int pairCount;
+
+    public List<String> generateParenthesis(int n) {
+        this.pairCount = n;
+        backtrack(0, 0, "");
+        return result;
+    }
+
+    private void backtrack(int openCount, int closeCount,
+                           String currentString) {
+        // Pruning:
+        // 1. Если скобок стало больше чем надо
+        // 2. Если закрывающих больше чем открывающих
+        if (openCount > pairCount || closeCount > pairCount
+            || openCount < closeCount) {
+            return;
+        }
+
+        // Base case: обе равны n → нашли результат
+        if (openCount == pairCount && closeCount == pairCount) {
+            result.add(currentString);
+            return;
+        }
+
+        // Попытка добавить открывающую
+        backtrack(openCount + 1, closeCount,
+                  currentString + "(");
+        // Попытка добавить закрывающую
+        backtrack(openCount, closeCount + 1,
+                  currentString + ")");
+    }
+}`,
+expl:`Поиск в глубину с отсечением ветвей.
+Отслеживаем l (открывающие) и r (закрывающие).
+- Не добавляем больше n каждого типа
+- r никогда не превышает l
+- Когда l == r == n — допустимая комбинация`},
+
+{id:"bs1",t:"Поиск в повернутом массиве (33)",p:"Binary Search",d:"средне",
+desc:`Дан целочисленный массив nums, изначально отсортированный по возрастанию, содержащий уникальные значения. Массив мог быть повернут влево в некоторой неизвестной точке k.
+
+Найти заданное target значение и вернуть его индекс. Если не найдено — вернуть -1.
+
+Пример:
+Ввод: nums = [4,5,6,7,0,1,2], target = 0
+Вывод: 4`,
+hint:"Модифицированный бинарный поиск. Определяем какая половина отсортирована, ищем target в ней.",
+code:`class Solution {
+    public int search(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] == target) {
+                return mid;
+            }
+
+            // Check which half is sorted
+            if (nums[left] <= nums[mid]) {
+                // Left half is sorted
+                if (nums[left] <= target
+                    && target < nums[mid]) {
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
+                }
+            } else {
+                // Right half is sorted
+                if (nums[mid] < target
+                    && target <= nums[right]) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
+}`,
+expl:`O(log n) — пространство поиска уменьшается вдвое на каждой итерации.
+O(1) память — только переменные left, right, mid.`},
+
+{id:"gop1",t:"Best Time to Buy and Sell Stock II (122)",p:"Greedy",d:"легко",
+desc:`Дан массив prices, где prices[i] — цена акции в день i.
+Можно совершать несколько транзакций (покупку и продажу):
+- Покупать и продавать в любой день
+- Не более одной акции одновременно
+- Можно покупать и продавать в один день
+
+Найти максимальную прибыль.
+
+Пример:
+Ввод: prices = [1, 3, 2, 5]
+- Покупка день 0 (цена 1), продажа день 1 (цена 3): прибыль = 2
+- Покупка день 2 (цена 2), продажа день 3 (цена 5): прибыль = 3
+- Итого: 5`,
+hint:"Жадный подход: всякий раз когда цена растёт — берём прибыль, покупая вчера и продавая сегодня.",
+code:`class Solution {
+    public int maxProfit(int[] prices) {
+        int totalProfit = 0;
+
+        for (int day = 1; day < prices.length; day++) {
+            int dailyProfit = prices[day] - prices[day - 1];
+            // Берём только положительные разницы
+            totalProfit += Math.max(0, dailyProfit);
+        }
+
+        return totalProfit;
+    }
+}`,
+expl:`O(n) время, O(1) память. Один проход — суммируем все положительные разности.`},
+
+{id:"hf1",t:"Group Anagrams (49)",p:"HashMap",d:"средне",
+desc:`Дан массив строк strs. Сгруппировать все анаграммы вместе.
+Анаграммы — слова с одинаковыми символами в разном порядке.
+
+Пример:
+Ввод: ["eat","tea","tan","ate","nat","bat"]
+Вывод: [["eat","tea","ate"],["tan","nat"],["bat"]]
+
+Порядок групп и строк внутри группы не важен.`,
+hint:"HashMap + частотный ключ. Для каждой строки считаем частоту символов и строим ключ.",
+code:`class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> map = new HashMap<>();
+
+        for (String s : strs) {
+            int[] cnt = new int[26];
+            for (int i = 0; i < s.length(); i++) {
+                cnt[s.charAt(i) - 'a']++;
+            }
+
+            String key = buildKey(cnt);
+            map.computeIfAbsent(key,
+                k -> new ArrayList<>()).add(s);
+        }
+
+        return new ArrayList<>(map.values());
+    }
+
+    private String buildKey(int[] cnt) {
+        StringBuilder sb = new StringBuilder(26 * 2);
+        for (int x : cnt) {
+            sb.append('#').append(x);
+        }
+        return sb.toString();
+    }
+}`,
+expl:`O(n × k) время, O(n × k) память. Все анаграммы дают одинаковый частотный ключ.`},
+
+{id:"hpq1",t:"K наиболее частых элементов (347)",p:"Heap / PQ",d:"средне",
+desc:`Дан массив целых чисел nums и число k.
+Найти и вернуть k наиболее часто встречающихся элементов.
+Гарантируется уникальность ответа.
+
+Пример:
+nums = [1,1,1,2,2,3], k = 2
+Элемент 1 — 3 раза, 2 — 2 раза, 3 — 1 раз.
+Вывод: [1, 2]`,
+hint:"Считаем частоту через HashMap, затем min-heap размера k. Если размер > k — удаляем минимальный.",
+code:`class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> frequencyMap = new HashMap<>();
+        for (int num : nums) {
+            frequencyMap.merge(num, 1, Integer::sum);
+        }
+
+        // Min-heap по частоте
+        PriorityQueue<Map.Entry<Integer, Integer>> minHeap =
+            new PriorityQueue<>(
+                Comparator.comparingInt(Map.Entry::getValue));
+
+        for (Map.Entry<Integer, Integer> entry
+             : frequencyMap.entrySet()) {
+            minHeap.offer(entry);
+            // Если больше k — удаляем самый редкий
+            if (minHeap.size() > k) {
+                minHeap.poll();
+            }
+        }
+
+        return minHeap.stream()
+            .mapToInt(Map.Entry::getKey)
+            .toArray();
+    }
+}`,
+expl:`O(n log k) время, O(k) память для кучи. Min-heap хранит только k самых частых.`},
+
+{id:"iss1",t:"Merge Intervals (56)",p:"Intervals Sweep",d:"средне",
+desc:`Дан список отрезков [начало, конец]. Необходимо объединить все пересекающиеся отрезки в более крупные.
+
+Примеры:
+- [1,3] и [2,6] перекрываются → [1,6]
+- [1,4] и [4,5] перекрываются (общая точка 4) → [1,5]
+- [1,2] и [3,4] не перекрываются
+
+Ввод: [[1,3],[2,6],[8,10],[15,18]]
+Вывод: [[1,6],[8,10],[15,18]]`,
+hint:"Сортируем по началу. Идём слева направо, расширяем текущий интервал или начинаем новый.",
+code:`class Solution {
+    public int[][] merge(int[][] intervals) {
+        // 1) Сортируем по началу
+        Arrays.sort(intervals,
+            Comparator.comparingInt(a -> a[0]));
+
+        List<int[]> merged = new ArrayList<>();
+
+        int currentStart = intervals[0][0];
+        int currentEnd   = intervals[0][1];
+
+        for (int i = 1; i < intervals.length; i++) {
+            int nextStart = intervals[i][0];
+            int nextEnd   = intervals[i][1];
+
+            if (currentEnd < nextStart) {
+                // Нет пересечения — закрываем текущий
+                merged.add(
+                    new int[]{currentStart, currentEnd});
+                currentStart = nextStart;
+                currentEnd   = nextEnd;
+            } else {
+                // Пересечение — расширяем
+                currentEnd =
+                    Math.max(currentEnd, nextEnd);
+            }
+        }
+
+        merged.add(new int[]{currentStart, currentEnd});
+        return merged.toArray(new int[merged.size()][]);
+    }
+}`,
+expl:`O(n log n) время (сортировка). O(log n) доп. память. Один проход после сортировки.`},
+
+{id:"ll1",t:"Reverse Linked List (206)",p:"Linked List",d:"легко",
+desc:`Дан head односвязного списка. Перевернуть весь список и вернуть начало перевернутого.
+
+Пример:
+1 → 2 → 3 → 4 → 5
+Вывод: 5 → 4 → 3 → 2 → 1`,
+hint:"Метод «введения в голову» с фиктивным узлом. На каждом шаге вставляем текущий узел в начало нового списка.",
+code:`class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode dummyNode = new ListNode();
+        ListNode current = head;
+
+        while (current != null) {
+            // Запоминаем следующий узел
+            ListNode nextNode = current.next;
+
+            // Вставляем current в начало
+            current.next = dummyNode.next;
+            dummyNode.next = current;
+
+            // Переходим к следующему
+            current = nextNode;
+        }
+
+        return dummyNode.next;
+    }
+}`,
+expl:`O(n) время — один проход по списку. O(1) память — только указатели, без доп. структур.`},
+
+{id:"ps1",t:"Subarray Sum Equals K (560)",p:"Prefix Sum",d:"средне",
+desc:`Дан массив целых чисел nums и число k.
+Найти общее количество подмассивов, сумма которых равна k.
+Подмассив — непрерывная последовательность элементов.
+
+Пример:
+nums = [1, 2, 3], k = 3
+Подмассивы с суммой 3: [1,2] и [3] → ответ 2`,
+hint:"Хеш-таблица + префиксные суммы. Если prefixSum в текущей позиции = s, а ранее была s - k, то подмассив между ними = k.",
+code:`class Solution {
+    public int subarraySum(int[] nums, int k) {
+        Map<Integer, Integer> prefixSumCount =
+            new HashMap<>();
+        // Сумма 0 встречается 1 раз (до начала массива)
+        prefixSumCount.put(0, 1);
+
+        int count = 0;
+        int currentSum = 0;
+
+        for (int num : nums) {
+            currentSum += num;
+
+            // Если (currentSum - k) встречалась ранее,
+            // значит есть подмассивы с суммой k
+            count += prefixSumCount
+                .getOrDefault(currentSum - k, 0);
+
+            prefixSumCount
+                .merge(currentSum, 1, Integer::sum);
+        }
+
+        return count;
+    }
+}`,
+expl:`O(n) время, O(n) память. Один проход, ищем prefixSum - k в HashMap.`},
+
+{id:"sw1",t:"Minimum Window Substring (76)",p:"Sliding Window",d:"сложно",
+desc:`Даны строки s и t. Найти минимальную подстроку s, содержащую все символы t (включая дубликаты).
+Если такой подстроки нет — вернуть "".
+
+Пример 1:
+s = "ADOBECODEBANC", t = "ABC"
+Вывод: "BANC"
+
+Пример 2:
+s = "a", t = "a"
+Вывод: "a"`,
+hint:"Классическое sliding window. Расширяем правую границу пока не покроем все символы t, затем сжимаем левую для минимизации.",
+code:`class Solution {
+    public String minWindow(String s, String t) {
+        if (s == null || t == null
+            || s.length() < t.length()) return "";
+
+        // need[c] — сколько символов c ещё нужно
+        int[] need = new int[128];
+        for (char c : t.toCharArray()) need[c]++;
+
+        int remaining = t.length(); // ещё не покрыто
+        int left = 0;
+        int bestStart = 0;
+        int minLen = Integer.MAX_VALUE;
+
+        for (int right = 0; right < s.length(); right++){
+            char rChar = s.charAt(right);
+            need[rChar]--;
+            if (need[rChar] >= 0) remaining--;
+
+            // Окно содержит ВСЕ символы t
+            while (remaining == 0) {
+                int windowLen = right - left + 1;
+                if (windowLen < minLen) {
+                    minLen = windowLen;
+                    bestStart = left;
+                }
+                // Сжимаем слева
+                char lChar = s.charAt(left);
+                need[lChar]++;
+                if (need[lChar] > 0) remaining++;
+                left++;
+            }
+        }
+
+        return minLen == Integer.MAX_VALUE ? ""
+            : s.substring(bestStart, bestStart + minLen);
+    }
+}`,
+expl:`O(n) время — каждый указатель проходит строку один раз. O(1) память — фиксированный массив 128.`},
+
+{id:"st1",t:"Valid Parentheses (20)",p:"Stack",d:"легко",
+desc:`Дана строка содержащая только скобки: ( ) { } [ ]
+Определить, является ли строка допустимой.
+
+Допустимые пары: () [] {}
+
+Примеры:
+"()" → true
+"()[]{}" → true
+"([{}])" → true
+"(]" → false
+"([)]" → false`,
+hint:"Стек (ArrayDeque). Открывающую кладём, при закрывающей — сверяем с вершиной стека.",
+code:`class Solution {
+    public boolean isValid(String s) {
+        Deque<Character> stack = new ArrayDeque<>();
+
+        for (char c : s.toCharArray()) {
+            if (c == '(' || c == '{' || c == '[') {
+                stack.push(c);
+            }
+            else if (stack.isEmpty()
+                || !isMatchingPair(stack.pop(), c)) {
+                return false;
+            }
+        }
+
+        return stack.isEmpty();
+    }
+
+    private boolean isMatchingPair(char open, char close){
+        return (open == '(' && close == ')')
+            || (open == '{' && close == '}')
+            || (open == '[' && close == ']');
+    }
+}`,
+expl:`O(n) время, O(n) память в худшем случае (все открывающие).`},
+
+{id:"tr1",t:"Number of Islands (200)",p:"Trees / DFS",d:"средне",
+desc:`Дана карта в виде двумерного массива grid:
+1 — суша, 0 — вода.
+Определить сколько отдельных островов на карте.
+Остров — группа соединённых по вертикали/горизонтали клеток с сушей.
+
+Пример:
+grid = [[1,1,0],
+        [1,0,0],
+        [0,0,1]]
+Вывод: 2`,
+hint:"DFS flood fill: при нахождении 1 запускаем DFS, который затапливает весь остров (ставит 0).",
+code:`public class Solution {
+    private static boolean inBound(int i, int j,
+            List<List<Integer>> grid) {
+        return i >= 0 && i < grid.size()
+            && j >= 0 && j < grid.get(0).size();
+    }
+
+    private static void dfs(int i, int j,
+            List<List<Integer>> grid) {
+        if (!inBound(i, j, grid)
+            || grid.get(i).get(j) == 0) return;
+
+        grid.get(i).set(j, 0); // затапливаем
+
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+        for (int[] d : dirs) {
+            dfs(i + d[0], j + d[1], grid);
+        }
+    }
+
+    public static int numIslands(
+            List<List<Integer>> grid) {
+        if (grid.isEmpty()) return 0;
+        int count = 0;
+        for (int i = 0; i < grid.size(); i++)
+            for (int j = 0; j < grid.get(0).size(); j++)
+                if (grid.get(i).get(j) == 1) {
+                    dfs(i, j, grid);
+                    count++;
+                }
+        return count;
+    }
+}`,
+expl:`DFS flood fill. При нахождении 1 — затапливаем весь остров, +1 к счётчику. O(m×n) время и память.`},
+
+{id:"tp1",t:"Container With Most Water (11)",p:"Two Pointers",d:"средне",
+desc:`Дан массив nums, nums[i] — высота линии.
+Найти максимальную площадь воды между двумя линиями.
+Площадь = min(nums[i], nums[j]) × (j - i)
+
+Пример:
+Ввод: nums = [1,8,6,2,5,4,8,3,7]
+Вывод: 49
+Объяснение: 7 × (8 - 1) = 49`,
+hint:"Два указателя с разных концов. Сдвигаем тот, чья высота меньше.",
+code:`public class Solution {
+    public int maxArea(List<Integer> height) {
+        int l = 0;
+        int r = height.size() - 1;
+        int resultArea = 0;
+
+        while (l < r) {
+            int currArea =
+                Math.min(height.get(l), height.get(r))
+                * (r - l);
+            resultArea =
+                Math.max(resultArea, currArea);
+
+            if (height.get(l) < height.get(r)) {
+                l++;
+            } else {
+                r--;
+            }
+        }
+
+        return resultArea;
+    }
+}`,
+expl:`O(n) время, O(1) память. Сдвигаем меньший указатель — сдвиг большего точно не увеличит площадь.`},
+
+{id:"uf1",t:"Объединение графиков",p:"Union-Find",d:"средне",
+desc:`Дан массив graphics, где каждый график — список пар [время, значение], отсортированный по времени.
+Объединить все графики в один: [время, сумма значений].
+
+Пример:
+Ввод: graphics = [[[1,2],[3,1]], [[2,3],[4,2]]]
+Вывод: [[1,2],[2,5],[3,4],[4,3]]`,
+hint:"Min-heap для событий из всех графиков. Обрабатываем все события с одинаковым временем вместе.",
+code:`public class Solution {
+    public List<List<Integer>> merge(
+            List<List<List<Integer>>> graphics) {
+        int k = graphics.size();
+        int[] currentValues = new int[k];
+        long currentSum = 0;
+
+        // Куча: {время, индекс_графика, индекс_точки}
+        PriorityQueue<int[]> heap =
+            new PriorityQueue<>(
+                Comparator.comparingInt(a -> a[0]));
+
+        for (int i = 0; i < k; i++) {
+            var g = graphics.get(i);
+            if (g != null && !g.isEmpty())
+                heap.offer(new int[]{
+                    g.get(0).get(0), i, 0});
+        }
+
+        List<List<Integer>> result = new ArrayList<>();
+
+        while (!heap.isEmpty()) {
+            int curTime = heap.peek()[0];
+
+            while (!heap.isEmpty()
+                   && heap.peek()[0] == curTime) {
+                int[] ev = heap.poll();
+                int gi = ev[1], pi = ev[2];
+                var g = graphics.get(gi);
+                int newVal = g.get(pi).get(1);
+                int oldVal = currentValues[gi];
+
+                if (newVal != oldVal) {
+                    currentValues[gi] = newVal;
+                    currentSum +=
+                        (long)newVal - oldVal;
+                }
+
+                if (pi + 1 < g.size())
+                    heap.offer(new int[]{
+                        g.get(pi+1).get(0), gi, pi+1});
+            }
+
+            result.add(Arrays.asList(
+                curTime, (int)currentSum));
+        }
+        return result;
+    }
+}`,
+expl:`Min-heap обрабатывает события по времени. Все события одного момента — за раз. O(N log k) где N — суммарное число точек.`},
+
+{id:"gbfs1",t:"Кратчайший путь в графе (BFS)",p:"Graph BFS",d:"средне",
+desc:`Дан граф как список рёбер edges и две вершины start и end.
+Расстояния между вершинами равны 1.
+Найти кратчайший путь от start до end.
+Вернуть список вершин или пустой список если пути нет.
+
+Пример:
+edges = [[1,8],[2,1],[5,1],[3,8],[3,5]], start = 2, end = 5
+Вывод: [2,1,5]`,
+hint:"BFS (поиск в ширину) + восстановление пути через карту родителей.",
+code:`public class Solution {
+    public List<Integer> findShortestPath(
+            List<List<Integer>> edges,
+            Integer start, Integer end) {
+
+        // 1. Строим граф
+        Map<Integer, List<Integer>> graph =
+            new HashMap<>();
+        for (List<Integer> edge : edges) {
+            int u = edge.get(0), v = edge.get(1);
+            graph.putIfAbsent(u, new ArrayList<>());
+            graph.putIfAbsent(v, new ArrayList<>());
+            graph.get(u).add(v);
+            graph.get(v).add(u);
+        }
+
+        // 2. BFS
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(start);
+        // visited: вершина → родитель
+        Map<Integer, Integer> visited =
+            new HashMap<>();
+        visited.put(start, null);
+
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            if (node == end) break;
+
+            for (int nb : graph.getOrDefault(
+                    node, new ArrayList<>())) {
+                if (!visited.containsKey(nb)) {
+                    visited.put(nb, node);
+                    queue.add(nb);
+                }
+            }
+        }
+
+        // 3. Нет пути
+        if (!visited.containsKey(end))
+            return new ArrayList<>();
+
+        // 4. Восстановление пути
+        List<Integer> path = new ArrayList<>();
+        Integer cur = end;
+        while (cur != null) {
+            path.add(cur);
+            cur = visited.get(cur);
+        }
+        Collections.reverse(path);
+        return path;
+    }
+}`,
+expl:`BFS гарантирует кратчайший путь в невзвешенном графе. Очередь FIFO обрабатывает сначала ближайших. Восстановление пути через карту родителей.`},
+
+{id:"dp1",t:"Longest Palindromic Substring (5)",p:"Dynamic Prog.",d:"средне",
+desc:`Дана строка s. Найти самую длинную подстроку-палиндром.
+
+Пример:
+Ввод: s = "babad"
+Вывод: "bab" (или "aba")`,
+hint:"Expand around center: для каждого символа (и пары) расширяйся влево-вправо пока совпадает.",
+code:`class Solution {
+    public String longestPalindrome(String s) {
+        int start = 0, maxLen = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int len1 = expand(s, i, i);     // нечётный
+            int len2 = expand(s, i, i + 1); // чётный
+            int len = Math.max(len1, len2);
+            if (len > maxLen) {
+                maxLen = len;
+                start = i - (len - 1) / 2;
+            }
+        }
+        return s.substring(start, start + maxLen);
+    }
+
+    int expand(String s, int l, int r) {
+        while (l >= 0 && r < s.length()
+               && s.charAt(l) == s.charAt(r)) {
+            l--; r++;
+        }
+        return r - l - 1;
+    }
+}`,
+expl:`O(n²) время, O(1) память. Для каждого центра расширяемся пока символы совпадают.`}
 ];
 
 const patterns={};
 P.forEach(p=>{if(!patterns[p.p])patterns[p.p]=[];patterns[p.p].push(p)});
 const patNames=Object.keys(patterns);
-let curPat=null,curScreen='patterns';
+let curPat=null;
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active',['patterns','quiz','cards'][i]===id);
-  });
-  curScreen=id;
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',['patterns','quiz','cards'][i]===id)});
   if(id==='quiz')initQuiz();
   if(id==='cards')initCards();
 }
 
-// PATTERNS
 function renderPatterns(){
-  const g=document.getElementById('patternsGrid');
-  g.innerHTML=patNames.map(name=>`
+  document.getElementById('patternsGrid').innerHTML=patNames.map(name=>`
     <div class="pcard" onclick="openPattern('${name}')">
       <div class="name">${name}</div>
-      <div class="desc">${patterns[name].length} задач</div>
+      <div class="cnt">${patterns[name].length} задач</div>
     </div>`).join('');
 }
 function openPattern(name){
@@ -145,13 +769,13 @@ function openProblem(id,from){
   document.getElementById('probContent').innerHTML=`
     <span class="tag" style="background:${p.d==='легко'?'#22c55e30;color:#22c55e':p.d==='средне'?'#f59e0b30;color:#f59e0b':'#ef444430;color:#ef4444'}">${p.d}</span>
     <span class="tag" style="background:#7c3aed30;color:#7c3aed;margin-left:4px">${p.p}</span>
-    <div class="detail-section"><h3>📝 Условие</h3><div style="white-space:pre-wrap">${esc(p.desc)}</div></div>
+    <div class="detail-section"><h3>📝 Условие</h3><div class="body">${esc(p.desc)}</div></div>
     <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">💡 Показать подсказку</button>
-    <div class="detail-section" style="display:none"><h3>💡 Подсказка</h3>${esc(p.hint)}</div>
+    <div class="detail-section" style="display:none"><h3>💡 Подсказка</h3><div class="body">${esc(p.hint)}</div></div>
     <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">👨‍💻 Показать решение</button>
     <div class="detail-section" style="display:none"><h3>👨‍💻 Код</h3><pre>${esc(p.code)}</pre></div>
     <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">🧠 Показать объяснение</button>
-    <div class="detail-section" style="display:none"><h3>🧠 Объяснение</h3>${esc(p.expl)}</div>`;
+    <div class="detail-section" style="display:none"><h3>🧠 Объяснение</h3><div class="body">${esc(p.expl)}</div></div>`;
   showScreen('problemDetail');
 }
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -171,62 +795,52 @@ function nextQ(){
         <div style="font-size:48px">${qScore>=4?'⭐':'🔄'}</div>
         <h2 style="margin:12px 0">${qScore} из ${qTotal}</h2>
         <button class="big-btn" onclick="initQuiz()">Ещё раз</button>
-      </div>`;
-    return;
+      </div>`;return;
   }
   qAnswered=false;
-  const p=qList[qIdx];
-  const correct=p.p;
+  const p=qList[qIdx],correct=p.p;
   let opts=patNames.filter(n=>n!==correct);
-  opts=shuffle(opts).slice(0,3);
-  opts.push(correct);
+  opts=shuffle(opts).slice(0,3).concat(correct);
   opts=shuffle(opts);
-  const area=document.getElementById('quizArea');
-  area.innerHTML=`
+  document.getElementById('quizArea').innerHTML=`
     <div class="counter">${qIdx+1} / ${qTotal}</div>
     <div class="progress-bar"><div class="fill" style="width:${qIdx/qTotal*100}%"></div></div>
-    <div class="detail-section"><strong>${p.t}</strong><div style="white-space:pre-wrap;margin-top:8px;font-size:14px">${esc(p.desc)}</div></div>
+    <div class="detail-section"><strong>${p.t}</strong><div class="body" style="margin-top:8px">${esc(p.desc)}</div></div>
     <p style="font-weight:600;margin:8px 0">Какой паттерн?</p>
-    ${opts.map(o=>`<div class="quiz-option" data-v="${o}" onclick="pickAnswer(this,'${esc2(correct)}')">${o}</div>`).join('')}`;
+    ${opts.map(o=>`<div class="quiz-option" data-v="${o}" onclick="pickAnswer(this,'${o===correct}')">${o}</div>`).join('')}`;
 }
-function pickAnswer(el,correct){
-  if(qAnswered)return;
-  qAnswered=true;
-  const v=el.dataset.v;
+function pickAnswer(el,isCorrectStr){
+  if(qAnswered)return;qAnswered=true;
+  const isCorrect=isCorrectStr==='true';
+  const correct=qList[qIdx].p;
   document.querySelectorAll('.quiz-option').forEach(o=>{
     if(o.dataset.v===correct)o.classList.add('correct');
     else if(o===el)o.classList.add('wrong');
-    else o.classList.add('reveal');
   });
-  if(v===correct)qScore++;
+  if(isCorrect)qScore++;
   qIdx++;
   setTimeout(nextQ,1200);
 }
-function esc2(s){return s.replace(/'/g,"\\'")}
 
 // FLASHCARDS
 let fcIdx=0,fcFlipped=false,fcList=[];
-function initCards(){
-  fcList=shuffle([...P]);fcIdx=0;fcFlipped=false;
-  renderCard();
-}
+function initCards(){fcList=shuffle([...P]);fcIdx=0;fcFlipped=false;renderCard()}
 function renderCard(){
   const p=fcList[fcIdx];
-  const area=document.getElementById('cardsArea');
-  area.innerHTML=`
+  document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
     <div class="flashcard${fcFlipped?' flipped':''}" onclick="flipCard()">
       <div class="fc-face">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.d}</span>
-        <h3 style="margin:12px 0">${p.t}</h3>
-        <div style="white-space:pre-wrap;font-size:14px">${esc(p.desc)}</div>
-        <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть</div>
+        <h3 style="margin:12px 0">${esc(p.t)}</h3>
+        <div style="white-space:pre-wrap;font-size:14px;line-height:1.6">${esc(p.desc)}</div>
+        <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
       <div class="fc-face fc-back">
-        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.p}</span>
-        <div style="margin:10px 0;color:var(--orange);font-size:14px">${esc(p.hint)}</div>
-        <pre style="font-size:11px;background:var(--card2);padding:10px;border-radius:10px;overflow-x:auto">${esc(p.code)}</pre>
-        <div style="margin-top:8px;font-size:13px;color:var(--dim)">${esc(p.expl)}</div>
+        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
+        <div style="margin:10px 0;color:var(--orange);font-size:14px;white-space:pre-wrap">${esc(p.hint)}</div>
+        <pre style="font-size:11px;background:var(--card2);padding:12px;border-radius:10px;overflow-x:auto;line-height:1.5">${esc(p.code)}</pre>
+        <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
       </div>
     </div>
     <div class="fc-nav">

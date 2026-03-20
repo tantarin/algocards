@@ -97,7 +97,7 @@ function renderCard(){
     <div class="flashcard" onclick="flipCard()">
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
-        <h3 style="margin:12px 0;font-size:17px">${esc(p.t)}</h3>
+        <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div style="white-space:pre-wrap;font-size:14px;line-height:1.6">${esc(p.desc)}</div>
         <div class="spoiler-row">
           <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>

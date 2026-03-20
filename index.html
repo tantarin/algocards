@@ -28,6 +28,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 #search:focus{border-color:var(--purple)}
 .hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;margin-top:14px;display:inline-block}
 .hint-text{margin-top:10px;color:var(--orange);font-size:14px;font-weight:600}
+.hl{color:var(--orange);font-weight:600;background:rgba(245,158,11,0.15);padding:1px 4px;border-radius:4px}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 </style>
@@ -42,7 +43,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 
 <script src="problems.js"></script>
 <script>
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
 const allPatterns=[...new Set(P.map(p=>p.p))].sort();

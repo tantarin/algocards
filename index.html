@@ -26,8 +26,11 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 #search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none;margin-bottom:8px}
 #search::placeholder{color:var(--dim)}
 #search:focus{border-color:var(--purple)}
-.hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;margin-top:14px;display:inline-block}
-.hint-text{margin-top:10px;color:var(--orange);font-size:14px;font-weight:600}
+.spoiler-row{margin-top:12px}
+.hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;display:inline-block}
+.steps-btn{color:var(--green)}
+.hint-text{margin-top:8px;color:var(--orange);font-size:14px;font-weight:600}
+.steps-text{margin-top:8px;color:var(--green);font-size:13px;line-height:1.7;white-space:pre-wrap}
 .hl{color:var(--orange);font-weight:600;background:rgba(245,158,11,0.15);padding:1px 4px;border-radius:4px}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
@@ -92,8 +95,14 @@ function renderCard(){
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px">${esc(p.t)}</h3>
         <div style="white-space:pre-wrap;font-size:14px;line-height:1.6">${esc(p.desc)}</div>
-        <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
-        <div class="hint-text" style="display:none">${esc(p.hint)}</div>
+        <div class="spoiler-row">
+          <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
+          <div class="hint-text" style="display:none">${esc(p.hint)}</div>
+        </div>
+        ${p.steps?`<div class="spoiler-row">
+          <button class="hint-btn steps-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">🔢 Схема решения</button>
+          <div class="steps-text" style="display:none">${esc(p.steps)}</div>
+        </div>`:''}
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">

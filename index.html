@@ -8,6 +8,9 @@
 <meta name="theme-color" content="#7c3aed">
 <link rel="manifest" href="manifest.json">
 <title>AlgoCards</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--orange:#f59e0b;--text:#e2e8f0;--dim:#94a3b8;--radius:16px}
@@ -34,6 +37,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .hl{color:var(--orange);font-weight:600;background:rgba(245,158,11,0.15);padding:1px 4px;border-radius:4px}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 </style>
 </head>
 <body>
@@ -107,7 +111,7 @@ function renderCard(){
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
-        <pre style="font-size:11px;background:var(--card2);padding:12px;border-radius:10px;overflow-x:auto;line-height:1.5;margin-top:10px">${esc(p.code)}</pre>
+        <pre style="margin-top:10px;border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${esc(p.code)}</code></pre>
         <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
       </div>
     </div>
@@ -116,6 +120,7 @@ function renderCard(){
       <button onclick="fcShuffle()">🔀</button>
       <button onclick="fcNext()">→</button>
     </div>`;
+  document.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
 }
 
 function flipCard(){fcFlipped=!fcFlipped;renderCard()}

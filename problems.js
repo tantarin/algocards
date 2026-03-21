@@ -3657,44 +3657,124 @@ desc:`(term)[n] — повторить term n раз. ==Вложенность==
 Вывод: "xyyyz"`,
 hint:`Два стека: один для строк (StringBuilder), один для чисел. При ( — push текущую строку и начать новую. При ] — pop и повторить.`,
 code:`class Solution {
+
+    /**
+     * Декодирует строку формата:
+     * (term)[n] — повторить term n раз
+     * с поддержкой вложенности.
+     *
+     * Пример:
+     * "a(b(c)[2])[3]" → "abccbccbcc"
+     *
+     * Идея решения:
+     * - используем стек для хранения "контекста" (строки до '(')
+     * - при закрытии блока повторяем текущую строку и приклеиваем назад
+     */
     public String decode(String s) {
+
+        // стек строк (контексты до входа в '(')
         Deque<StringBuilder> strStack = new ArrayDeque<>();
+
+        // стек чисел повторения
         Deque<Integer> numStack = new ArrayDeque<>();
+
+        // текущая строка (на текущем уровне вложенности)
         StringBuilder current = new StringBuilder();
+
         int i = 0;
 
+        /**
+         * Основной инвариант:
+         * current всегда содержит строку текущего уровня вложенности
+         * strStack хранит строки предыдущих уровней
+         */
         while (i < s.length()) {
+
             char c = s.charAt(i);
 
+            // --- Открытие нового блока ---
             if (c == '(') {
+
+                /**
+                 * Мы "входим" в новый уровень вложенности.
+                 * Сохраняем текущую строку в стек,
+                 * и начинаем собирать новую.
+                 */
                 strStack.push(current);
+
                 current = new StringBuilder();
+
                 i++;
-            } else if (c == ')') {
-                i++;
-                i++; // skip '['
+            }
+
+            // --- Закрытие блока (term)[n] ---
+            else if (c == ')') {
+
+                /**
+                 * Закрываем текущий блок:
+                 * current сейчас = term
+                 */
+
+                i++; // переходим после ')'
+                i++; // пропускаем '['
+
+                /**
+                 * Парсим число n
+                 */
                 int num = 0;
                 while (i < s.length()
                     && Character.isDigit(s.charAt(i))) {
+
+                    // num = num * 10 + digit
                     num = num * 10
                         + (s.charAt(i) - '0');
+
                     i++;
                 }
-                i++; // skip ']'
-                numStack.push(num);
+
+                i++; // пропускаем ']'
+
+                /**
+                 * Достаём предыдущий контекст (до '(')
+                 */
                 StringBuilder prev = strStack.pop();
-                int repeat = numStack.pop();
+
+                int repeat = num;
+
+                /**
+                 * Повторяем текущую строку
+                 */
                 String repeated = current.toString();
+
+                /**
+                 * Ключевая операция:
+                 * prev + (current * repeat)
+                 */
                 for (int r = 0; r < repeat; r++) {
                     prev.append(repeated);
                 }
+
+                /**
+                 * Возвращаемся на уровень выше
+                 */
                 current = prev;
-            } else {
+            }
+
+            // --- Обычный символ ---
+            else {
+
+                /**
+                 * Просто добавляем символ в текущую строку
+                 */
                 current.append(c);
+
                 i++;
             }
         }
 
+        /**
+         * В конце current содержит итоговую строку
+         */
         return current.toString();
     }
 }`,

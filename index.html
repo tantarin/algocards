@@ -278,7 +278,7 @@ function renderCard(){
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
-          <button class="copy-btn" onclick="event.stopPropagation();copyDesc(this)">Условие</button>
+          <button class="copy-btn" onclick="event.stopPropagation();copyDesc(this)">Скопировать</button>
           <div class="desc-copy-body" style="white-space:pre-wrap;font-size:14px;line-height:1.6;padding-top:32px">${esc(p.desc)}</div>
         </div>
         <div class="spoiler-row">
@@ -329,7 +329,7 @@ function copyDesc(btn){
     btn.textContent='Скопировано ✓';
     btn.style.background='var(--green)';
     btn.style.color='#000';
-    setTimeout(()=>{btn.textContent='Условие';btn.style.background='';btn.style.color=''},1500);
+    setTimeout(()=>{btn.textContent='Скопировать';btn.style.background='';btn.style.color=''},1500);
   }).catch(()=>{btn.textContent='Ошибка'});
 }
 

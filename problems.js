@@ -3695,21 +3695,36 @@ desc:`(term)[n] — повторить term n раз. ==Вложенность==
 hint:`Два стека: один для строк (StringBuilder), один для чисел. При ( — push текущую строку и начать новую. При ] — pop и повторить.`,
 code:`class Solution {
     public String decode(String s) {
+
+        // стек строк: хранит строки до входа в '('
         Deque<StringBuilder> strStack = new ArrayDeque<>();
+
+        // стек чисел повторения
         Deque<Integer> numStack = new ArrayDeque<>();
+
+        // текущая собираемая строка (на текущем уровне вложенности)
         StringBuilder current = new StringBuilder();
+
         int i = 0;
 
+        // идём по строке слева направо
         while (i < s.length()) {
             char c = s.charAt(i);
 
             if (c == '(') {
+                // начинаем новый вложенный блок:
+                // сохраняем текущую строку и начинаем новую
                 strStack.push(current);
                 current = new StringBuilder();
                 i++;
+
             } else if (c == ')') {
-                i++;
-                i++; // skip '['
+                // закрытие блока (term)[n]
+
+                i++; // переходим после ')'
+                i++; // пропускаем '['
+
+                // парсим число n
                 int num = 0;
                 while (i < s.length()
                     && Character.isDigit(s.charAt(i))) {
@@ -3717,21 +3732,37 @@ code:`class Solution {
                         + (s.charAt(i) - '0');
                     i++;
                 }
-                i++; // skip ']'
+
+                i++; // пропускаем ']'
+
+                // кладём число в стек (хотя можно было и без него)
                 numStack.push(num);
+
+                // достаём строку до этого блока
                 StringBuilder prev = strStack.pop();
+
+                // сколько раз повторить текущую строку
                 int repeat = numStack.pop();
+
+                // текущий term, который нужно повторить
                 String repeated = current.toString();
+
+                // добавляем term * repeat к предыдущей строке
                 for (int r = 0; r < repeat; r++) {
                     prev.append(repeated);
                 }
+
+                // возвращаемся на уровень выше
                 current = prev;
+
             } else {
+                // обычный символ — просто добавляем
                 current.append(c);
                 i++;
             }
         }
 
+        // итоговая строка
         return current.toString();
     }
 }`,

@@ -77,20 +77,29 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
+// --- «14 задач на сегодня» (без поиска) ---
+// Из текущего набора (все задачи или выбранный паттерн) каждый календарный день показываем не больше DAILY_LIMIT карточек.
+// Состав и порядок детерминированы от строки seed (дата + фильтр), чтобы за день список не менялся между перезагрузками.
+// Поиск не ограничиваем — при непустой строке поиска показываются все совпадения из getFiltered().
+
 const DAILY_LIMIT=14;
+/** Дата (YYYY-MM-DD), для которой уже собран fcList; если наступил новый день — пересобираем список в renderCard */
 let dailyListDateKey='';
 
+/** Локальная календарная дата устройства — ключ «какой сегодня день» для дневной выборки */
 function todayLocalDateKey(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
+/** FNV-1a: превращаем строку seed в стартовое число для PRNG */
 function hashString(s){
   let h=2166136261>>>0;
   for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}
   return h>>>0;
 }
 
+/** Детерминированный генератор [0,1) — нужен для воспроизводимого «перемешивания» по дню */
 function mulberry32(seed){
   return function(){
     let t=(seed+=0x6D2B79F5)>>>0;
@@ -100,6 +109,10 @@ function mulberry32(seed){
   };
 }
 
+/**
+ * Берёт из list до maxN задач: Fisher–Yates с PRNG от seedStr.
+ * seedStr обычно «дата|all» или «дата|Two Pointers» — отдельная выборка на каждый паттерн в тот же день.
+ */
 function pickDailyProblems(list,seedStr,maxN){
   if(!list.length)return[];
   const n=Math.min(maxN,list.length);
@@ -112,6 +125,7 @@ function pickDailyProblems(list,seedStr,maxN){
   return idx.slice(0,n).map(i=>list[i]);
 }
 
+/** Заполняет fcList дневной порцией. Имеет смысл только при пустом поиске: тогда getFiltered() даёт все задачи или только выбранный паттерн. */
 function rebuildDailyList(){
   const k=todayLocalDateKey();
   dailyListDateKey=k;
@@ -182,6 +196,7 @@ function getFiltered(){
 
 function applySearch(){
   searchQuery=document.getElementById('search').value.trim();
+  // С поиском — полный список совпадений; без поиска — снова лимит «на сегодня»
   if(searchQuery)fcList=getFiltered();
   else rebuildDailyList();
   fcIdx=0;fcFlipped=false;
@@ -197,6 +212,7 @@ function renderFilters(){
 function setFilter(pat){
   activeFilter=pat;
   renderFilters();
+  // При активном поиске фильтр только сужает выдачу поиска; иначе — новая дневная 14 из выбранного паттерна
   if(searchQuery)fcList=getFiltered();
   else rebuildDailyList();
   fcIdx=0;fcFlipped=false;
@@ -238,6 +254,7 @@ function renderEditCard(){
 }
 
 function renderCard(){
+  // Вкладка открыта через полночь: обновляем дневной набор (только в обычном режиме, не в поиске)
   if(!searchQuery){
     const k=todayLocalDateKey();
     if(dailyListDateKey!==k){
@@ -247,6 +264,7 @@ function renderCard(){
   }
   const totalFiltered=getFiltered().length;
   let infoText=fcList.length+' задач';
+  // Подсказка под заголовком: «на сегодня» только когда реально действует лимит DAILY_LIMIT
   if(!searchQuery&&totalFiltered>DAILY_LIMIT)infoText+=' на сегодня';
   else if(searchQuery)infoText+=' по поиску';
   document.getElementById('info').textContent=infoText;
@@ -320,6 +338,7 @@ function fcNext(){fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
 function fcPrev(){fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
 function fcShuffle(){
   fcFlipped=false;
+  // В дневном режиме перемешиваем только сегодняшние карточки; при поиске — весь отфильтрованный список
   if(searchQuery)fcList=shuffle(getFiltered());
   else fcList=shuffle(fcList.slice());
   fcIdx=0;renderCard();
@@ -417,7 +436,7 @@ async function saveCard(){
 }
 
 renderFilters();
-rebuildDailyList();
+rebuildDailyList(); // старт: fcList = до 14 задач на сегодня (или все, если в наборе меньше)
 renderCard();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script>

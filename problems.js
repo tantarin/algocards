@@ -4525,20 +4525,38 @@ desc:`средне
 - Дерево является валидным BST`,
 hint:`Спускаемся по BST: если target < node.val — идём влево, иначе вправо. На каждом шаге обновляем ближайший.`,
 code:`class Solution {
+
     public int closestValue(TreeNode root,
                             double target) {
+
+        // лучший найденный на данный момент ответ
         int closest = root.val;
 
+        // идём по дереву как в бинарном поиске
         while (root != null) {
+
+            /**
+             * проверяем: текущий узел ближе к target,
+             * чем лучший найденный?
+             */
             if (Math.abs(root.val - target)
                 < Math.abs(closest - target)) {
+
                 closest = root.val;
             }
 
+            /**
+             * используем свойство BST:
+             * - если target меньше текущего значения →
+             *   все более близкие кандидаты могут быть слева
+             * - иначе идём вправо
+             */
             root = target < root.val
-                ? root.left : root.right;
+                ? root.left
+                : root.right;
         }
 
+        // возвращаем ближайшее найденное значение
         return closest;
     }
 }`,

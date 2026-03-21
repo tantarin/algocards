@@ -946,15 +946,26 @@ desc:`Дан путь из команд U/D/L/R (вверх/вниз/лево/п
 hint:`Множество посещённых координат. При повторном посещении — разматываем путь обратно до этой точки.`,
 code:`class Solution {
     public List<String> optimizeRoute(String[] moves) {
+
+        // итоговый маршрут без петель (список команд)
         List<String> result = new ArrayList<>();
+
+        // список координат текущего маршрута (каждая точка после шага)
         List<int[]> coords = new ArrayList<>();
+
+        // множество посещённых точек текущего маршрута
         Set<String> visited = new HashSet<>();
 
+        // стартовая позиция
         int x = 0, y = 0;
+
+        // добавляем стартовую точку
         coords.add(new int[]{x, y});
         visited.add(x + "," + y);
 
         for (String move : moves) {
+
+            // делаем шаг
             switch (move) {
                 case "U": y++; break;
                 case "D": y--; break;
@@ -963,24 +974,40 @@ code:`class Solution {
             }
 
             String key = x + "," + y;
+
+            // если точка уже была — нашли петлю
             if (visited.contains(key)) {
+
+                /**
+                 * удаляем весь хвост маршрута,
+                 * пока не дойдём до предыдущего появления этой точки
+                 */
                 while (true) {
-                    int[] last = coords.get(
-                        coords.size() - 1);
-                    String lastKey =
-                        last[0] + "," + last[1];
+                    int[] last = coords.get(coords.size() - 1);
+                    String lastKey = last[0] + "," + last[1];
+
+                    // дошли до нужной точки — остановка
                     if (lastKey.equals(key)) break;
+
+                    // удаляем точку из visited
                     visited.remove(lastKey);
+
+                    // удаляем последнюю точку маршрута
                     coords.remove(coords.size() - 1);
+
+                    // удаляем соответствующую команду
                     result.remove(result.size() - 1);
                 }
+
             } else {
+                // новая точка — просто добавляем в маршрут
                 visited.add(key);
                 coords.add(new int[]{x, y});
                 result.add(move);
             }
         }
 
+        // возвращаем маршрут без петель
         return result;
     }
 }`,

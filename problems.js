@@ -4343,12 +4343,12 @@ code:`class Solution {
         return count;
     }
 }`,
-steps:`1. Сортируем; left = 0, right = 1.
-2. diff = nums[right] − nums[left].
-3. При diff = k — считаем блоки; < k — right++; > k — left++.`,
+steps:`1.diff = nums[right] − nums[left].
+2. При diff = k — считаем блоки; < k — right++; > k — left++.`,
 complexity:`Время: O(n log n), Память: O(1)`,
-complexityExpl:`Сортировка O(n log n), два указателя с учётом блоков — O(n). Счётчики — O(1) памяти.`,
-expl:`Сортируем массив. Два указателя: если diff < k — right++, если diff > k — left++. При diff == k считаем количество дубликатов и переходим дальше. O(n log n).`},
+complexityExpl:`время: O(n)
+память: O(1)`,
+expl:`Два указателя: если diff < k — right++, если diff > k — left++. При diff == k считаем количество дубликатов и переходим дальше. O(n log n).`},
 
 {id:"tp19",t:"Подсчёт пар с разницей >= К",p:"Two Pointers",d:"средне",
 desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i < j и ==|nums[i] - nums[j]| >= k==.

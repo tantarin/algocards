@@ -4227,36 +4227,116 @@ desc:`Дан ==отсортированный массив== и число k >= 
 hint:`Два указателя. Если разница < k — двигаем правый. Если > k — двигаем левый. Если == k — считаем.`,
 code:`class Solution {
     public int countPairsWithDiff(int[] nums, int k) {
-        Arrays.sort(nums);
-        int count = 0;
-        int left = 0, right = 1;
+        int n = nums.length;
 
-        while (right < nums.length) {
+        // Если меньше 2 элементов — пар быть не может
+        if (n < 2) return 0;
+
+        int count = 0;
+
+        // =========================
+        // СЛУЧАЙ k == 0
+        // =========================
+        // Нам нужно найти количество пар одинаковых элементов.
+        // Так как массив отсортирован, одинаковые значения идут подряд.
+        //
+        // Если подряд идет блок длины len,
+        // количество пар внутри него:
+        // len * (len - 1) / 2
+        //
+        // Пример: [1,1,1] → len = 3 → 3 пары
+        if (k == 0) {
+            int i = 0;
+
+            while (i < n) {
+                int j = i;
+
+                // Ищем конец блока одинаковых элементов nums[i]
+                while (j < n && nums[j] == nums[i]) {
+                    j++;
+                }
+
+                // Длина блока одинаковых значений
+                int len = j - i;
+
+                // Добавляем число пар внутри этого блока
+                count += len * (len - 1) / 2;
+
+                // Переходим к следующему блоку
+                i = j;
+            }
+
+            return count;
+        }
+
+        // =========================
+        // СЛУЧАЙ k > 0
+        // =========================
+        // Используем два указателя (two pointers)
+        //
+        // Инвариант:
+        // left < right
+        // массив отсортирован → nums[right] >= nums[left]
+        //
+        // diff = nums[right] - nums[left]
+        int left = 0;
+        int right = 1;
+
+        while (right < n) {
+
+            // Защита от ситуации, когда указатели совпали
+            if (left == right) {
+                right++;
+                continue;
+            }
+
             int diff = nums[right] - nums[left];
 
-            if (diff == k) {
-                count++;
-                int lv = nums[left];
-                int rv = nums[right];
-                int lc = 0, rc = 0;
-                while (left < nums.length
-                    && nums[left] == lv) {
-                    left++; lc++;
-                }
-                while (right < nums.length
-                    && nums[right] == rv) {
-                    right++; rc++;
-                }
-                if (k == 0) {
-                    count += lc * (lc - 1) / 2 - 1;
-                } else {
-                    count += lc * rc - 1;
-                }
-            } else if (diff < k) {
+            if (diff < k) {
+                // Разница слишком маленькая → нужно увеличить diff
+                // так как массив отсортирован, увеличиваем right
                 right++;
-            } else {
+
+            } else if (diff > k) {
+                // Разница слишком большая → нужно уменьшить diff
+                // двигаем left вправо
                 left++;
-                if (left == right) right++;
+
+            } else {
+                // =========================
+                // diff == k → нашли подходящие значения
+                // =========================
+                //
+                // Но важно: могут быть дубликаты!
+                //
+                // Например:
+                // nums = [1,1,1,3,3]
+                // k = 2
+                //
+                // Тогда:
+                // 1 (x3) и 3 (x2)
+                // количество пар = 3 * 2 = 6
+
+                int leftVal = nums[left];
+                int rightVal = nums[right];
+
+                // Считаем, сколько одинаковых элементов подряд слева
+                int leftCount = 0;
+                while (left < n && nums[left] == leftVal) {
+                    left++;
+                    leftCount++;
+                }
+
+                // Считаем, сколько одинаковых элементов подряд справа
+                int rightCount = 0;
+                while (right < n && nums[right] == rightVal) {
+                    right++;
+                    rightCount++;
+                }
+
+                // Каждое значение слева можно сочетать
+                // с каждым значением справа
+                count += leftCount * rightCount;
             }
         }
 

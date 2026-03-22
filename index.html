@@ -302,6 +302,7 @@ const EDIT_FIELDS=[
   {key:'hint',label:'Подсказка',rows:2},
   {key:'steps',label:'Схема решения',rows:4},
   {key:'code',label:'Код (Java)',rows:12},
+  {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
   {key:'complexity',label:'Сложность',rows:1},
   {key:'complexityExpl',label:'Объяснение сложности',rows:2},
   {key:'expl',label:'Объяснение алгоритма',rows:3}
@@ -377,6 +378,11 @@ function renderCard(){
           <button class="copy-btn" onclick="event.stopPropagation();copyCode(this)">Копировать</button>
           <pre style="border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         </div>
+        ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
+        <div class="code-wrap">
+          <button class="copy-btn" onclick="event.stopPropagation();copyCode(this)">Копировать</button>
+          <pre style="border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
+        </div>`:''}
         ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
           <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
           ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
@@ -440,6 +446,7 @@ function buildProblemsJs(){
     out+='desc:`'+escVal(p.desc)+'`,\n';
     out+='hint:`'+escVal(p.hint)+'`,\n';
     out+='code:`'+escVal(p.code)+'`,\n';
+    if(p.code2)out+='code2:`'+escVal(p.code2)+'`,\n';
     out+='steps:`'+escVal(p.steps)+'`,\n';
     out+='complexity:`'+escVal(p.complexity)+'`,\n';
     out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';

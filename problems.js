@@ -714,6 +714,9 @@ code:`class Solution {
         }
 
         List<Integer> result = new ArrayList<>();
+
+        //partitionStart — где начался текущий кусок
+        //maxReach — насколько далеко должен дойти текущий кусок
         int partitionStart = 0;
         int maxReach = 0;
 

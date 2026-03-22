@@ -1,4 +1,4 @@
-const CACHE = 'algocards-v16';
+const CACHE = 'algocards-v17';
 /** problems.js часто меняется через API — не включаем в precache (устаревает мгновенно) */
 const ASSETS = ['./index.html', './manifest.json'];
 

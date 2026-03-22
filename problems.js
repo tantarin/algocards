@@ -283,7 +283,7 @@ code:`class Solution {
         int lo = 0, hi = nums.length - 1, result = -1;
         while (lo <= hi) {
             int mid = lo + (hi - lo) / 2;
-            if (nums[mid] == target) {
+            if (nums[mid] == target) { //Мы НЕ останавливаемся при нахождении target
                 result = mid;
                 hi = mid - 1;
             } else if (nums[mid] < target) {
@@ -299,7 +299,7 @@ code:`class Solution {
         int lo = 0, hi = nums.length - 1, result = -1;
         while (lo <= hi) {
             int mid = lo + (hi - lo) / 2;
-            if (nums[mid] == target) {
+            if (nums[mid] == target) { //Мы НЕ останавливаемся при нахождении target
                 result = mid;
                 lo = mid + 1;
             } else if (nums[mid] < target) {

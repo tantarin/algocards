@@ -64,6 +64,11 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 .solve-btn{width:42px;height:42px;border-radius:12px;border:1px solid #ffffff20;background:var(--card2);color:var(--text);font-size:22px;line-height:1;cursor:pointer;transition:transform .1s,background .15s}
 .solve-btn:active{transform:scale(.92);background:var(--purple);color:#fff}
 .solve-num{min-width:32px;text-align:center;font-weight:700;font-size:17px;color:var(--green)}
+.lc-similar{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff15}
+.lc-similar-title{font-size:12px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.lc-similar-links{display:flex;flex-wrap:wrap;gap:8px 14px}
+.lc-similar-link{color:var(--purple);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.lc-similar-link:active{opacity:.85}
 </style>
 </head>
 <body>
@@ -172,6 +177,30 @@ function solveTrackerHtml(p){
     <button type="button" class="solve-btn" aria-label="Минус один" onclick="adjustSolve('${p.id}',-1)">−</button>
     <span class="solve-num">${n}</span>
     <button type="button" class="solve-btn" aria-label="Плюс один" onclick="adjustSolve('${p.id}',1)">+</button>
+  </div>`;
+}
+
+function isInTodaysDailyBatch(p){
+  if(searchQuery)return false;
+  const list=getFiltered();
+  const k=todayLocalDateKey()+'|'+(activeFilter||'all');
+  const daily=pickDailyProblems(list,k,DAILY_LIMIT);
+  return daily.some(x=>x.id===p.id);
+}
+
+function lcSimilarHtml(p){
+  if(!p.lcSimilar||!p.lcSimilar.length)return '';
+  if(!isInTodaysDailyBatch(p))return '';
+  const items=p.lcSimilar.map(x=>{
+    const h=(x.h||'').replace(/[^a-z0-9-]/gi,'');
+    if(!h)return '';
+    const href='https://leetcode.com/problems/'+h+'/';
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="lc-similar-link">${esc(x.t||h)}</a>`;
+  }).filter(Boolean).join('');
+  if(!items)return '';
+  return `<div class="lc-similar" onclick="event.stopPropagation()">
+    <div class="lc-similar-title">Похожие задачи с LeetCode</div>
+    <div class="lc-similar-links">${items}</div>
   </div>`;
 }
 
@@ -334,6 +363,7 @@ function renderCard(){
           <button class="hint-btn steps-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">🔢 Схема решения</button>
           <div class="steps-text" style="display:none">${esc(p.steps)}</div>
         </div>`:''}
+        ${lcSimilarHtml(p)}
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
@@ -408,7 +438,9 @@ function buildProblemsJs(){
     out+='steps:`'+escVal(p.steps)+'`,\n';
     out+='complexity:`'+escVal(p.complexity)+'`,\n';
     out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
-    out+='expl:`'+escVal(p.expl)+'`}';
+    out+='expl:`'+escVal(p.expl)+'`';
+    if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length)out+=',\nlcSimilar:'+JSON.stringify(p.lcSimilar);
+    out+='}';
     if(i<P.length-1)out+=',';
     out+='\n\n';
   });

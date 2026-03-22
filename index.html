@@ -81,7 +81,12 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
 <div id="tokenModal" class="token-modal" style="display:none"></div>
 
-<script src="problems.js" charset="UTF-8"></script>
+<script charset="UTF-8">
+(function(){
+  var v=typeof localStorage!=='undefined'?localStorage.getItem('algocards_pq'):'';
+  document.write('<script src="problems.js'+(v?'?v='+encodeURIComponent(v):'')+'" charset="UTF-8"><\/script>');
+})();
+</script>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -448,6 +453,18 @@ function buildProblemsJs(){
   return out;
 }
 
+async function purgeProblemsJsFromCaches(){
+  if(!('caches'in window))return;
+  const names=await caches.keys();
+  await Promise.all(names.map(async name=>{
+    const c=await caches.open(name);
+    const reqs=await c.keys();
+    await Promise.all(reqs.map(r=>{
+      if((r.url||'').includes('problems.js'))return c.delete(r);
+    }));
+  }));
+}
+
 async function saveCard(){
   const p=fcList[fcIdx];
   const btn=document.getElementById('saveBtn');
@@ -501,10 +518,23 @@ async function saveCard(){
       const err=await put.json();
       throw new Error(err.message||'PUT failed: '+put.status);
     }
-    
+
+    localStorage.setItem('algocards_pq',String(Date.now()));
+    await purgeProblemsJsFromCaches();
+
     status.style.color='var(--green)';
-    status.textContent='✅ Сохранено и запушено!';
+    status.textContent='✅ Запушено. Через 5–30 с GitHub Pages обновит файл — нажми «Обновить страницу» ниже или Ctrl+F5.';
     btn.disabled=false;
+    const row=document.createElement('div');
+    row.style.cssText='margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
+    row.innerHTML='<button type="button" id="reloadAfterPush" style="padding:8px 14px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-weight:600;cursor:pointer">Обновить страницу</button>';
+    const old=document.getElementById('reloadAfterPushRow');
+    if(old)old.remove();
+    row.id='reloadAfterPushRow';
+    status.parentNode.insertBefore(row,status.nextSibling);
+    document.getElementById('reloadAfterPush').onclick=function(){
+      location.reload();
+    };
   }catch(e){
     status.style.color='var(--red)';
     status.textContent='❌ '+e.message;

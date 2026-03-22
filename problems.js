@@ -723,7 +723,7 @@ code:`class Solution {
         for (int i = 0; i < s.length(); i++) {
             maxReach = Math.max(maxReach,
                 lastOccurrence[s.charAt(i) - 'a']);
-            if (i == maxReach) {
+            if (i == maxReach) { //все символы, которые мы встретили в текущем куске, больше не встречаются дальше
                 result.add(i - partitionStart + 1);
                 partitionStart = i + 1;
             }

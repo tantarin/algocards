@@ -744,7 +744,7 @@ steps:`1. Идти по дням с 1 до n−1.
 3. Суммировать только положительные приросты.`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по ценам — O(n). Только totalProfit и счётчик — O(1) памяти.`,
-expl:`O(n) время, O(1) память. Один проход — суммируем все положительные разности цен между соседними днями.`,
+expl:`Сумма всех маленьких ростов = максимальная прибыль`,
 lcSimilar:[{"t":"Best Time to Buy and Sell Stock II","h":"best-time-to-buy-and-sell-stock-ii"},{"t":"Best Time to Buy and Sell Stock","h":"best-time-to-buy-and-sell-stock"}]},
 
 {id:"gop2",t:"Partition Labels",p:"Greedy",d:"средне",

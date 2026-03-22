@@ -59,6 +59,11 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 .token-btns button{flex:1;padding:10px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer}
 .token-ok{background:var(--purple);color:#fff}
 .token-cancel{background:var(--card2);color:var(--dim)}
+.solve-tracker{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 10px;flex-wrap:wrap;-webkit-user-select:none;user-select:none}
+.solve-tracker .solve-label{color:var(--dim);font-size:13px}
+.solve-btn{width:42px;height:42px;border-radius:12px;border:1px solid #ffffff20;background:var(--card2);color:var(--text);font-size:22px;line-height:1;cursor:pointer;transition:transform .1s,background .15s}
+.solve-btn:active{transform:scale(.92);background:var(--purple);color:#fff}
+.solve-num{min-width:32px;text-align:center;font-weight:700;font-size:17px;color:var(--green)}
 </style>
 </head>
 <body>
@@ -130,6 +135,44 @@ function rebuildDailyList(){
   const k=todayLocalDateKey();
   dailyListDateKey=k;
   fcList=pickDailyProblems(getFiltered(),k+'|'+(activeFilter||'all'),DAILY_LIMIT);
+}
+
+const SOLVE_STORAGE_KEY='algocards_solve_counts';
+
+function loadSolveCounts(){
+  try{
+    const raw=localStorage.getItem(SOLVE_STORAGE_KEY);
+    const o=raw?JSON.parse(raw):{};
+    return o&&typeof o==='object'?o:{};
+  }catch(e){return{}}
+}
+
+function saveSolveCounts(map){
+  try{localStorage.setItem(SOLVE_STORAGE_KEY,JSON.stringify(map));}catch(e){}
+}
+
+function getSolveCount(problemId){
+  const m=loadSolveCounts();
+  const v=m[problemId];
+  return typeof v==='number'&&v>=0&&!isNaN(v)?Math.floor(v):0;
+}
+
+function adjustSolve(problemId,delta){
+  const m=loadSolveCounts();
+  const next=Math.max(0,getSolveCount(problemId)+delta);
+  m[problemId]=next;
+  saveSolveCounts(m);
+  renderCard();
+}
+
+function solveTrackerHtml(p){
+  const n=getSolveCount(p.id);
+  return `<div class="solve-tracker" onclick="event.stopPropagation()">
+    <span class="solve-label">Прорешано раз:</span>
+    <button type="button" class="solve-btn" aria-label="Минус один" onclick="adjustSolve('${p.id}',-1)">−</button>
+    <span class="solve-num">${n}</span>
+    <button type="button" class="solve-btn" aria-label="Плюс один" onclick="adjustSolve('${p.id}',1)">+</button>
+  </div>`;
 }
 
 const REPO='tantarin/algocards';
@@ -239,6 +282,7 @@ function renderEditCard(){
 
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+    ${solveTrackerHtml(p)}
     <div class="flashcard" style="cursor:default">
       <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
       <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:4px">${esc(p.d)}</span>
@@ -273,6 +317,7 @@ function renderCard(){
   const p=fcList[fcIdx];
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+    ${solveTrackerHtml(p)}
     <div class="flashcard" onclick="flipCard()">
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>

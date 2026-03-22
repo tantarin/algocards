@@ -4469,9 +4469,11 @@ code:`class Solution {
 steps:`1.diff = nums[right] − nums[left].
 2. При diff = k — считаем блоки; < k — right++; > k — left++.`,
 complexity:`Время: O(n log n), Память: O(1)`,
-complexityExpl:`время: O(n)
-память: O(1)`,
-expl:`Два указателя: если diff < k — right++, если diff > k — left++. При diff == k считаем количество дубликатов и переходим дальше. O(n log n).`,
+complexityExpl:`Итоговая сложность — O(n) по времени и O(1) по памяти.`,
+expl:`Так как массив уже отсортирован, использую два указателя.
+Для k > 0 сравниваю nums[right] - nums[left] и двигаю один из указателей, пока не найду нужную разность.
+При совпадении сразу считаю количество дубликатов слева и справа, чтобы учесть все пары.
+Для k == 0 отдельно считаю количество пар внутри каждого блока одинаковых чисел.`,
 lcSimilar:[{"t":"K-diff Pairs in an Array","h":"k-diff-pairs-in-an-array"},{"t":"Two Sum II - Input Array Is Sorted","h":"two-sum-ii-input-array-is-sorted"}]},
 
 {id:"tp19",t:"Подсчёт пар с разницей >= К",p:"Two Pointers",d:"средне",

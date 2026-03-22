@@ -5209,7 +5209,7 @@ expl:`DFS: на каждом узле формируем число currentNum *
 
 // ===== HASHMAP =====
 {id:"hf8",t:"Count Pairs With Absolute Diff K",p:"HashMap",d:"легко",
-desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i < j и ==|nums[i] - nums[j]| == k==.
+desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i < j и|nums[i] - nums[j]| == k.
 
 Пример:
 Ввод: nums = [1, 2, 2, 1], k = 1

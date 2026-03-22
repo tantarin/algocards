@@ -273,42 +273,48 @@ desc:`Дан ==отсортированный массив== целых чисе
 hint:`Два бинарных поиска: один ищет левую границу, другой — правую.`,
 code:`class Solution {
     public int[] searchRange(int[] nums, int target) {
-        return new int[]{
-            findLeft(nums, target),
-            findRight(nums, target)
-        };
+        int left = lowerBound(nums, target);
+        int right = upperBound(nums, target) - 1;
+
+        if (left == nums.length || nums[left] != target) {
+            return new int[]{-1, -1};
+        }
+
+        return new int[]{left, right};
     }
 
-    private int findLeft(int[] nums, int target) {
-        int lo = 0, hi = nums.length - 1, result = -1;
-        while (lo <= hi) {
+    // Первый индекс i, такой что nums[i] >= target
+    private int lowerBound(int[] nums, int target) {
+        int lo = 0, hi = nums.length;
+
+        while (lo < hi) {
             int mid = lo + (hi - lo) / 2;
-            if (nums[mid] == target) { //Мы НЕ останавливаемся при нахождении target
-                result = mid;
-                hi = mid - 1; //двигаем правую границу влево
-            } else if (nums[mid] < target) {
-                lo = mid + 1;
+
+            if (nums[mid] >= target) {
+                hi = mid;
             } else {
-                hi = mid - 1;
+                lo = mid + 1;
             }
         }
-        return result;
+
+        return lo;
     }
 
-    private int findRight(int[] nums, int target) {
-        int lo = 0, hi = nums.length - 1, result = -1;
-        while (lo <= hi) {
+    // Первый индекс i, такой что nums[i] > target
+    private int upperBound(int[] nums, int target) {
+        int lo = 0, hi = nums.length;
+
+        while (lo < hi) {
             int mid = lo + (hi - lo) / 2;
-            if (nums[mid] == target) { //Мы НЕ останавливаемся при нахождении target
-                result = mid;
-                lo = mid + 1;
-            } else if (nums[mid] < target) {
-                lo = mid + 1;
+
+            if (nums[mid] > target) {
+                hi = mid;
             } else {
-                hi = mid - 1;
+                lo = mid + 1;
             }
         }
-        return result;
+
+        return lo;
     }
 }`,
 steps:`1. findLeft: при nums[mid]==target — hi = mid−1.

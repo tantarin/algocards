@@ -561,7 +561,6 @@ code:`public class Solution {
         // =========================
         // graph[u] = список соседей вершины u
         Map<Integer, List<Integer>> graph = new HashMap<>();
-
         for (List<Integer> edge : edges) {
             int u = edge.get(0), v = edge.get(1);
 

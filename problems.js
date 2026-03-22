@@ -2093,8 +2093,11 @@ code:`class Solution {
 
         for (int right = 0; right < s.length(); right++) {
             char rChar = s.charAt(right);
+            
+            if (need[rChar] > 0) {
+                remaining--;
+            }
             need[rChar]--;
-            if (need[rChar] >= 0) remaining--;
 
             while (remaining == 0) {
                 int windowLen = right - left + 1;

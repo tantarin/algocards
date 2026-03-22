@@ -2106,7 +2106,7 @@ code:`class Solution {
                     bestStart = left;
                 }
 
-                //попробуем уменьшить его уменьшить слева
+                //попробуем уменьшить окно слева
                 char lChar = s.charAt(left);
                 need[lChar]++;
                 if (need[lChar] > 0) remaining++;

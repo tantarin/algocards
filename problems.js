@@ -531,10 +531,7 @@ expl:`Ось = (minX + maxX) / 2. Вместо деления используе
 
 // ===== GRAPH BFS =====
 {id:"gbfs1",t:"Кратчайший путь в графе",p:"Graph BFS",d:"средне",
-desc:`средне
-# Яндекс, Google
-
-Дан ==невзвешенный неориентированный граф== в виде списка рёбер edges и две вершины start и end. Расстояния между вершинами равны 1. Найти ==кратчайший путь== от start до end. Вернуть список вершин пути или пустой список, если путь не существует.
+desc:`Дан ==невзвешенный неориентированный граф== в виде списка рёбер edges и две вершины start и end. Расстояния между вершинами равны 1. Найти ==кратчайший путь== от start до end. Вернуть список вершин пути или пустой список, если путь не существует.
 
 Пример 1:
 Ввод: edges = [[1,8],[2,1],[5,1],[3,8],[3,5]], start = 2, end = 5
@@ -554,48 +551,97 @@ desc:`средне
 - Вершины пронумерованы целыми числами`,
 hint:`BFS (поиск в ширину) + карта родителей для восстановления пути. BFS гарантирует кратчайший путь в невзвешенном графе.`,
 code:`public class Solution {
+
     public List<Integer> findShortestPath(
             List<List<Integer>> edges,
             Integer start, Integer end) {
 
-        Map<Integer, List<Integer>> graph =
-            new HashMap<>();
+        // =========================
+        // 1. Строим граф (adjacency list)
+        // =========================
+        // graph[u] = список соседей вершины u
+        Map<Integer, List<Integer>> graph = new HashMap<>();
+
         for (List<Integer> edge : edges) {
             int u = edge.get(0), v = edge.get(1);
+
+            // Инициализируем списки соседей, если их ещё нет
             graph.putIfAbsent(u, new ArrayList<>());
             graph.putIfAbsent(v, new ArrayList<>());
+
+            // Так как граф неориентированный —
+            // добавляем ребро в обе стороны
             graph.get(u).add(v);
             graph.get(v).add(u);
         }
 
+        // =========================
+        // 2. BFS (поиск в ширину)
+        // =========================
+
+        // Очередь для обхода графа
         Queue<Integer> queue = new LinkedList<>();
         queue.add(start);
+
+        // visited:
+        // ключ = вершина
+        // значение = откуда мы в неё пришли (parent)
+        //
+        // Это одновременно:
+        // - множество посещённых вершин
+        // - структура для восстановления пути
         Map<Integer, Integer> visited = new HashMap<>();
+
+        // Стартовая вершина:
+        // у неё нет родителя
         visited.put(start, null);
 
         while (!queue.isEmpty()) {
             int node = queue.poll();
+
+            // Если дошли до цели — можно остановиться,
+            // потому что BFS гарантирует кратчайший путь
             if (node == end) break;
 
+            // Перебираем всех соседей текущей вершины
             for (int nb : graph.getOrDefault(
                     node, new ArrayList<>())) {
+
+                // Если соседа ещё не посещали —
+                // добавляем в очередь
                 if (!visited.containsKey(nb)) {
+
+                    // Запоминаем, что пришли в nb из node
                     visited.put(nb, node);
+
                     queue.add(nb);
                 }
             }
         }
 
+        // =========================
+        // 3. Проверка: достижима ли цель
+        // =========================
         if (!visited.containsKey(end))
-            return new ArrayList<>();
+            return new ArrayList<>(); // пути нет
+
+        // =========================
+        // 4. Восстановление пути
+        // =========================
+        // Идём от end назад по parent-ссылкам
 
         List<Integer> path = new ArrayList<>();
         Integer cur = end;
+
         while (cur != null) {
             path.add(cur);
-            cur = visited.get(cur);
+            cur = visited.get(cur); // идём к родителю
         }
+
+        // Сейчас путь в обратном порядке (end → start),
+        // переворачиваем его
         Collections.reverse(path);
+
         return path;
     }
 }`,

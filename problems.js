@@ -285,7 +285,7 @@ code:`class Solution {
             int mid = lo + (hi - lo) / 2;
             if (nums[mid] == target) { //Мы НЕ останавливаемся при нахождении target
                 result = mid;
-                hi = mid - 1;
+                hi = mid - 1; //двигаем правую границу влево
             } else if (nums[mid] < target) {
                 lo = mid + 1;
             } else {

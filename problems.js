@@ -4813,8 +4813,7 @@ desc:`Дан корень бинарного дерева. Вернуть ==зи
 - -100 ≤ Node.val ≤ 100`,
 hint:`BFS с очередью. На чётных уровнях добавляем в конец списка, на нечётных — в начало (или reverse).`,
 code:`class Solution {
-    public List<List<Integer>> zigzagLevelOrder(
-            TreeNode root) {
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
         List<List<Integer>> result = new ArrayList<>();
         if (root == null) return result;
 

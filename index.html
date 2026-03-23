@@ -262,6 +262,26 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .struct-arrow{color:var(--dim)}
 .struct-val{color:var(--text)}
 
+/* Cartesian product visualization */
+.cart-vis{display:flex;flex-direction:column;gap:10px}
+.cart-input-title{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px}
+.cart-input-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cart-input-label{font-family:monospace;color:var(--purple);min-width:72px;font-size:12px}
+.cart-arr{display:flex;gap:4px;flex-wrap:wrap}
+.cart-val{background:var(--card);border:1px solid #ffffff20;padding:5px 10px;border-radius:6px;font-family:monospace;font-size:13px}
+.cart-val.active{border-color:var(--green);background:rgba(34,197,94,0.18)}
+.cart-state{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cart-box{background:var(--card);border-radius:8px;padding:8px 10px}
+.cart-box-title{font-size:11px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.cart-chip-row{display:flex;gap:4px;flex-wrap:wrap}
+.cart-chip{background:var(--card2);border:1px solid #ffffff20;padding:4px 8px;border-radius:6px;font-family:monospace;font-size:12px}
+.cart-chip.idx{color:var(--orange)}
+.cart-results{display:flex;flex-direction:column;gap:4px;max-height:130px;overflow:auto}
+.cart-result{font-family:monospace;font-size:12px;color:var(--text);background:var(--card2);border:1px solid #ffffff15;border-radius:6px;padding:4px 8px}
+@media (max-width:560px){
+  .cart-state{grid-template-columns:1fr}
+}
+
 /* Animations */
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 @keyframes stackPush{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}
@@ -425,6 +445,8 @@ function diagramHtml(p) {
     content = renderBSearchDiagram(d, currentStep);
   } else if (d.type === 'multi') {
     content = renderMultiDiagram(d, currentStep);
+  } else if (d.type === 'cartesian') {
+    content = renderCartesianDiagram(d, currentStep);
   }
 
   const controls = d.steps && d.steps.length > 1 ? `
@@ -592,6 +614,52 @@ function renderMultiDiagram(d, step) {
 
   html += '</div>';
   return html;
+}
+
+function renderCartesianDiagram(d, step){
+  const input=Array.isArray(d.input)?d.input:[];
+  const activeArr=step?.activeArr ?? -1;
+  const activeVal=step?.activeVal ?? -1;
+  const idx=step?.idx ?? 0;
+  const current=Array.isArray(step?.current)?step.current:[];
+  const result=Array.isArray(step?.result)?step.result:[];
+
+  const inputHtml=input.map((arr,arrIdx)=>{
+    const vals=(Array.isArray(arr)?arr:[]).map((v,valIdx)=>{
+      const cls='cart-val'+((arrIdx===activeArr && valIdx===activeVal)?' active':'');
+      return `<span class="${cls}">${esc(String(v))}</span>`;
+    }).join('');
+    return `<div class="cart-input-row">
+      <span class="cart-input-label">arrays[${arrIdx}] =</span>
+      <div class="cart-arr">${vals}</div>
+    </div>`;
+  }).join('');
+
+  const currentHtml=current.length
+    ? current.map(v=>`<span class="cart-chip">${esc(String(v))}</span>`).join('')
+    : '<span class="cart-chip">[]</span>';
+
+  const resultHtml=result.length
+    ? result.map(r=>`<div class="cart-result">[${(Array.isArray(r)?r:[]).map(x=>esc(String(x))).join(', ')}]</div>`).join('')
+    : '<div class="cart-result">пока пусто</div>';
+
+  return `<div class="cart-vis">
+    <div class="cart-input-title">Вход: массив массивов</div>
+    ${inputHtml}
+    <div class="cart-state">
+      <div class="cart-box">
+        <div class="cart-box-title">Текущее состояние рекурсии</div>
+        <div class="cart-chip-row">
+          <span class="cart-chip idx">idx=${idx}</span>
+          ${currentHtml}
+        </div>
+      </div>
+      <div class="cart-box">
+        <div class="cart-box-title">Уже собранные комбинации</div>
+        <div class="cart-results">${resultHtml}</div>
+      </div>
+    </div>
+  </div>`;
 }
 
 const REPO='tantarin/algocards';

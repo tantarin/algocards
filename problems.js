@@ -103,16 +103,16 @@ complexity:`Время: O(∏ |arrays[i]|), Память: O(k)`,
 complexityExpl:`На каждом уровне перебираем элементы массива, рекурсия углубляется — всего перебирается произведение размеров. Глубина рекурсии = число массивов k — O(k) памяти.`,
 expl:`На каждом уровне рекурсии выбираем элемент из соответствующего массива. После возврата удаляем последний элемент (backtrack). Когда idx == arrays.size() — комбинация готова.`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}],
-diagram:{type:"tree",data:["∅","1","2","3","3","4","5","4","5"],steps:[
-{active:[0],visited:[],desc:"**Начало**: пустой current = []"},
-{active:[1],visited:[0],desc:"**Выбираем 1** из [1,2] → current = [1]"},
-{active:[3],visited:[0,1],desc:"**Выбираем 3** из [3] → current = [1,3]"},
-{active:[5],visited:[0,1,3],desc:"**Выбираем 4** из [4,5] → current = [1,3,4] ✓ Результат!"},
-{active:[6],visited:[0,1,3,5],desc:"**Backtrack**, выбираем 5 → current = [1,3,5] ✓ Результат!"},
-{active:[2],visited:[0,1,3,5,6],desc:"**Backtrack** до корня, выбираем 2 → current = [2]"},
-{active:[4],visited:[0,1,2,3,5,6],desc:"**Выбираем 3** из [3] → current = [2,3]"},
-{active:[7],visited:[0,1,2,3,4,5,6],desc:"**Выбираем 4** → current = [2,3,4] ✓ Результат!"},
-{active:[8],visited:[0,1,2,3,4,5,6,7],desc:"**Backtrack**, выбираем 5 → current = [2,3,5] ✓ Готово!"}
+diagram:{type:"cartesian",input:[[1,2],[3],[4,5]],steps:[
+{idx:0,current:[],result:[],activeArr:0,activeVal:-1,desc:"**Вход**: arrays = [[1,2],[3],[4,5]]. Начинаем с idx=0, current=[]"},
+{idx:1,current:[1],result:[],activeArr:0,activeVal:0,desc:"Из arrays[0]=[1,2] берём **1** → current=[1], переходим к idx=1"},
+{idx:2,current:[1,3],result:[],activeArr:1,activeVal:0,desc:"Из arrays[1]=[3] берём **3** → current=[1,3], переходим к idx=2"},
+{idx:3,current:[1,3,4],result:[[1,3,4]],activeArr:2,activeVal:0,desc:"Из arrays[2]=[4,5] берём **4** → idx=3 (конец), сохраняем [1,3,4]"},
+{idx:3,current:[1,3,5],result:[[1,3,4],[1,3,5]],activeArr:2,activeVal:1,desc:"Backtrack в arrays[2], берём **5** → сохраняем [1,3,5]"},
+{idx:1,current:[2],result:[[1,3,4],[1,3,5]],activeArr:0,activeVal:1,desc:"Backtrack до idx=0, теперь берём **2** → current=[2]"},
+{idx:2,current:[2,3],result:[[1,3,4],[1,3,5]],activeArr:1,activeVal:0,desc:"Из arrays[1] снова берём **3** → current=[2,3]"},
+{idx:3,current:[2,3,4],result:[[1,3,4],[1,3,5],[2,3,4]],activeArr:2,activeVal:0,desc:"Берём **4** из arrays[2] → сохраняем [2,3,4]"},
+{idx:3,current:[2,3,5],result:[[1,3,4],[1,3,5],[2,3,4],[2,3,5]],activeArr:2,activeVal:1,desc:"Берём **5** из arrays[2] → сохраняем [2,3,5]. Готово!"}
 ]}},
 
 {id:"bt3",t:"Перебор IP-адресов",p:"Backtracking",d:"средне",

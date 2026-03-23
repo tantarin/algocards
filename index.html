@@ -119,6 +119,8 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
   .typing-bubble,.fly-marker{display:none !important}
 }
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
+.code-wrap{animation:codeBreathe 6s ease-in-out infinite}
+@keyframes codeBreathe{0%,100%{box-shadow:0 0 15px rgba(124,58,237,0.2)}50%{box-shadow:0 0 25px rgba(124,58,237,0.4),0 0 40px rgba(236,72,153,0.2)}}
 .solution-pre{margin:0}
 .solution-pre code{display:block;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;white-space:pre}
 .solution-pre code.solution-bg{background:var(--card2);color:var(--dim);user-select:none}

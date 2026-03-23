@@ -31,6 +31,10 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
   .flashcard{padding:24px}
 }
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
+.counter-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0}
+.counter-row .counter{margin:0}
+.shuffle-mini{background:var(--card2);border:1px solid #ffffff20;color:var(--dim);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+.shuffle-mini:active{background:var(--purple);color:#fff;border-color:var(--purple);transform:scale(.98)}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
 .filter-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
 #search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none;margin-bottom:8px}
@@ -607,7 +611,10 @@ function renderEditCard(){
   `).join('');
 
   document.getElementById('cardsArea').innerHTML=`
-    <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+    <div class="counter-row">
+      <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+      <button type="button" class="shuffle-mini" onclick="fcShuffle()">🔀</button>
+    </div>
     <div class="flashcard" style="cursor:default">
       <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
       <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:4px">${esc(p.d)}</span>
@@ -615,9 +622,7 @@ function renderEditCard(){
       <button class="edit-save" id="saveBtn" onclick="saveCard()">💾 Сохранить и запушить</button>
       <div class="edit-status" id="editStatus"></div>
     </div>
-    <div class="fc-nav">
-      <button onclick="fcShuffle()">🔀</button>
-    </div>`;
+    `;
 }
 
 function renderCard(){
@@ -646,7 +651,10 @@ function renderCard(){
   const code1Bg=input1Open?stripCodeComments(p.code):p.code;
   const code2Bg=input2Open?stripCodeComments(p.code2):p.code2;
   document.getElementById('cardsArea').innerHTML=`
-    <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+    <div class="counter-row">
+      <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+      <button type="button" class="shuffle-mini" onclick="fcShuffle()">🔀</button>
+    </div>
     <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
       <button type="button" class="side-nav left" onclick="event.stopPropagation();fcPrev()">←</button>
@@ -696,9 +704,7 @@ function renderCard(){
         <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
       </div>
     </div>
-    <div class="fc-nav">
-      <button onclick="fcShuffle()">🔀</button>
-    </div>`;
+    `;
   applyCardAccent(p);
   document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));
   setupMascots();

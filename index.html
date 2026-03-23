@@ -17,7 +17,7 @@
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;padding-top:env(safe-area-inset-top,16px);-webkit-user-select:none;user-select:none}
 h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:14px}
-.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px 72px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden}
+.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px 72px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden;touch-action:pan-y}
 .fc-face{display:none}
 .fc-face.visible{display:block}
 .fc-nav{display:flex;justify-content:center;gap:24px;margin-top:12px}
@@ -300,6 +300,10 @@ function setupSwipeNav(){
   const SWIPE_PX=70;
   const DY_RATIO=1.25;
   const MAX_DT=700;
+  // Тайтовые пороги для touch часто не проходят (палец мягче двигается и датчики скорости другие).
+  const SWIPE_PX_TOUCH=45;
+  const DY_RATIO_TOUCH=1.05;
+  const MAX_DT_TOUCH=1050;
 
   function shouldIgnoreTarget(target){
     if(!target)return true;
@@ -332,6 +336,42 @@ function setupSwipeNav(){
         fcPrev();
       }
     }
+  },{passive:true});
+
+  // Touch-обработка (iOS/некоторые Android иногда хуже отрабатывают pointer events).
+  card.addEventListener('touchstart',(e)=>{
+    if(shouldIgnoreTarget(e.target))return;
+    if(!e.touches || !e.touches.length)return;
+    const t=e.touches[0];
+    startX=t.clientX; startY=t.clientY; startT=Date.now();
+  },{passive:true});
+
+  card.addEventListener('touchend',(e)=>{
+    if(!startT)return;
+    // На touchend используем startY/startX, текущие координаты не обязательны — dx/dy считаем по последней дельте.
+    // Если touchcancel/scroll сорвёт жест — startT сбросится по touchcancel ниже.
+    const dt=Date.now()-startT;
+    startT=0;
+    // touchend часто не даёт clientX/clientY в end-объекте так, как pointerup, поэтому берём last touch координату из changedTouches.
+    const c = e.changedTouches && e.changedTouches.length ? e.changedTouches[0] : null;
+    if(!c)return;
+    const dx=c.clientX-startX;
+    const dy=c.clientY-startY;
+
+    if(Math.abs(dx)>=SWIPE_PX_TOUCH && Math.abs(dx)>(Math.abs(dy)*DY_RATIO_TOUCH) && dt<=MAX_DT_TOUCH){
+      lastSwipeAt=Date.now();
+      if(dx<0){
+        spawnFlyMarker('right', card);
+        fcNext();
+      } else {
+        spawnFlyMarker('left', card);
+        fcPrev();
+      }
+    }
+  },{passive:true});
+
+  card.addEventListener('touchcancel',()=>{
+    startT=0;
   },{passive:true});
 
   card.addEventListener('click',(e)=>{

@@ -66,6 +66,48 @@ for (int right = 0; right < n; right++) {
     result = Math.max(result, right - left + 1);
 }`
   },
+  'SW + String': {
+    icon: '🔤',
+    title: 'Окно + частоты символов',
+    desc: 'Скользящее окно фиксированного размера с массивом частот для поиска анаграмм/подстрок.',
+    code: `public List<Integer> findAnagrams(String s, String t) {
+    List<Integer> result = new ArrayList<>();
+    if (s.length() < t.length()) return result;
+
+    // ШАГ 1: ЧАСТОТНЫЙ МАССИВ
+    // need[char] = сколько раз символ нужен из t
+    int[] need = new int[128];
+    for (char c : t.toCharArray()) {
+        need[c]++;
+    }
+
+    // ШАГ 2: СЧЁТЧИКИ
+    int missing = t.length();  // сколько символов ещё не найдено
+    int windowLen = t.length();
+
+    // ШАГ 3: СКОЛЬЗЯЩЕЕ ОКНО
+    for (int i = 0; i < s.length(); i++) {
+
+        // 3.1. Добавляем символ справа
+        char rChar = s.charAt(i);
+        if (need[rChar] > 0) missing--;
+        need[rChar]--;
+
+        // 3.2. Удаляем символ слева (если окно полное)
+        if (i >= windowLen) {
+            char lChar = s.charAt(i - windowLen);
+            need[lChar]++;
+            if (need[lChar] > 0) missing++;
+        }
+
+        // 3.3. Проверяем анаграмму
+        if (missing == 0) {
+            result.add(i - windowLen + 1);
+        }
+    }
+    return result;
+}`
+  },
   'Two Pointers': {
     icon: '👆',
     title: 'Два указателя',

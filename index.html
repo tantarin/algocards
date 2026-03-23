@@ -54,6 +54,8 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
 .copy-btn:active{background:var(--purple);color:#fff}
+.enter-btn-inline{position:absolute;top:34px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
+.enter-btn-inline:active{background:var(--purple);color:#fff}
 .mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
 .mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
 .mascot-bird{animation:mascotBird 2.8s ease-in-out both}
@@ -682,22 +684,23 @@ function renderCard(){
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
         <div class="code-wrap">
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
+          <button type="button" class="enter-btn-inline" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
           <div class="solution-editor">
             <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code1Bg)}</code></pre>
             ${input1Open?`<textarea id="solutionInput_${p.id}_1" class="solution-input" data-problem-id="${p.id}" data-which="1" spellcheck="false" oninput="saveSolutionDraft(this)" onfocus="setMascotTyping(true)" onblur="setMascotTyping(false)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input1Draft)}</textarea>`:''}
           </div>
         </div>
-        <button type="button" class="solution-enter-btn" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
 
         ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
         <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
+          <button type="button" class="enter-btn-inline" onclick="event.stopPropagation();openSolutionInput(2)">${input2Open?'Закрыть':'Ввести'}</button>
           <div class="solution-editor">
             <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code2Bg)}</code></pre>
             ${input2Open?`<textarea id="solutionInput_${p.id}_2" class="solution-input" data-problem-id="${p.id}" data-which="2" spellcheck="false" oninput="saveSolutionDraft(this)" onfocus="setMascotTyping(true)" onblur="setMascotTyping(false)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input2Draft)}</textarea>`:''}
           </div>
         </div>
-        <button type="button" class="solution-enter-btn" onclick="event.stopPropagation();openSolutionInput(2)">${input2Open?'Закрыть':'Ввести'}</button>`:''}
+        `:''}
         ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
           <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
           ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}

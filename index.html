@@ -42,6 +42,14 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
 .copy-btn:active{background:var(--purple);color:#fff}
+.solution-editor{position:relative;border-radius:10px;overflow:hidden}
+.solution-pre{margin:0}
+.solution-pre code{display:block;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;white-space:pre}
+.solution-pre code.solution-bg{background:var(--card2);color:var(--dim);user-select:none}
+.solution-pre code.no-hljs{background:var(--card2);color:var(--dim);user-select:none}
+.solution-input{position:absolute;inset:0;width:100%;height:100%;padding:12px;border:0;outline:none;background:transparent;color:var(--text);font-family:monospace;font-size:11px;line-height:1.5;resize:none;overflow:auto;caret-color:var(--purple)}
+.solution-enter-btn{margin-top:12px;width:100%;background:var(--card2);border:1px solid #ffffff20;color:var(--dim);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.solution-enter-btn:active{transform:scale(.99);background:var(--purple);color:#fff;border-color:var(--purple)}
 .edit-toggle{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid #ffffff20;color:var(--dim);width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:.2s}
 .edit-toggle.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 .edit-field{width:100%;background:var(--card2);color:var(--text);border:1px solid #ffffff20;border-radius:8px;padding:8px;font-size:13px;font-family:monospace;resize:vertical;line-height:1.5;margin-top:6px}
@@ -217,6 +225,47 @@ let activeFilter=null;
 let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
 let editMode=false;
+let solutionInputOpen={}; // { [problemId]: {1:boolean,2:boolean} }
+
+function solutionInputKey(problemId, which){
+  return 'algocards_solution_input_'+problemId+'_'+which;
+}
+function loadSolutionInput(problemId, which){
+  try{
+    const raw=localStorage.getItem(solutionInputKey(problemId, which));
+    return typeof raw==='string'?raw:'';
+  }catch(e){
+    return '';
+  }
+}
+function saveSolutionDraft(textarea){
+  const pid=textarea.dataset.problemId;
+  const which=textarea.dataset.which;
+  if(!pid||!which)return;
+  try{localStorage.setItem(solutionInputKey(pid, which), textarea.value);}catch(e){}
+}
+function isSolutionInputOpen(problemId, which){
+  return !!(solutionInputOpen[problemId] && solutionInputOpen[problemId][which]);
+}
+function openSolutionInput(which){
+  const p=fcList[fcIdx];
+  if(!p)return;
+  if(isSolutionInputOpen(p.id, which)){
+    solutionInputOpen[p.id][which]=false;
+    renderCard();
+    return;
+  }
+  if(!solutionInputOpen[p.id])solutionInputOpen[p.id]={};
+  solutionInputOpen[p.id][which]=true;
+  renderCard();
+  setTimeout(()=>{
+    const el=document.getElementById('solutionInput_'+p.id+'_'+which);
+    if(!el)return;
+    el.focus();
+    const v=el.value||'';
+    try{el.setSelectionRange(v.length, v.length);}catch(e){}
+  },0);
+}
 
 function getToken(){return localStorage.getItem('gh_token')}
 function setToken(t){localStorage.setItem('gh_token',t)}
@@ -351,6 +400,10 @@ function renderCard(){
   if(!fcList.length){document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';return;}
   if(editMode){renderEditCard();return}
   const p=fcList[fcIdx];
+  const input1Open=isSolutionInputOpen(p.id,1);
+  const input1Draft=input1Open?loadSolutionInput(p.id,1):'';
+  const input2Open=isSolutionInputOpen(p.id,2);
+  const input2Draft=input2Open?loadSolutionInput(p.id,2):'';
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
     ${solveTrackerHtml(p)}
@@ -377,12 +430,22 @@ function renderCard(){
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
         <div class="code-wrap">
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
-          <pre style="border-radius:10px;overflow:hidden" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+          <div class="solution-editor">
+            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+            ${input1Open?`<textarea id="solutionInput_${p.id}_1" class="solution-input" data-problem-id="${p.id}" data-which="1" spellcheck="false" oninput="saveSolutionDraft(this)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input1Draft)}</textarea>`:''}
+          </div>
         </div>
+        <button type="button" class="solution-enter-btn" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
+
         ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
-        <div class="code-wrap">
-          <pre style="border-radius:10px;overflow:hidden" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
-        </div>`:''}
+        <div class="code-wrap" style="margin-top:10px">
+          <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
+          <div class="solution-editor">
+            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
+            ${input2Open?`<textarea id="solutionInput_${p.id}_2" class="solution-input" data-problem-id="${p.id}" data-which="2" spellcheck="false" oninput="saveSolutionDraft(this)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input2Draft)}</textarea>`:''}
+          </div>
+        </div>
+        <button type="button" class="solution-enter-btn" onclick="event.stopPropagation();openSolutionInput(2)">${input2Open?'Закрыть':'Ввести'}</button>`:''}
         ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
           <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
           ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
@@ -395,7 +458,7 @@ function renderCard(){
       <button onclick="fcShuffle()">🔀</button>
       <button onclick="fcNext()">→</button>
     </div>`;
-  document.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
+  document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));
 }
 
 function copyProblemBundle(btn){

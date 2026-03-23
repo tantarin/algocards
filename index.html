@@ -17,7 +17,7 @@
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;padding-top:env(safe-area-inset-top,16px);-webkit-user-select:none;user-select:none}
 h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:14px}
-.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden}
+.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px 72px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden}
 .fc-face{display:none}
 .fc-face.visible{display:block}
 .fc-nav{display:flex;justify-content:center;gap:24px;margin-top:12px}
@@ -28,6 +28,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .side-nav.right{right:10px}
 @media (max-width:600px){
   .side-nav{display:none}
+  .flashcard{padding:24px}
 }
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
@@ -696,9 +697,7 @@ function renderCard(){
       </div>
     </div>
     <div class="fc-nav">
-      <button onclick="fcPrev()">←</button>
       <button onclick="fcShuffle()">🔀</button>
-      <button onclick="fcNext()">→</button>
     </div>`;
   applyCardAccent(p);
   document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));

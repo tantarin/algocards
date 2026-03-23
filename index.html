@@ -613,7 +613,7 @@ function renderEditCard(){
 
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter-row">
-      <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+      <div class="counter">${fcIdx+1} / ${fcList.length}${!searchQuery?' • на сегодня':''}</div>
       <button type="button" class="shuffle-mini" onclick="fcShuffle()">🔀</button>
     </div>
     <div class="flashcard" style="cursor:default">

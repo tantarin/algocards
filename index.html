@@ -155,14 +155,102 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .lc-similar-link{color:var(--purple);font-size:13px;text-decoration:underline;text-underline-offset:3px}
 .lc-similar-link:active{opacity:.85}
 
-/* ===== DIAGRAM STYLES ===== */
-.diagram-wrap{margin-top:16px;padding:16px;background:var(--card2);border-radius:12px;overflow-x:auto}
-.diagram-title{font-size:12px;color:var(--dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
-.diagram-title::before{content:'';display:block;width:4px;height:4px;background:var(--purple);border-radius:50%}
+/* ===== DIAGRAM STYLES (сказочный блок — отдельный фон) ===== */
+.diagram-wrap{
+  margin-top:18px;
+  padding:22px 20px 20px;
+  position:relative;
+  border-radius:20px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  border:1px solid rgba(251,191,36,0.35);
+  box-shadow:
+    0 0 0 1px rgba(167,139,250,0.25) inset,
+    0 4px 24px rgba(91,33,182,0.45),
+    0 12px 48px rgba(236,72,153,0.18),
+    0 0 80px rgba(251,191,36,0.08);
+  background:
+    linear-gradient(155deg,
+      #1a0a2e 0%,
+      #2d1b4e 22%,
+      #4c1d95 48%,
+      #1e3a5f 78%,
+      #0f172a 100%);
+}
+/* северное сияние + тёплый блик */
+.diagram-wrap::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:0;
+  opacity:.95;
+  background:
+    radial-gradient(ellipse 140% 70% at 50% -30%, rgba(192,132,252,0.45), transparent 55%),
+    radial-gradient(ellipse 90% 50% at 100% 80%, rgba(244,114,182,0.28), transparent 50%),
+    radial-gradient(ellipse 70% 45% at 0% 90%, rgba(52,211,153,0.12), transparent 45%),
+    radial-gradient(ellipse 60% 40% at 85% 15%, rgba(251,191,36,0.2), transparent 40%);
+  animation:diagramAurora 14s ease-in-out infinite alternate;
+}
+/* мелкие «звёзды» */
+.diagram-wrap::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:0;
+  opacity:.55;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,0.95) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 88% 12%, rgba(255,255,255,0.85) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 72% 42%, rgba(255,255,255,0.7) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 25% 55%, rgba(253,224,71,0.9) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 45% 28%, rgba(255,255,255,0.65) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 92% 68%, rgba(255,255,255,0.55) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 8% 82%, rgba(255,255,255,0.5) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 55% 88%, rgba(196,181,253,0.9) 0.5px, transparent 0.6px);
+  animation:diagramTwinkle 5s ease-in-out infinite;
+}
+@keyframes diagramAurora{
+  0%{opacity:.88;filter:hue-rotate(-8deg)}
+  100%{opacity:1;filter:hue-rotate(12deg)}
+}
+@keyframes diagramTwinkle{
+  0%,100%{opacity:.45}
+  50%{opacity:.72}
+}
+.diagram-wrap > *{position:relative;z-index:1}
+
+.diagram-title{
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:14px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:linear-gradient(90deg,#fde68a,#fbbf24,#f472b6,#c4b5fd);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.diagram-title::before{
+  content:'✨';
+  font-size:16px;
+  filter:none;
+  -webkit-background-clip:unset;
+  background-clip:unset;
+  color:#fde68a;
+  text-shadow:0 0 12px rgba(251,191,36,.8);
+}
 
 /* Array visualization */
 .arr-vis{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:12px 0}
 .arr-cell{min-width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--card);border:2px solid #ffffff20;border-radius:8px;font-size:14px;font-weight:600;transition:all .3s ease;position:relative}
+.diagram-wrap .arr-cell{background:rgba(15,23,42,0.55);border-color:rgba(226,232,240,0.28);color:#f1f5f9;border-radius:10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .arr-cell.active{border-color:var(--purple);background:rgba(124,58,237,0.2);transform:scale(1.1)}
 .arr-cell.left-ptr{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,0.3)}
 .arr-cell.right-ptr{border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,158,11,0.3)}
@@ -193,16 +281,82 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .tree-edge{position:absolute;width:2px;background:#ffffff30;transform-origin:top center}
 
 /* Controls */
-.diagram-controls{display:flex;gap:8px;justify-content:center;margin-top:12px}
-.diagram-btn{background:var(--card);border:1px solid #ffffff20;color:var(--text);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:4px}
-.diagram-btn:hover{border-color:var(--purple);background:rgba(124,58,237,0.1)}
-.diagram-btn:active{transform:scale(.95)}
-.diagram-btn:disabled{opacity:.4;cursor:not-allowed}
-.diagram-step{font-size:12px;color:var(--dim);padding:6px 12px}
+.diagram-controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:16px;flex-wrap:wrap}
+.diagram-btn{
+  background:linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.06));
+  border:1px solid rgba(251,191,36,0.45);
+  color:#fef3c7;
+  padding:8px 16px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .2s,border-color .2s;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  box-shadow:0 2px 12px rgba(91,33,182,0.35),0 0 20px rgba(251,191,36,0.08);
+}
+.diagram-btn:hover{
+  border-color:rgba(253,224,71,0.85);
+  box-shadow:0 4px 20px rgba(124,58,237,0.45),0 0 28px rgba(251,191,36,0.15);
+  color:#fff;
+}
+.diagram-btn:active{transform:scale(.96)}
+.diagram-btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.diagram-step{font-size:12px;color:rgba(254,243,199,0.85);padding:6px 12px;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.35)}
 
 /* Step description */
-.diagram-desc{font-size:13px;color:var(--text);text-align:center;margin-top:10px;min-height:40px;line-height:1.5}
-.diagram-desc .hl{color:var(--purple);font-weight:600}
+.diagram-desc{
+  font-size:13px;
+  color:#e2e8f0;
+  text-align:center;
+  margin-top:12px;
+  min-height:40px;
+  line-height:1.55;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(15,23,42,0.35);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  text-shadow:0 1px 12px rgba(0,0,0,.5);
+}
+.diagram-desc .hl{
+  color:#fde68a;
+  font-weight:700;
+  text-shadow:0 0 16px rgba(251,191,36,.45);
+}
+.diagram-wrap .stack-cell,
+.diagram-wrap .tree-node,
+.diagram-wrap .struct-block,
+.diagram-wrap .vars-panel,
+.diagram-wrap .cart-box,
+.diagram-wrap .cart-val,
+.diagram-wrap .ll-val,
+.diagram-wrap .deque-item{
+  background:rgba(15,23,42,0.5);
+  border-color:rgba(226,232,240,0.22);
+  color:#f1f5f9;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+.diagram-wrap .stack-base{background:linear-gradient(90deg,transparent,rgba(253,224,71,0.5),transparent)}
+.diagram-wrap .struct-item,
+.diagram-wrap .vars-arr-item,
+.diagram-wrap .cart-chip,
+.diagram-wrap .cart-result{background:rgba(30,27,75,0.55);border-color:rgba(255,255,255,0.12)}
+.diagram-wrap .cart-input-title,
+.diagram-wrap .cart-box-title,
+.diagram-wrap .cart-input-label,
+.diagram-wrap .struct-label,
+.diagram-wrap .deque-label{color:rgba(254,243,199,0.75)}
+.diagram-wrap .vars-name{color:#c4b5fd}
+.diagram-wrap .vars-eq,.diagram-wrap .struct-arrow,.diagram-wrap .ll-arrow{color:rgba(226,232,240,0.5)}
+
+@media (prefers-reduced-motion:reduce){
+  .diagram-wrap::before,.diagram-wrap::after{animation:none}
+}
 
 /* Variables panel (debugger-style) */
 .vars-panel{background:var(--card);border-radius:10px;padding:12px;margin:10px 0;font-family:monospace;font-size:12px}
@@ -287,7 +441,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 @media (max-width:400px){
   .arr-cell{min-width:28px;height:28px;font-size:12px}
   .tree-node{width:28px;height:28px;font-size:11px}
-  .diagram-wrap{padding:12px}
+  .diagram-wrap{padding:16px 14px 14px}
 }
 </style>
 </head>

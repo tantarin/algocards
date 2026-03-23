@@ -3725,7 +3725,7 @@ code:`class Solution {
 
         for (int right = 0; right < nums.length; right++){
             while (!maxD.isEmpty()
-                && nums[maxD.peekLast()] <= nums[right])
+                && nums[maxD.peekLast()] <= nums[right]) //удаляем все элементы с конца deque, которые ≤ текущего
                 maxD.pollLast();
             maxD.addLast(right);
 

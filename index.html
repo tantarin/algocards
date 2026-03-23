@@ -23,6 +23,12 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .fc-nav{display:flex;justify-content:center;gap:24px;margin-top:12px}
 .fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer;transition:transform .1s}
 .fc-nav button:active{transform:scale(.9)}
+.side-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:var(--card2);border:1px solid #ffffff20;color:var(--text);font-size:22px;cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;opacity:.95}
+.side-nav.left{left:10px}
+.side-nav.right{right:10px}
+@media (max-width:600px){
+  .side-nav{display:none}
+}
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
 .filter-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
@@ -642,6 +648,8 @@ function renderCard(){
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
     <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
+      <button type="button" class="side-nav left" onclick="event.stopPropagation();fcPrev()">←</button>
+      <button type="button" class="side-nav right" onclick="event.stopPropagation();fcNext()">→</button>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>

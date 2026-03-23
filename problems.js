@@ -2158,7 +2158,7 @@ complexityExpl:`Сумма всех элементов O(n), затем один
 expl:`O(n) один проход (после подсчёта суммы). rightSum = totalSum - leftSum - nums[i]. Когда leftSum == rightSum — нашли pivot.`},
 
 // ===== SLIDING WINDOW =====
-{id:"sw1",t:"Minimum Window Substring",p:"Sliding Window",d:"сложно",
+{id:"sw1",t:"Minimum Window Substring",p:"SW + String",d:"сложно",
 desc:`Даны две строки s и t. Найти ==минимальную по длине подстроку==, которая ==содержит все символы== строки t (включая дубликаты). Если такой подстроки нет — вернуть пустую строку "".
 
 Пример 1:
@@ -2494,7 +2494,7 @@ diagram:{type:"window",data:["a","b","c","a","b","c","b","b"],steps:[
 {wl:4,wr:7,desc:"Сжали до [c,b,b] — финал"}
 ]}},
 
-{id:"sw8",t:"Подстроки с полным алфавитом",p:"Sliding Window",d:"средне",
+{id:"sw8",t:"Подстроки с полным алфавитом",p:"SW + String",d:"средне",
 desc:`Подсчитать ==количество подстрок==, содержащих ==все уникальные символы== s.
 
 Пример:
@@ -2564,7 +2564,7 @@ complexityExpl:`right идёт один раз, left сдвигается при
 expl:`Когда окно содержит все уникальные символы, все расширения вправо (s.length() - right) тоже валидны. Сжимаем left и считаем. O(n).`,
 lcSimilar:[{"t":"Number of Substrings Containing All Three Characters","h":"number-of-substrings-containing-all-three-characters"},{"t":"Substrings with Concatenation of All Words","h":"substrings-with-concatenation-of-all-words"}],repoSimilar:["sw1","sw3","sw9"]},
 
-{id:"sw9",t:"Поиск мутирующего вируса",p:"Sliding Window",d:"средне",
+{id:"sw9",t:"Поиск мутирующего вируса",p:"SW + String",d:"средне",
 desc:`Проверить, содержит ли строка gene какую-либо ==перестановку строки virus==.
 
 Пример:

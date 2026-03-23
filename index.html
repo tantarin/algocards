@@ -462,6 +462,26 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
   .tree-node{width:28px;height:28px;font-size:11px}
   .diagram-wrap{padding:16px 14px 14px}
 }
+
+/* Theory modal */
+.theory-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:250;padding:16px;backdrop-filter:blur(4px)}
+.theory-box{background:var(--card);border-radius:20px;padding:24px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:1px solid #ffffff15}
+.theory-close{position:absolute;top:12px;right:12px;background:var(--card2);border:none;color:var(--dim);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
+.theory-close:hover{color:var(--text)}
+.theory-title{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.theory-title .icon{font-size:24px}
+.theory-subtitle{color:var(--dim);font-size:13px;margin-bottom:16px}
+.theory-section{margin-bottom:16px}
+.theory-section-title{font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600}
+.theory-text{font-size:14px;line-height:1.6;color:var(--text)}
+.theory-code{background:var(--card2);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;overflow-x:auto;margin-top:8px}
+.theory-code .comment{color:var(--dim)}
+.theory-code .keyword{color:var(--purple)}
+.theory-code .hl{color:var(--green);font-weight:600}
+.theory-when{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.theory-when-item{background:rgba(124,58,237,0.15);color:var(--purple);padding:4px 10px;border-radius:6px;font-size:12px}
+.tag.clickable{cursor:pointer;transition:.2s}
+.tag.clickable:hover{filter:brightness(1.2);transform:scale(1.05)}
 </style>
 </head>
 <body>
@@ -474,6 +494,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 <div id="cardsArea"></div>
 <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
 <div id="tokenModal" class="token-modal" style="display:none"></div>
+<div id="theoryModal" class="theory-modal" style="display:none"></div>
 
 <script charset="UTF-8">
 (function(){
@@ -496,6 +517,253 @@ function stripCodeComments(src){
   // Однострочные комментарии
   out=out.replace(/(^|[^:])\/\/.*$/gm,'$1');
   return out;
+}
+
+// ===== THEORY DATA =====
+const THEORY = {
+  'Trees / BFS': {
+    icon: '🌳',
+    title: 'BFS по уровням дерева',
+    desc: 'Обход дерева в ширину — по уровням, с помощью очереди.',
+    when: ['Обход по уровням', 'Зигзаг', 'Кратчайший путь в дереве', 'Проверка уровней'],
+    code: `public List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (root == null) return result;
+
+    Queue<TreeNode> queue = new ArrayDeque<>();
+    queue.offer(root);
+
+    while (!queue.isEmpty()) {
+        int levelSize = queue.size();
+        List<Integer> level = new ArrayList<>();
+
+        for (int i = 0; i < levelSize; i++) {
+            TreeNode node = queue.poll();
+
+            level.add(node.val);  // ← ТОЧКА НАСТРОЙКИ 1
+
+            if (node.left != null) queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
+        }
+
+        result.add(level);        // ← ТОЧКА НАСТРОЙКИ 2
+    }
+    return result;
+}`
+  },
+  'Trees / DFS': {
+    icon: '🌲',
+    title: 'DFS обход дерева',
+    desc: 'Обход дерева в глубину — рекурсивно или со стеком.',
+    when: ['Поиск пути', 'Проверка свойств', 'Сумма путей', 'Симметрия'],
+    code: `void dfs(TreeNode node) {
+    if (node == null) return;
+
+    // Preorder: обработка ДО детей
+    process(node);
+
+    dfs(node.left);
+
+    // Inorder: обработка МЕЖДУ детьми (для BST)
+
+    dfs(node.right);
+
+    // Postorder: обработка ПОСЛЕ детей
+}`
+  },
+  'Sliding Window': {
+    icon: '🪟',
+    title: 'Скользящее окно',
+    desc: 'Два указателя образуют окно, которое расширяется/сжимается.',
+    when: ['Подстрока с условием', 'Максимальная длина', 'Анаграммы', 'К уникальных'],
+    code: `int left = 0;
+for (int right = 0; right < n; right++) {
+    // Расширяем окно: добавляем arr[right]
+    add(arr[right]);
+
+    while (needShrink()) {
+        // Сжимаем окно: убираем arr[left]
+        remove(arr[left]);
+        left++;
+    }
+
+    // Обновляем результат
+    result = Math.max(result, right - left + 1);
+}`
+  },
+  'Two Pointers': {
+    icon: '👆',
+    title: 'Два указателя',
+    desc: 'Два указателя движутся по массиву/строке навстречу или в одном направлении.',
+    when: ['Сумма двух', 'Палиндром', 'Удаление дубликатов', 'Слияние'],
+    code: `// Навстречу друг другу
+int left = 0, right = n - 1;
+while (left < right) {
+    if (condition) {
+        left++;
+    } else {
+        right--;
+    }
+}
+
+// В одном направлении (fast/slow)
+int slow = 0;
+for (int fast = 0; fast < n; fast++) {
+    if (keep(arr[fast])) {
+        arr[slow++] = arr[fast];
+    }
+}`
+  },
+  'Window + Deque': {
+    icon: '📊',
+    title: 'Окно + монотонный дек',
+    desc: 'Скользящее окно с двумя деками для отслеживания min/max.',
+    when: ['Max-Min ≤ limit', 'Максимум в окне', 'Монотонная очередь'],
+    code: `Deque<Integer> maxD = new ArrayDeque<>(); // убывающий
+Deque<Integer> minD = new ArrayDeque<>(); // возрастающий
+
+for (int right = 0; right < n; right++) {
+    // Поддерживаем монотонность
+    while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right])
+        maxD.pollLast();
+    maxD.addLast(right);
+
+    while (!minD.isEmpty() && nums[minD.peekLast()] >= nums[right])
+        minD.pollLast();
+    minD.addLast(right);
+
+    // Сжимаем если нарушено условие
+    while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {
+        left++;
+        if (maxD.peekFirst() < left) maxD.pollFirst();
+        if (minD.peekFirst() < left) minD.pollFirst();
+    }
+}`
+  },
+  'HashMap': {
+    icon: '🗂️',
+    title: 'HashMap / Частоты',
+    desc: 'Хеш-таблица для подсчёта частот или группировки.',
+    when: ['Анаграммы', 'Частоты', 'Two Sum', 'Группировка'],
+    code: `Map<Key, Value> map = new HashMap<>();
+
+// Подсчёт частот
+for (int x : arr) {
+    map.merge(x, 1, Integer::sum);
+    // или
+    map.put(x, map.getOrDefault(x, 0) + 1);
+}
+
+// Группировка
+map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);`
+  },
+  'Linked List': {
+    icon: '🔗',
+    title: 'Связный список',
+    desc: 'Fast/Slow указатели, dummy-узел для упрощения.',
+    when: ['Цикл', 'Середина', 'N-й с конца', 'Разворот'],
+    code: `// Fast/Slow для поиска середины или цикла
+ListNode slow = head, fast = head;
+while (fast != null && fast.next != null) {
+    slow = slow.next;
+    fast = fast.next.next;
+}
+
+// Dummy для упрощения удаления
+ListNode dummy = new ListNode(0);
+dummy.next = head;
+// ... работаем ...
+return dummy.next;`
+  },
+  'Backtracking': {
+    icon: '🔙',
+    title: 'Перебор с откатом',
+    desc: 'Рекурсивный перебор всех вариантов с отсечением.',
+    when: ['Все комбинации', 'Перестановки', 'Подмножества', 'Валидные скобки'],
+    code: `void backtrack(State state, List<Result> result) {
+    if (isComplete(state)) {
+        result.add(copy(state));
+        return;
+    }
+
+    for (Choice choice : getChoices(state)) {
+        if (!isValid(choice)) continue;  // отсечение
+
+        state.apply(choice);      // делаем выбор
+        backtrack(state, result); // рекурсия
+        state.undo(choice);       // откат
+    }
+}`
+  },
+  'Binary Search': {
+    icon: '🔍',
+    title: 'Бинарный поиск',
+    desc: 'Поиск в отсортированном массиве за O(log n).',
+    when: ['Поиск элемента', 'Левая/правая граница', 'Поиск ответа'],
+    code: `// Поиск левой границы (first >= target)
+int lo = 0, hi = n;
+while (lo < hi) {
+    int mid = lo + (hi - lo) / 2;
+    if (arr[mid] >= target) {
+        hi = mid;
+    } else {
+        lo = mid + 1;
+    }
+}
+return lo;`
+  },
+  'Greedy': {
+    icon: '🎯',
+    title: 'Жадный алгоритм',
+    desc: 'На каждом шаге выбираем локально оптимальное решение.',
+    when: ['Интервалы', 'Оптимизация', 'Выбор действия'],
+    code: `// Пример: максимум непересекающихся интервалов
+Arrays.sort(intervals, (a, b) -> a[1] - b[1]); // по концу
+
+int count = 0, end = Integer.MIN_VALUE;
+for (int[] interval : intervals) {
+    if (interval[0] >= end) {
+        count++;
+        end = interval[1];
+    }
+}`
+  }
+};
+
+function showTheory(pattern) {
+  const t = THEORY[pattern];
+  if (!t) return;
+
+  const m = document.getElementById('theoryModal');
+  m.style.display = 'flex';
+  m.innerHTML = `
+    <div class="theory-box">
+      <button class="theory-close" onclick="closeTheory()">×</button>
+      <div class="theory-title"><span class="icon">${t.icon}</span> ${t.title}</div>
+      <div class="theory-subtitle">${pattern}</div>
+
+      <div class="theory-section">
+        <div class="theory-section-title">Описание</div>
+        <div class="theory-text">${t.desc}</div>
+      </div>
+
+      <div class="theory-section">
+        <div class="theory-section-title">Когда использовать</div>
+        <div class="theory-when">
+          ${t.when.map(w => `<span class="theory-when-item">${w}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="theory-section">
+        <div class="theory-section-title">Шаблон кода</div>
+        <pre class="theory-code">${escCode(t.code).replace(/\/\/.*/g, '<span class="comment">$&</span>').replace(/←[^<]*/g, '<span class="hl">$&</span>')}</pre>
+      </div>
+    </div>
+  `;
+}
+
+function closeTheory() {
+  document.getElementById('theoryModal').style.display = 'none';
 }
 
 // --- «14 задач на сегодня» (без поиска) ---
@@ -1451,7 +1719,8 @@ function renderCard(){
     <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
       <div class="fc-face${!fcFlipped?' visible':''}">
-        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
+        <span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span>
+        <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
@@ -1570,6 +1839,8 @@ function buildProblemsJs(){
     out+='expl:`'+escVal(p.expl)+'`';
     if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length)out+=',\nlcSimilar:'+JSON.stringify(p.lcSimilar);
     if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length)out+=',\nrepoSimilar:'+JSON.stringify(p.repoSimilar);
+    // Иначе при пуше из редактора пропадают все diagram:{...} в problems.js
+    if(p.diagram!=null&&typeof p.diagram==='object')out+=',\ndiagram:'+JSON.stringify(p.diagram);
     out+='}';
     if(i<P.length-1)out+=',';
     out+='\n\n';

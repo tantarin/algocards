@@ -2228,7 +2228,7 @@ complexityExpl:`Левый и правый указатели двигаются
 expl:`Сначала нужно отдельным циклом пройти по t и записать какие в массив какие символы на нужны.
 Затем отдельным циклом пройти по s и в окне проверять сколько символов осталось покрыть через отдельную переменную.
 И если все символы покрыты, то ищем минимум и ПРОБУЕМ УМЕНЬШИТЬ ОКНО СЛЕВА`,
-lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}]},
+lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],repoSimilar:["sw3"]},
 
 {id:"sw2",t:"Longest Repeating Char Replacement",p:"Sliding Window",d:"средне",
 desc:`Дана строка s и число k. Можно заменить до k символов. Найти ==длину самой длинной подстроки== из одинаковых символов.
@@ -2330,7 +2330,7 @@ diagram:{type:"multi",data:["c","b","a","e","b","a","b","a","c","d"],steps:[
 {type:"int[]",name:"need",data:{"a":1,"b":1,"c":1}},
 {type:"int",name:"missing",data:"0 ✓"}
 ],desc:"Окно [b,a,c] — анаграмма найдена!"}
-]}},
+]},repoSimilar:["sw1"]},
 
 {id:"sw4",t:"Возрастающая подпоследовательность",p:"Sliding Window",d:"легко",
 desc:`Найти длину самого длинного ==непрерывного строго возрастающего подмассива==.

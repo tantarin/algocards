@@ -101,6 +101,18 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
+// Очень простой stripper для Java/С-стиля комментариев.
+// Удаляет //... до конца строки и /* ... */ блоки, сохраняя переносы строк.
+function stripCodeComments(src){
+  if(!src)return '';
+  let out=String(src);
+  // Блок-комментарии
+  out=out.replace(/\/\*[\s\S]*?\*\//g,'');
+  // Однострочные комментарии
+  out=out.replace(/(^|[^:])\/\/.*$/gm,'$1');
+  return out;
+}
+
 // --- «14 задач на сегодня» (без поиска) ---
 // Из текущего набора (все задачи или выбранный паттерн) каждый календарный день показываем не больше DAILY_LIMIT карточек.
 // Состав и порядок детерминированы от строки seed (дата + фильтр), чтобы за день список не менялся между перезагрузками.
@@ -404,6 +416,8 @@ function renderCard(){
   const input1Draft=input1Open?loadSolutionInput(p.id,1):'';
   const input2Open=isSolutionInputOpen(p.id,2);
   const input2Draft=input2Open?loadSolutionInput(p.id,2):'';
+  const code1Bg=input1Open?stripCodeComments(p.code):p.code;
+  const code2Bg=input2Open?stripCodeComments(p.code2):p.code2;
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
     ${solveTrackerHtml(p)}
@@ -431,7 +445,7 @@ function renderCard(){
         <div class="code-wrap">
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
           <div class="solution-editor">
-            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code1Bg)}</code></pre>
             ${input1Open?`<textarea id="solutionInput_${p.id}_1" class="solution-input" data-problem-id="${p.id}" data-which="1" spellcheck="false" oninput="saveSolutionDraft(this)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input1Draft)}</textarea>`:''}
           </div>
         </div>
@@ -441,7 +455,7 @@ function renderCard(){
         <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
           <div class="solution-editor">
-            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
+            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code2Bg)}</code></pre>
             ${input2Open?`<textarea id="solutionInput_${p.id}_2" class="solution-input" data-problem-id="${p.id}" data-which="2" spellcheck="false" oninput="saveSolutionDraft(this)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input2Draft)}</textarea>`:''}
           </div>
         </div>

@@ -152,8 +152,27 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .lc-similar{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff15}
 .lc-similar-title{font-size:12px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
 .lc-similar-links{display:flex;flex-wrap:wrap;gap:8px 14px}
+.lc-similar-subtitle{font-size:11px;color:var(--dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.45px}
+.lc-similar-subtitle:first-of-type{margin-top:0}
 .lc-similar-link{color:var(--purple);font-size:13px;text-decoration:underline;text-underline-offset:3px}
 .lc-similar-link:active{opacity:.85}
+.repo-similar-link{
+  display:inline-block;
+  margin:0;
+  padding:6px 12px;
+  border-radius:10px;
+  border:1px solid rgba(34,197,94,0.35);
+  background:rgba(34,197,94,0.1);
+  color:var(--green);
+  font-size:13px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  text-align:left;
+  transition:background .15s,border-color .15s,transform .1s;
+}
+.repo-similar-link:hover{background:rgba(34,197,94,0.18);border-color:rgba(34,197,94,0.55)}
+.repo-similar-link:active{transform:scale(.98);opacity:.95}
 
 /* ===== DIAGRAM STYLES (сказочный блок — отдельный фон) ===== */
 .diagram-wrap{
@@ -542,19 +561,66 @@ function isInTodaysDailyBatch(p){
   return daily.some(x=>x.id===p.id);
 }
 
-function lcSimilarHtml(p){
-  if(!p.lcSimilar||!p.lcSimilar.length)return '';
+/** Переход к карточке из этой репы (полный список по паттерну цели; поиск сбрасывается). */
+function openRepoSimilarCard(targetId){
+  const target=P.find(x=>String(x.id)===String(targetId));
+  if(!target)return;
+  setMascotTyping(false);
+  fcFlipped=false;
+  searchQuery='';
+  const se=document.getElementById('search');
+  if(se)se.value='';
+  if(activeFilter!=null&&activeFilter!==target.p){
+    activeFilter=target.p;
+    renderFilters();
+  }
+  let list=getFiltered();
+  let idx=list.findIndex(x=>String(x.id)===String(targetId));
+  if(idx<0){
+    activeFilter=null;
+    renderFilters();
+    list=getFiltered();
+    idx=list.findIndex(x=>String(x.id)===String(targetId));
+  }
+  if(idx<0)return;
+  fcList=list;
+  fcIdx=idx;
+  renderCard();
+}
+
+function similarProblemsHtml(p){
   if(!isInTodaysDailyBatch(p))return '';
-  const items=p.lcSimilar.map(x=>{
-    const h=(x.h||'').replace(/[^a-z0-9-]/gi,'');
-    if(!h)return '';
-    const href='https://leetcode.com/problems/'+h+'/';
-    return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="lc-similar-link">${esc(x.t||h)}</a>`;
-  }).filter(Boolean).join('');
-  if(!items)return '';
+  let lcBlock='';
+  if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length){
+    const items=p.lcSimilar.map(x=>{
+      const h=(x.h||'').replace(/[^a-z0-9-]/gi,'');
+      if(!h)return '';
+      const href='https://leetcode.com/problems/'+h+'/';
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="lc-similar-link">${esc(x.t||h)}</a>`;
+    }).filter(Boolean).join('');
+    if(items) lcBlock=`<div class="lc-similar-subtitle">LeetCode</div><div class="lc-similar-links">${items}</div>`;
+  }
+  let repoBlock='';
+  if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length){
+    const repoItems=p.repoSimilar.map(entry=>{
+      const rid=typeof entry==='string'?entry:(entry&&entry.id);
+      if(!rid)return '';
+      const other=P.find(x=>String(x.id)===String(rid));
+      if(!other||String(other.id)===String(p.id))return '';
+      const label=(typeof entry==='object'&&entry.t)?entry.t:other.t;
+      const num=P.indexOf(other)+1;
+      // id в одинарных кавычках — иначе JSON.stringify даёт "id" и ломает onclick="...openRepoSimilarCard("
+      const safeId=String(rid).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const titleAttr=String(label).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      return `<button type="button" class="repo-similar-link" title="${titleAttr}" onclick="event.stopPropagation();openRepoSimilarCard('${safeId}')">#${num} ${esc(label)}</button>`;
+    }).filter(Boolean).join('');
+    if(repoItems) repoBlock=`<div class="lc-similar-subtitle">В этой коллекции</div><div class="lc-similar-links">${repoItems}</div>`;
+  }
+  if(!lcBlock&&!repoBlock)return '';
   return `<div class="lc-similar" onclick="event.stopPropagation()">
-    <div class="lc-similar-title">Похожие задачи с LeetCode</div>
-    <div class="lc-similar-links">${items}</div>
+    <div class="lc-similar-title">Похожие задачи</div>
+    ${lcBlock}
+    ${repoBlock}
   </div>`;
 }
 
@@ -911,7 +977,9 @@ function setupSwipeNav(){
 
   card.addEventListener('click',(e)=>{
     if(Date.now()-lastSwipeAt<450)return;
-    // обычный тап — перелистывание карты как раньше
+    // не переворачивать при клике по ссылкам/кнопкам и блоку похожих задач
+    const t=e.target;
+    if(t&&t.closest&&(t.closest('button,a,.lc-similar')||t.closest('textarea')))return;
     flipCard();
   });
 }
@@ -1397,7 +1465,7 @@ function renderCard(){
           <button class="hint-btn steps-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">🔢 Схема решения</button>
           <div class="steps-text" style="display:none">${esc(p.steps)}</div>
         </div>`:''}
-        ${lcSimilarHtml(p)}
+        ${similarProblemsHtml(p)}
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
@@ -1498,6 +1566,7 @@ function buildProblemsJs(){
     out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
     out+='expl:`'+escVal(p.expl)+'`';
     if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length)out+=',\nlcSimilar:'+JSON.stringify(p.lcSimilar);
+    if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length)out+=',\nrepoSimilar:'+JSON.stringify(p.repoSimilar);
     out+='}';
     if(i<P.length-1)out+=',';
     out+='\n\n';

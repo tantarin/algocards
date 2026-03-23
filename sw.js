@@ -1,10 +1,11 @@
-const CACHE = 'algocards-v19';
-/** problems.js часто меняется через API — не включаем в precache (устаревает мгновенно) */
+const CACHE = 'algocards-v20';
+/** problems.js и theory.js часто меняются через API — не включаем в precache (устаревает мгновенно) */
 const ASSETS = ['./index.html', './manifest.json'];
 
-function isProblemsJsUrl(url) {
+function isDynamicJs(url) {
   const p = url.pathname || '';
-  return p.endsWith('/problems.js') || p.endsWith('problems.js');
+  return p.endsWith('/problems.js') || p.endsWith('problems.js') ||
+         p.endsWith('/theory.js') || p.endsWith('theory.js');
 }
 
 self.addEventListener('install', e => {
@@ -30,8 +31,8 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // problems.js: всегда сеть без HTTP-кэша; на GitHub Pages иначе часто виден старый файл
-  if (isProblemsJsUrl(url)) {
+  // problems.js и theory.js: всегда сеть без HTTP-кэша; на GitHub Pages иначе часто виден старый файл
+  if (isDynamicJs(url)) {
     e.respondWith(
       fetch(e.request, { cache: 'no-store' })
         .then(response => {

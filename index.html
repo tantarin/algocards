@@ -468,6 +468,8 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .theory-box{background:var(--card);border-radius:20px;padding:24px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:1px solid #ffffff15}
 .theory-close{position:absolute;top:12px;right:12px;background:var(--card2);border:none;color:var(--dim);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
 .theory-close:hover{color:var(--text)}
+.theory-edit-toggle{position:absolute;top:12px;right:52px;background:var(--card2);border:none;color:var(--dim);width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;transition:.2s}
+.theory-edit-toggle:hover{color:var(--text);background:var(--purple)}
 .theory-title{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
 .theory-title .icon{font-size:24px}
 .theory-subtitle{color:var(--dim);font-size:13px;margin-bottom:16px}
@@ -502,6 +504,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
   document.write('<script src="problems.js'+(v?'?v='+encodeURIComponent(v):'')+'" charset="UTF-8"><\/script>');
 })();
 </script>
+<script src="theory.js" charset="UTF-8"></script>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -519,252 +522,87 @@ function stripCodeComments(src){
   return out;
 }
 
-// ===== THEORY DATA =====
-const THEORY = {
-  'Trees / BFS': {
-    icon: '🌳',
-    title: 'BFS по уровням дерева',
-    desc: 'Обход дерева в ширину — по уровням, с помощью очереди.',
-    when: ['Обход по уровням', 'Зигзаг', 'Кратчайший путь в дереве', 'Проверка уровней'],
-    code: `public List<List<Integer>> levelOrder(TreeNode root) {
-    List<List<Integer>> result = new ArrayList<>();
-    if (root == null) return result;
+// THEORY загружается из theory.js
 
-    Queue<TreeNode> queue = new ArrayDeque<>();
-    queue.offer(root);
+let currentTheoryPattern = null;
+let theoryEditMode = false;
 
-    while (!queue.isEmpty()) {
-        int levelSize = queue.size();
-        List<Integer> level = new ArrayList<>();
-
-        for (int i = 0; i < levelSize; i++) {
-            TreeNode node = queue.poll();
-
-            level.add(node.val);  // ← ТОЧКА НАСТРОЙКИ 1
-
-            if (node.left != null) queue.offer(node.left);
-            if (node.right != null) queue.offer(node.right);
-        }
-
-        result.add(level);        // ← ТОЧКА НАСТРОЙКИ 2
-    }
-    return result;
-}`
-  },
-  'Trees / DFS': {
-    icon: '🌲',
-    title: 'DFS обход дерева',
-    desc: 'Обход дерева в глубину — рекурсивно или со стеком.',
-    when: ['Поиск пути', 'Проверка свойств', 'Сумма путей', 'Симметрия'],
-    code: `void dfs(TreeNode node) {
-    if (node == null) return;
-
-    // Preorder: обработка ДО детей
-    process(node);
-
-    dfs(node.left);
-
-    // Inorder: обработка МЕЖДУ детьми (для BST)
-
-    dfs(node.right);
-
-    // Postorder: обработка ПОСЛЕ детей
-}`
-  },
-  'Sliding Window': {
-    icon: '🪟',
-    title: 'Скользящее окно',
-    desc: 'Два указателя образуют окно, которое расширяется/сжимается.',
-    when: ['Подстрока с условием', 'Максимальная длина', 'Анаграммы', 'К уникальных'],
-    code: `int left = 0;
-for (int right = 0; right < n; right++) {
-    // Расширяем окно: добавляем arr[right]
-    add(arr[right]);
-
-    while (needShrink()) {
-        // Сжимаем окно: убираем arr[left]
-        remove(arr[left]);
-        left++;
-    }
-
-    // Обновляем результат
-    result = Math.max(result, right - left + 1);
-}`
-  },
-  'Two Pointers': {
-    icon: '👆',
-    title: 'Два указателя',
-    desc: 'Два указателя движутся по массиву/строке навстречу или в одном направлении.',
-    when: ['Сумма двух', 'Палиндром', 'Удаление дубликатов', 'Слияние'],
-    code: `// Навстречу друг другу
-int left = 0, right = n - 1;
-while (left < right) {
-    if (condition) {
-        left++;
-    } else {
-        right--;
-    }
-}
-
-// В одном направлении (fast/slow)
-int slow = 0;
-for (int fast = 0; fast < n; fast++) {
-    if (keep(arr[fast])) {
-        arr[slow++] = arr[fast];
-    }
-}`
-  },
-  'Window + Deque': {
-    icon: '📊',
-    title: 'Окно + монотонный дек',
-    desc: 'Скользящее окно с двумя деками для отслеживания min/max.',
-    when: ['Max-Min ≤ limit', 'Максимум в окне', 'Монотонная очередь'],
-    code: `Deque<Integer> maxD = new ArrayDeque<>(); // убывающий
-Deque<Integer> minD = new ArrayDeque<>(); // возрастающий
-
-for (int right = 0; right < n; right++) {
-    // Поддерживаем монотонность
-    while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right])
-        maxD.pollLast();
-    maxD.addLast(right);
-
-    while (!minD.isEmpty() && nums[minD.peekLast()] >= nums[right])
-        minD.pollLast();
-    minD.addLast(right);
-
-    // Сжимаем если нарушено условие
-    while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {
-        left++;
-        if (maxD.peekFirst() < left) maxD.pollFirst();
-        if (minD.peekFirst() < left) minD.pollFirst();
-    }
-}`
-  },
-  'HashMap': {
-    icon: '🗂️',
-    title: 'HashMap / Частоты',
-    desc: 'Хеш-таблица для подсчёта частот или группировки.',
-    when: ['Анаграммы', 'Частоты', 'Two Sum', 'Группировка'],
-    code: `Map<Key, Value> map = new HashMap<>();
-
-// Подсчёт частот
-for (int x : arr) {
-    map.merge(x, 1, Integer::sum);
-    // или
-    map.put(x, map.getOrDefault(x, 0) + 1);
-}
-
-// Группировка
-map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);`
-  },
-  'Linked List': {
-    icon: '🔗',
-    title: 'Связный список',
-    desc: 'Fast/Slow указатели, dummy-узел для упрощения.',
-    when: ['Цикл', 'Середина', 'N-й с конца', 'Разворот'],
-    code: `// Fast/Slow для поиска середины или цикла
-ListNode slow = head, fast = head;
-while (fast != null && fast.next != null) {
-    slow = slow.next;
-    fast = fast.next.next;
-}
-
-// Dummy для упрощения удаления
-ListNode dummy = new ListNode(0);
-dummy.next = head;
-// ... работаем ...
-return dummy.next;`
-  },
-  'Backtracking': {
-    icon: '🔙',
-    title: 'Перебор с откатом',
-    desc: 'Рекурсивный перебор всех вариантов с отсечением.',
-    when: ['Все комбинации', 'Перестановки', 'Подмножества', 'Валидные скобки'],
-    code: `void backtrack(State state, List<Result> result) {
-    if (isComplete(state)) {
-        result.add(copy(state));
-        return;
-    }
-
-    for (Choice choice : getChoices(state)) {
-        if (!isValid(choice)) continue;  // отсечение
-
-        state.apply(choice);      // делаем выбор
-        backtrack(state, result); // рекурсия
-        state.undo(choice);       // откат
-    }
-}`
-  },
-  'Binary Search': {
-    icon: '🔍',
-    title: 'Бинарный поиск',
-    desc: 'Поиск в отсортированном массиве за O(log n).',
-    when: ['Поиск элемента', 'Левая/правая граница', 'Поиск ответа'],
-    code: `// Поиск левой границы (first >= target)
-int lo = 0, hi = n;
-while (lo < hi) {
-    int mid = lo + (hi - lo) / 2;
-    if (arr[mid] >= target) {
-        hi = mid;
-    } else {
-        lo = mid + 1;
-    }
-}
-return lo;`
-  },
-  'Greedy': {
-    icon: '🎯',
-    title: 'Жадный алгоритм',
-    desc: 'На каждом шаге выбираем локально оптимальное решение.',
-    when: ['Интервалы', 'Оптимизация', 'Выбор действия'],
-    code: `// Пример: максимум непересекающихся интервалов
-Arrays.sort(intervals, (a, b) -> a[1] - b[1]); // по концу
-
-int count = 0, end = Integer.MIN_VALUE;
-for (int[] interval : intervals) {
-    if (interval[0] >= end) {
-        count++;
-        end = interval[1];
-    }
-}`
-  }
-};
-
-function showTheory(pattern) {
+function showTheory(pattern, forceEdit) {
   const t = THEORY[pattern];
   if (!t) return;
+  currentTheoryPattern = pattern;
+  if (forceEdit !== undefined) theoryEditMode = forceEdit;
 
   const m = document.getElementById('theoryModal');
   m.style.display = 'flex';
-  m.innerHTML = `
-    <div class="theory-box">
-      <button class="theory-close" onclick="closeTheory()">×</button>
-      <div class="theory-title"><span class="icon">${t.icon}</span> ${t.title}</div>
-      <div class="theory-subtitle">${pattern}</div>
 
-      <div class="theory-section">
-        <div class="theory-section-title">Описание</div>
-        <div class="theory-text">${t.desc}</div>
+  if (theoryEditMode) {
+    m.innerHTML = `
+      <div class="theory-box theory-edit-mode">
+        <button class="theory-close" onclick="closeTheory()">×</button>
+        <button class="theory-edit-toggle" onclick="toggleTheoryEdit()" title="Отменить редактирование">✕</button>
+        <div class="theory-subtitle">${pattern}</div>
+
+        <div class="edit-label">Иконка</div>
+        <input type="text" class="edit-field theory-edit-field" data-key="icon" value="${t.icon||''}" style="width:60px;text-align:center;font-size:24px">
+
+        <div class="edit-label">Название</div>
+        <input type="text" class="edit-field theory-edit-field" data-key="title" value="${escCode(t.title||'')}">
+
+        <div class="edit-label">Описание</div>
+        <textarea class="edit-field theory-edit-field" data-key="desc" rows="3">${t.desc||''}</textarea>
+
+        <div class="edit-label">Шаблон кода</div>
+        <textarea class="edit-field theory-edit-field" data-key="code" rows="15" style="font-family:monospace;font-size:12px">${t.code||''}</textarea>
+
+        <button class="edit-save" id="saveTheoryBtn" onclick="saveTheory()">💾 Сохранить и запушить</button>
+        <div class="edit-status" id="theoryEditStatus"></div>
       </div>
+    `;
+  } else {
+    m.innerHTML = `
+      <div class="theory-box">
+        <button class="theory-close" onclick="closeTheory()">×</button>
+        <button class="theory-edit-toggle" onclick="toggleTheoryEdit()" title="Редактировать">✏️</button>
+        <div class="theory-title"><span class="icon">${t.icon}</span> ${t.title}</div>
+        <div class="theory-subtitle">${pattern}</div>
 
-      <div class="theory-section">
-        <div class="theory-section-title">Когда использовать</div>
-        <div class="theory-when">
-          ${t.when.map(w => `<span class="theory-when-item">${w}</span>`).join('')}
+        <div class="theory-section">
+          <div class="theory-section-title">Описание</div>
+          <div class="theory-text">${t.desc}</div>
+        </div>
+
+        <div class="theory-section">
+          <div class="theory-section-title">Шаблон кода</div>
+          <pre class="theory-code"><code class="language-java">${escCode(t.code)}</code></pre>
         </div>
       </div>
+    `;
+    // Подсветка синтаксиса
+    m.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+  }
+}
 
-      <div class="theory-section">
-        <div class="theory-section-title">Шаблон кода</div>
-        <pre class="theory-code">${escCode(t.code).replace(/\/\/.*/g, '<span class="comment">$&</span>').replace(/←[^<]*/g, '<span class="hl">$&</span>')}</pre>
-      </div>
-    </div>
-  `;
+function toggleTheoryEdit() {
+  const token = getToken();
+  if (!theoryEditMode && !token) {
+    showTokenModal();
+    return;
+  }
+  theoryEditMode = !theoryEditMode;
+  showTheory(currentTheoryPattern);
 }
 
 function closeTheory() {
+  theoryEditMode = false;
   document.getElementById('theoryModal').style.display = 'none';
 }
+
+// Закрытие модала при клике на фон
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('theoryModal');
+  if (e.target === modal) closeTheory();
+});
 
 // --- «14 задач на сегодня» (без поиска) ---
 // Из текущего набора (все задачи или выбранный паттерн) каждый календарный день показываем не больше DAILY_LIMIT карточек.
@@ -1146,6 +984,7 @@ function renderCartesianDiagram(d, step){
 
 const REPO='tantarin/algocards';
 const FILE_PATH='problems.js';
+const THEORY_FILE_PATH='theory.js';
 const allPatterns=[...new Set(P.map(p=>p.p))].sort();
 let activeFilter=null;
 let searchQuery='';
@@ -1738,7 +1577,7 @@ function renderCard(){
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
-        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
+        <span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span>
         <div class="code-wrap">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
           <button type="button" class="enter-btn-inline${input1Open?' active':''}" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
@@ -1929,6 +1768,118 @@ async function saveCard(){
     row.id='reloadAfterPushRow';
     status.parentNode.insertBefore(row,status.nextSibling);
     document.getElementById('reloadAfterPush').onclick=function(){
+      location.reload();
+    };
+  }catch(e){
+    status.style.color='var(--red)';
+    status.textContent='❌ '+e.message;
+    btn.disabled=false;
+  }
+}
+
+function buildTheoryJs(){
+  const escVal=s=>{
+    if(s==null)return '';
+    return s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  };
+  let out='const THEORY = {\n';
+  const keys=Object.keys(THEORY);
+  keys.forEach((k,i)=>{
+    const t=THEORY[k];
+    out+=`  '${k}': {\n`;
+    out+=`    icon: '${t.icon||''}',\n`;
+    out+=`    title: '${(t.title||'').replace(/'/g,"\\'")}',\n`;
+    out+=`    desc: '${(t.desc||'').replace(/'/g,"\\'")}',\n`;
+    out+=`    code: \`${escVal(t.code)}\`\n`;
+    out+='  }';
+    if(i<keys.length-1)out+=',';
+    out+='\n';
+  });
+  out+='};\n';
+  return out;
+}
+
+async function purgeTheoryJsFromCaches(){
+  if(!('caches'in window))return;
+  const names=await caches.keys();
+  await Promise.all(names.map(async name=>{
+    const c=await caches.open(name);
+    const reqs=await c.keys();
+    await Promise.all(reqs.map(r=>{
+      if((r.url||'').includes('theory.js'))return c.delete(r);
+    }));
+  }));
+}
+
+async function saveTheory(){
+  const pattern=currentTheoryPattern;
+  if(!pattern||!THEORY[pattern])return;
+  const t=THEORY[pattern];
+  const btn=document.getElementById('saveTheoryBtn');
+  const status=document.getElementById('theoryEditStatus');
+
+  document.querySelectorAll('.theory-edit-field').forEach(el=>{
+    t[el.dataset.key]=el.value;
+  });
+
+  btn.disabled=true;
+  status.style.color='var(--dim)';
+  status.textContent='Генерация файла...';
+
+  const content=buildTheoryJs();
+  const encoded=btoa(unescape(encodeURIComponent(content)));
+
+  status.textContent='Получение SHA текущего файла...';
+  const token=getToken();
+
+  try{
+    const meta=await fetch(`https://api.github.com/repos/${REPO}/contents/${THEORY_FILE_PATH}`,{
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!meta.ok){
+      if(meta.status===401){
+        status.style.color='var(--red)';
+        status.textContent='Неверный токен. Нажмите ✏️ чтобы обновить.';
+        localStorage.removeItem('gh_token');
+        editMode=false;
+        document.getElementById('editToggle').classList.remove('active');
+        btn.disabled=false;
+        return;
+      }
+      throw new Error('GitHub API: '+meta.status);
+    }
+    const metaJson=await meta.json();
+    const sha=metaJson.sha;
+
+    status.textContent='Пушим в GitHub...';
+    const put=await fetch(`https://api.github.com/repos/${REPO}/contents/${THEORY_FILE_PATH}`,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:'Update theory: '+pattern,
+        content:encoded,
+        sha:sha
+      })
+    });
+
+    if(!put.ok){
+      const err=await put.json();
+      throw new Error(err.message||'PUT failed: '+put.status);
+    }
+
+    await purgeTheoryJsFromCaches();
+
+    status.style.color='var(--green)';
+    status.textContent='✅ Запушено! Обнови страницу через 5-30 сек.';
+    btn.disabled=false;
+    const row=document.createElement('div');
+    row.style.cssText='margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
+    row.innerHTML='<button type="button" id="reloadAfterTheoryPush" style="padding:8px 14px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-weight:600;cursor:pointer">Обновить страницу</button>';
+    const old=document.getElementById('reloadAfterTheoryPushRow');
+    if(old)old.remove();
+    row.id='reloadAfterTheoryPushRow';
+    status.parentNode.insertBefore(row,status.nextSibling);
+    document.getElementById('reloadAfterTheoryPush').onclick=function(){
       location.reload();
     };
   }catch(e){

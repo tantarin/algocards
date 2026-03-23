@@ -1538,9 +1538,12 @@ function fcPrev(){setMascotTyping(false);fcFlipped=false;fcIdx=(fcIdx-1+fcList.l
 function fcShuffle(){
   setMascotTyping(false);
   fcFlipped=false;
-  // В дневном режиме перемешиваем только сегодняшние карточки; при поиске — весь отфильтрованный список
+  // Поиск — перемешиваем всю выдачу; иначе всегда заново «на сегодня» (14), даже после перехода по repoSimilar с полным списком
   if(searchQuery)fcList=shuffle(getFiltered());
-  else fcList=shuffle(fcList.slice());
+  else{
+    rebuildDailyList();
+    fcList=shuffle(fcList.slice());
+  }
   fcIdx=0;renderCard();
 }
 

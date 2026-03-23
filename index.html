@@ -1758,18 +1758,8 @@ async function saveCard(){
     await purgeProblemsJsFromCaches();
 
     status.style.color='var(--green)';
-    status.textContent='✅ Запушено. Через 5–30 с GitHub Pages обновит файл — нажми «Обновить страницу» ниже или Ctrl+F5.';
+    status.textContent='✅ Запушено!';
     btn.disabled=false;
-    const row=document.createElement('div');
-    row.style.cssText='margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
-    row.innerHTML='<button type="button" id="reloadAfterPush" style="padding:8px 14px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-weight:600;cursor:pointer">Обновить страницу</button>';
-    const old=document.getElementById('reloadAfterPushRow');
-    if(old)old.remove();
-    row.id='reloadAfterPushRow';
-    status.parentNode.insertBefore(row,status.nextSibling);
-    document.getElementById('reloadAfterPush').onclick=function(){
-      location.reload();
-    };
   }catch(e){
     status.style.color='var(--red)';
     status.textContent='❌ '+e.message;
@@ -1870,18 +1860,8 @@ async function saveTheory(){
     await purgeTheoryJsFromCaches();
 
     status.style.color='var(--green)';
-    status.textContent='✅ Запушено! Обнови страницу через 5-30 сек.';
+    status.textContent='✅ Запушено!';
     btn.disabled=false;
-    const row=document.createElement('div');
-    row.style.cssText='margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
-    row.innerHTML='<button type="button" id="reloadAfterTheoryPush" style="padding:8px 14px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-weight:600;cursor:pointer">Обновить страницу</button>';
-    const old=document.getElementById('reloadAfterTheoryPushRow');
-    if(old)old.remove();
-    row.id='reloadAfterTheoryPushRow';
-    status.parentNode.insertBefore(row,status.nextSibling);
-    document.getElementById('reloadAfterTheoryPush').onclick=function(){
-      location.reload();
-    };
   }catch(e){
     status.style.color='var(--red)';
     status.textContent='❌ '+e.message;

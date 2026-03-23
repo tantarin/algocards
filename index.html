@@ -54,26 +54,26 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
 .copy-btn:active{background:var(--purple);color:#fff}
 .mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
-.mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));user-select:none;font-size:18px}
+.mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
 .mascot-bird{animation:mascotBird 2.8s ease-in-out both}
 .mascot-butterfly{animation:mascotButterfly 3.2s linear both}
 .mascot-cat{animation:mascotCat 3.6s ease-in-out both}
 @keyframes mascotBird{
-  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.9) rotate(-8deg)}
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75) rotate(-8deg)}
   10%{opacity:1}
-  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1) rotate(10deg)}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1.15) rotate(10deg)}
 }
 @keyframes mascotButterfly{
-  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.85) rotate(0deg)}
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.70) rotate(0deg)}
   10%{opacity:1}
-  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1) rotate(12deg)}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1.20) rotate(12deg)}
 }
 @keyframes mascotCat{
-  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.9)}
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75)}
   12%{opacity:1}
-  30%{transform:translate(calc(var(--x) + var(--dx)),var(--y)) scale(1.05)}
-  60%{transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.98)}
-  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.9)}
+  30%{transform:translate(calc(var(--x) + var(--dx)),var(--y)) scale(1.25)}
+  60%{transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(1.05)}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.95)}
 }
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
 .solution-pre{margin:0}
@@ -424,7 +424,7 @@ function spawnMascot(){
   el.textContent=pick.t;
   el.style.animationDuration=animDur+'s';
   const fontScale=prof.sizeJitter;
-  el.style.fontSize=(18*fontScale)+'px';
+  el.style.fontSize=(30*fontScale)+'px';
 
   const rect=layer.getBoundingClientRect();
   const w=rect.width||300;

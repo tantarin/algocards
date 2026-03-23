@@ -13,11 +13,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--text:#e2e8f0;--dim:#94a3b8;--radius:16px}
+:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--text:#e2e8f0;--dim:#94a3b8;--radius:16px;--accent:var(--purple);--accent-soft:rgba(124,58,237,0.25)}
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;padding-top:env(safe-area-inset-top,16px);-webkit-user-select:none;user-select:none}
 h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:14px}
-.flashcard{background:var(--card);border-radius:20px;padding:24px;margin:12px 0;cursor:pointer}
+.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden}
 .fc-face{display:none}
 .fc-face.visible{display:block}
 .fc-nav{display:flex;justify-content:center;gap:24px;margin-top:12px}
@@ -42,6 +42,28 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
 .copy-btn:active{background:var(--purple);color:#fff}
+.mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));user-select:none;font-size:18px}
+.mascot-bird{animation:mascotBird 2.8s ease-in-out both}
+.mascot-butterfly{animation:mascotButterfly 3.2s linear both}
+.mascot-cat{animation:mascotCat 3.6s ease-in-out both}
+@keyframes mascotBird{
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.9) rotate(-8deg)}
+  10%{opacity:1}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1) rotate(10deg)}
+}
+@keyframes mascotButterfly{
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.85) rotate(0deg)}
+  10%{opacity:1}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1) rotate(12deg)}
+}
+@keyframes mascotCat{
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.9)}
+  12%{opacity:1}
+  30%{transform:translate(calc(var(--x) + var(--dx)),var(--y)) scale(1.05)}
+  60%{transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.98)}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.9)}
+}
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
 .solution-pre{margin:0}
 .solution-pre code{display:block;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;white-space:pre}
@@ -168,44 +190,6 @@ function rebuildDailyList(){
   fcList=pickDailyProblems(getFiltered(),k+'|'+(activeFilter||'all'),DAILY_LIMIT);
 }
 
-const SOLVE_STORAGE_KEY='algocards_solve_counts';
-
-function loadSolveCounts(){
-  try{
-    const raw=localStorage.getItem(SOLVE_STORAGE_KEY);
-    const o=raw?JSON.parse(raw):{};
-    return o&&typeof o==='object'?o:{};
-  }catch(e){return{}}
-}
-
-function saveSolveCounts(map){
-  try{localStorage.setItem(SOLVE_STORAGE_KEY,JSON.stringify(map));}catch(e){}
-}
-
-function getSolveCount(problemId){
-  const m=loadSolveCounts();
-  const v=m[problemId];
-  return typeof v==='number'&&v>=0&&!isNaN(v)?Math.floor(v):0;
-}
-
-function adjustSolve(problemId,delta){
-  const m=loadSolveCounts();
-  const next=Math.max(0,getSolveCount(problemId)+delta);
-  m[problemId]=next;
-  saveSolveCounts(m);
-  renderCard();
-}
-
-function solveTrackerHtml(p){
-  const n=getSolveCount(p.id);
-  return `<div class="solve-tracker" onclick="event.stopPropagation()">
-    <span class="solve-label">Прорешано раз:</span>
-    <button type="button" class="solve-btn" aria-label="Минус один" onclick="adjustSolve('${p.id}',-1)">−</button>
-    <span class="solve-num">${n}</span>
-    <button type="button" class="solve-btn" aria-label="Плюс один" onclick="adjustSolve('${p.id}',1)">+</button>
-  </div>`;
-}
-
 function isInTodaysDailyBatch(p){
   if(searchQuery)return false;
   const list=getFiltered();
@@ -238,6 +222,193 @@ let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
 let editMode=false;
 let solutionInputOpen={}; // { [problemId]: {1:boolean,2:boolean} }
+let mascotTimer=null;
+let mascotTyping=false;
+let mascotProfile=null;
+
+const CARD_ACCENTS=[
+  {a:'#7c3aed',s:'rgba(124,58,237,0.25)'}, // purple
+  {a:'#3b82f6',s:'rgba(59,130,246,0.25)'}, // blue
+  {a:'#22c55e',s:'rgba(34,197,94,0.25)'}, // green
+  {a:'#f59e0b',s:'rgba(245,158,11,0.25)'}, // orange
+  {a:'#ef4444',s:'rgba(239,68,68,0.25)'}, // red
+  {a:'#06b6d4',s:'rgba(6,182,212,0.25)'}, // cyan
+  {a:'#ec4899',s:'rgba(236,72,153,0.25)'}, // pink
+  {a:'#a3e635',s:'rgba(163,230,53,0.25)'} // lime
+];
+
+function applyCardAccent(p){
+  if(!p)return;
+  const el=document.querySelector('#cardsArea .flashcard');
+  if(!el)return;
+  const idx=hashString(p.id)%CARD_ACCENTS.length;
+  const acc=CARD_ACCENTS[idx];
+  el.style.setProperty('--accent', acc.a);
+  el.style.setProperty('--accent-soft', acc.s);
+}
+
+function mascotProfileFor(problemId){
+  const h=hashString(String(problemId));
+  // разные карты = разные профили поведения питомцев
+  const inputInterval=450 + (h%550); // 450..999
+  const readInterval=1100 + (h%900); // 1100..1999
+  const extraSpawnProb=0.12 + ((h>>3)%20)/100; // 0.12..0.31
+  const catBias=((h>>7)&1)?1:-1;
+
+  const catW=0.25 + ((h>>2)%35)/100; // 0.25..0.60
+  const birdW=0.20 + ((h>>4)%25)/100; // 0.20..0.45
+  const buttW=0.20 + ((h>>6)%25)/100; // 0.20..0.45
+
+  // длительности анимаций тоже разные, чтобы визуально отличалось
+  const durBird=2.2 + (h%80)/100; // 2.2..3.0
+  const durButterfly=2.5 + ((h>>1)%90)/100; // 2.5..3.4
+  const durCat=2.8 + ((h>>5)%120)/100; // 2.8..4.0
+
+  return {
+    inputInterval,
+    readInterval,
+    extraSpawnProb,
+    catBias,
+    catW,
+    birdW,
+    buttW,
+    durBird,
+    durButterfly,
+    durCat,
+    sizeJitter:0.85 + ((h>>9)%40)/100 // 0.85..1.25
+  };
+}
+
+function setMascotProfile(p){
+  mascotProfile=mascotProfileFor(p.id);
+}
+
+function setMascotTyping(v){
+  mascotTyping=!!v;
+  setupMascots();
+}
+
+function stopMascots(){
+  if(mascotTimer)clearInterval(mascotTimer);
+  mascotTimer=null;
+}
+
+function spawnMascot(){
+  const layer=document.getElementById('mascotLayer');
+  if(!layer)return;
+  const existing=layer.querySelectorAll('.mascot');
+  if(existing.length>=12)return;
+  const p=fcList[fcIdx];
+  if(!p)return;
+  if(!mascotProfile)setMascotProfile(p);
+  const prof=mascotProfile||mascotProfileFor(p.id);
+  const hashVal=hashString(String(p.id));
+
+  // Разные эмодзи, но с разной “профильной” вероятностью по карточке.
+  const butterflyEmojis=[
+    {t:'🦋',cls:'mascot-butterfly'},
+    {t:'🪲',cls:'mascot-butterfly'}
+  ];
+  const birdEmojis=[
+    {t:'🐦',cls:'mascot-bird'},
+    {t:'🐧',cls:'mascot-bird'},
+    {t:'🦅',cls:'mascot-bird'}
+  ];
+  const catEmojis=[
+    {t:'🐱',cls:'mascot-cat'},
+    {t:'🐈',cls:'mascot-cat'},
+    {t:'🐅',cls:'mascot-cat'}
+  ];
+
+  // Вес внутри карточки зависит от problemId, а не только от рандома.
+  const hMix=(hashVal%1000)/1000;
+  let pickType;
+  if(mascotTyping){
+    // при вводе чаще котики
+    const wCat=0.55 + prof.catW*0.35;
+    const wBird=0.30 + prof.birdW*0.20;
+    const wBf=1 - wCat - wBird;
+    const r=Math.random();
+    pickType = r < wCat ? 'cat' : (r < wCat+wBird ? 'bird' : 'butterfly');
+  } else if(fcFlipped){
+    // на обороте (но без ввода) чаще птички/жучки
+    const wBird=0.45 + prof.birdW*0.25;
+    const wBf=0.40 + prof.buttW*0.20;
+    const wCat=1 - wBird - wBf;
+    const r=Math.random();
+    pickType = r < wBird ? 'bird' : (r < wBird+wBf ? 'butterfly' : 'cat');
+  } else {
+    // на фронте (читаешь условие) чаще бабочки
+    const wBf=0.55 + prof.buttW*0.25;
+    const wBird=0.35 + prof.birdW*0.15;
+    const wCat=1 - wBf - wBird;
+    const r=Math.random();
+    pickType = r < wBf ? 'butterfly' : (r < wBf+wBird ? 'bird' : 'cat');
+  }
+
+  let pickList=butterflyEmojis;
+  let animDur=prof.durButterfly;
+  if(pickType==='bird'){
+    pickList=birdEmojis;
+    animDur=prof.durBird;
+  } else if(pickType==='cat'){
+    pickList=catEmojis;
+    animDur=prof.durCat;
+  }
+
+  const variantIdx=(hashVal + existing.length + Math.floor(hMix*10))%pickList.length;
+  const pick=pickList[variantIdx];
+
+  const el=document.createElement('span');
+  el.className='mascot '+pick.cls;
+  el.textContent=pick.t;
+  el.style.animationDuration=animDur+'s';
+  const fontScale=prof.sizeJitter;
+  el.style.fontSize=(18*fontScale)+'px';
+
+  const rect=layer.getBoundingClientRect();
+  const w=rect.width||300;
+  const height=rect.height||220;
+  // стартовые точки и траектория тоже меняются по карточке
+  const x=Math.floor((0.05 + (hashVal%20)/100)*w + Math.random()*(w*0.20));
+  const y=Math.floor((0.08 + ((hashVal>>3)%20)/100)*height + Math.random()*(height*0.22));
+
+  const sign = (pickType==='cat'?prof.catBias:1) * (Math.random()<0.5?1:-1);
+  const dxAmp = w * (0.12 + (pickType==='bird'?prof.birdW:pickType==='butterfly'?prof.buttW:prof.catW)*0.25);
+  const dyAmp = height * (0.15 + (pickType==='bird'?prof.birdW:pickType==='butterfly'?prof.buttW:prof.catW)*0.25);
+
+  const dx=Math.floor(sign*Math.random()*dxAmp);
+  const dy=Math.floor((Math.random()*2-1)*dyAmp);
+  const dx2=dx + Math.floor(sign*Math.random()*w*(0.08 + prof.catW*0.10));
+
+  el.style.setProperty('--x', x+'px');
+  el.style.setProperty('--y', y+'px');
+  el.style.setProperty('--dx', dx+'px');
+  el.style.setProperty('--dy', dy+'px');
+  el.style.setProperty('--dx2', dx2+'px');
+
+  layer.appendChild(el);
+  el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
+}
+
+function setupMascots(){
+  if(editMode){stopMascots();return;}
+  const layer=document.getElementById('mascotLayer');
+  if(!layer){stopMascots();return;}
+  stopMascots();
+
+  // Если пишет — чаще, если читаешь — реже
+  let interval=1400;
+  const prof=mascotProfile||{};
+  if(mascotTyping)interval=prof.inputInterval||650;
+  else interval=fcFlipped?(prof.readInterval?Math.floor(prof.readInterval*0.92):1050):(prof.readInterval||1500);
+
+  mascotTimer=setInterval(()=>{
+    // Иногда подкидываем по 2 “питомца”, чтобы было веселее
+    spawnMascot();
+    if(!mascotTyping && Math.random()<(prof.extraSpawnProb||0.2))spawnMascot();
+  }, interval);
+}
 
 function solutionInputKey(problemId, which){
   return 'algocards_solution_input_'+problemId+'_'+which;
@@ -265,6 +436,7 @@ function openSolutionInput(which){
   if(isSolutionInputOpen(p.id, which)){
     solutionInputOpen[p.id][which]=false;
     renderCard();
+    setMascotTyping(false);
     return;
   }
   if(!solutionInputOpen[p.id])solutionInputOpen[p.id]={};
@@ -276,6 +448,7 @@ function openSolutionInput(which){
     el.focus();
     const v=el.value||'';
     try{el.setSelectionRange(v.length, v.length);}catch(e){}
+    setMascotTyping(true);
   },0);
 }
 
@@ -379,7 +552,6 @@ function renderEditCard(){
 
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
-    ${solveTrackerHtml(p)}
     <div class="flashcard" style="cursor:default">
       <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
       <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:4px">${esc(p.d)}</span>
@@ -412,6 +584,7 @@ function renderCard(){
   if(!fcList.length){document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';return;}
   if(editMode){renderEditCard();return}
   const p=fcList[fcIdx];
+  setMascotProfile(p);
   const input1Open=isSolutionInputOpen(p.id,1);
   const input1Draft=input1Open?loadSolutionInput(p.id,1):'';
   const input2Open=isSolutionInputOpen(p.id,2);
@@ -420,8 +593,8 @@ function renderCard(){
   const code2Bg=input2Open?stripCodeComments(p.code2):p.code2;
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
-    ${solveTrackerHtml(p)}
     <div class="flashcard" onclick="flipCard()">
+      <div class="mascot-layer" id="mascotLayer"></div>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
@@ -446,7 +619,7 @@ function renderCard(){
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
           <div class="solution-editor">
             <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code1Bg)}</code></pre>
-            ${input1Open?`<textarea id="solutionInput_${p.id}_1" class="solution-input" data-problem-id="${p.id}" data-which="1" spellcheck="false" oninput="saveSolutionDraft(this)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input1Draft)}</textarea>`:''}
+            ${input1Open?`<textarea id="solutionInput_${p.id}_1" class="solution-input" data-problem-id="${p.id}" data-which="1" spellcheck="false" oninput="saveSolutionDraft(this)" onfocus="setMascotTyping(true)" onblur="setMascotTyping(false)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input1Draft)}</textarea>`:''}
           </div>
         </div>
         <button type="button" class="solution-enter-btn" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
@@ -456,7 +629,7 @@ function renderCard(){
           <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
           <div class="solution-editor">
             <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code2Bg)}</code></pre>
-            ${input2Open?`<textarea id="solutionInput_${p.id}_2" class="solution-input" data-problem-id="${p.id}" data-which="2" spellcheck="false" oninput="saveSolutionDraft(this)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input2Draft)}</textarea>`:''}
+            ${input2Open?`<textarea id="solutionInput_${p.id}_2" class="solution-input" data-problem-id="${p.id}" data-which="2" spellcheck="false" oninput="saveSolutionDraft(this)" onfocus="setMascotTyping(true)" onblur="setMascotTyping(false)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input2Draft)}</textarea>`:''}
           </div>
         </div>
         <button type="button" class="solution-enter-btn" onclick="event.stopPropagation();openSolutionInput(2)">${input2Open?'Закрыть':'Ввести'}</button>`:''}
@@ -472,7 +645,9 @@ function renderCard(){
       <button onclick="fcShuffle()">🔀</button>
       <button onclick="fcNext()">→</button>
     </div>`;
+  applyCardAccent(p);
   document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));
+  setupMascots();
 }
 
 function copyProblemBundle(btn){
@@ -503,10 +678,11 @@ function copyProblemBundle(btn){
   }).catch(()=>{btn.textContent='Ошибка'});
 }
 
-function flipCard(){fcFlipped=!fcFlipped;renderCard()}
-function fcNext(){fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
-function fcPrev(){fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
+function flipCard(){setMascotTyping(false);fcFlipped=!fcFlipped;renderCard()}
+function fcNext(){setMascotTyping(false);fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
+function fcPrev(){setMascotTyping(false);fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
 function fcShuffle(){
+  setMascotTyping(false);
   fcFlipped=false;
   // В дневном режиме перемешиваем только сегодняшние карточки; при поиске — весь отфильтрованный список
   if(searchQuery)fcList=shuffle(getFiltered());

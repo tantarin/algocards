@@ -38,6 +38,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
+pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .copy-btn{position:absolute;top:8px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
 .copy-btn:active{background:var(--purple);color:#fff}
@@ -375,11 +376,12 @@ function renderCard(){
       <div class="fc-face${fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
         <div class="code-wrap">
-          <pre style="border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+          <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
+          <pre style="border-radius:10px;overflow:hidden" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         </div>
         ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
         <div class="code-wrap">
-          <pre style="border-radius:10px;overflow:hidden"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
+          <pre style="border-radius:10px;overflow:hidden" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
         </div>`:''}
         ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
           <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
@@ -399,6 +401,16 @@ function renderCard(){
 function copyProblemBundle(btn){
   const p=fcList[fcIdx];
   if(!p)return;
+  const sel=window.getSelection?window.getSelection().toString().trim():'';
+  if(sel){
+    navigator.clipboard.writeText(sel).then(()=>{
+      btn.textContent='Скопировано ✓';
+      btn.style.background='var(--green)';
+      btn.style.color='#000';
+      setTimeout(()=>{btn.textContent='Скопировать';btn.style.background='';btn.style.color=''},1500);
+    }).catch(()=>{btn.textContent='Ошибка'});
+    return;
+  }
   const num=P.indexOf(p)+1;
   const parts=['#'+num+' '+p.t,'','Условие:',p.desc||'','','Решение:',p.code||''];
   if(p.code2){

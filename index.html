@@ -17,22 +17,16 @@
 body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;padding-top:env(safe-area-inset-top,16px);-webkit-user-select:none;user-select:none}
 h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:14px}
-.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px 72px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden;touch-action:pan-y}
+.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden;touch-action:pan-y}
 .fc-face{display:none}
 .fc-face.visible{display:block}
 .fc-nav{display:flex;justify-content:center;gap:24px;margin-top:12px}
 .fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer;transition:transform .1s}
 .fc-nav button:active{transform:scale(.9)}
-.side-nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;background:var(--card2);border:1px solid #ffffff20;color:var(--text);font-size:22px;cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;opacity:.95}
-.side-nav.left{left:10px}
-.side-nav.right{right:10px}
-@media (max-width:600px){
-  .side-nav{display:none}
-  .flashcard{padding:24px}
-}
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
-.counter-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0}
+.counter-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 16px;margin:8px 0}
 .counter-row .counter{margin:0}
+.counter-nav-cluster{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
 .shuffle-mini{background:transparent;border:1px solid #ffffff15;color:var(--dim);width:34px;height:34px;border-radius:12px;font-size:16px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;opacity:.9}
 .shuffle-mini:active{background:rgba(124,58,237,0.28);color:#fff;border-color:var(--purple);transform:scale(.98)}
 .shuffle-mini:focus{outline:none;box-shadow:0 0 0 2px rgba(124,58,237,.25)}
@@ -1182,7 +1176,11 @@ function renderEditCard(){
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter-row">
       <div class="counter">${fcIdx+1} / ${fcList.length}${!searchQuery?' • на сегодня':''}</div>
-      <button type="button" class="shuffle-mini" onclick="fcShuffle()">🔀</button>
+      <div class="counter-nav-cluster">
+        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+        <button type="button" class="shuffle-mini" title="Перемешать" onclick="event.stopPropagation();fcShuffle()">🔀</button>
+        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
+      </div>
     </div>
     <div class="flashcard" style="cursor:default">
       <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
@@ -1222,12 +1220,14 @@ function renderCard(){
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter-row">
       <div class="counter">${fcIdx+1} / ${fcList.length}</div>
-      <button type="button" class="shuffle-mini" onclick="fcShuffle()">🔀</button>
+      <div class="counter-nav-cluster">
+        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+        <button type="button" class="shuffle-mini" title="Перемешать" onclick="event.stopPropagation();fcShuffle()">🔀</button>
+        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
+      </div>
     </div>
     <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
-      <button type="button" class="side-nav left" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
-      <button type="button" class="side-nav right" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>

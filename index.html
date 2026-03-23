@@ -225,6 +225,55 @@ let solutionInputOpen={}; // { [problemId]: {1:boolean,2:boolean} }
 let mascotTimer=null;
 let mascotTyping=false;
 let mascotProfile=null;
+let lastSwipeAt=0;
+
+function setupSwipeNav(){
+  if(editMode)return;
+  const card=document.querySelector('#cardsArea .flashcard');
+  if(!card)return;
+
+  // на каждый render навешиваем заново, но чтобы не размножать — очищаем обработчики через замену слушателя не делаем,
+  // т.к. рендер создаёт новый DOM и старые коллбеки теряются.
+
+  let startX=0, startY=0, startT=0;
+  const SWIPE_PX=70;
+  const DY_RATIO=1.25;
+  const MAX_DT=700;
+
+  function shouldIgnoreTarget(target){
+    if(!target)return true;
+    if(document.querySelector('#cardsArea textarea.solution-input'))return true;
+    if(target.closest && target.closest('textarea.solution-input'))return true;
+    if(target.closest && target.closest('button, a'))return true;
+    return false;
+  }
+
+  card.addEventListener('pointerdown',(e)=>{
+    if(e.pointerType==='mouse' && e.button!==0)return;
+    if(shouldIgnoreTarget(e.target))return;
+    startX=e.clientX;startY=e.clientY;startT=Date.now();
+  },{passive:true});
+
+  card.addEventListener('pointerup',(e)=>{
+    if(!startT)return;
+    const dx=e.clientX-startX;
+    const dy=e.clientY-startY;
+    const dt=Date.now()-startT;
+    startT=0;
+
+    if(Math.abs(dx)>=SWIPE_PX && Math.abs(dx)>(Math.abs(dy)*DY_RATIO) && dt<=MAX_DT){
+      lastSwipeAt=Date.now();
+      if(dx<0)fcNext();
+      else fcPrev();
+    }
+  },{passive:true});
+
+  card.addEventListener('click',(e)=>{
+    if(Date.now()-lastSwipeAt<450)return;
+    // обычный тап — перелистывание карты как раньше
+    flipCard();
+  });
+}
 
 const CARD_ACCENTS=[
   {a:'#7c3aed',s:'rgba(124,58,237,0.25)'}, // purple
@@ -593,7 +642,7 @@ function renderCard(){
   const code2Bg=input2Open?stripCodeComments(p.code2):p.code2;
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter">${fcIdx+1} / ${fcList.length}</div>
-    <div class="flashcard" onclick="flipCard()">
+    <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
@@ -648,6 +697,7 @@ function renderCard(){
   applyCardAccent(p);
   document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));
   setupMascots();
+  setupSwipeNav();
 }
 
 function copyProblemBundle(btn){

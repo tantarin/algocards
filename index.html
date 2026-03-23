@@ -59,10 +59,12 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .solution-copy, .enter-btn-inline{min-width:96px;text-align:center;line-height:1}
 .enter-btn-inline.active{box-shadow:0 0 0 2px rgba(124,58,237,.25)}
 .mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.fly-overlay{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
 .mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
 .mascot-bird{animation:mascotBird 2.8s ease-in-out both}
 .mascot-butterfly{animation:mascotButterfly 3.2s linear both}
 .mascot-cat{animation:mascotCat 3.6s ease-in-out both}
+
 @keyframes mascotBird{
   0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75) rotate(-8deg)}
   10%{opacity:1}
@@ -79,6 +81,48 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
   30%{transform:translate(calc(var(--x) + var(--dx)),var(--y)) scale(1.25)}
   60%{transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(1.05)}
   100%{opacity:0;transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.95)}
+}
+
+/* Интерактив 5: "пузырьки" во время ввода решения */
+.typing-bubble{
+  position:absolute;
+  left:0;
+  top:0;
+  pointer-events:none;
+  user-select:none;
+  will-change:transform,opacity;
+  opacity:.95;
+  font-size:18px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+  animation:bubbleRise 1200ms ease-out both;
+}
+@keyframes bubbleRise{
+  0%{opacity:0;transform:translate(0,0) scale(.8)}
+  12%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}
+}
+
+/* Интерактив 6: "вылетающие" эмодзи при переключении карточки */
+.fly-marker{
+  position:absolute;
+  left:0;
+  top:0;
+  pointer-events:none;
+  user-select:none;
+  will-change:transform,opacity;
+  opacity:0;
+  font-size:22px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+  animation:flyMarker 850ms ease-out both;
+}
+@keyframes flyMarker{
+  0%{opacity:0;transform:translate(0,0) scale(.75) rotate(0deg)}
+  12%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(var(--rot))}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .typing-bubble,.fly-marker{display:none !important}
 }
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
 .solution-pre{margin:0}
@@ -121,6 +165,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 <body>
 
 <h1>AlgoCards</h1>
+<div id="flyOverlay" class="fly-overlay" aria-hidden="true"></div>
 <div class="subtitle" id="info"></div>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
 <div class="filter-row" id="filters"></div>
@@ -279,8 +324,13 @@ function setupSwipeNav(){
 
     if(Math.abs(dx)>=SWIPE_PX && Math.abs(dx)>(Math.abs(dy)*DY_RATIO) && dt<=MAX_DT){
       lastSwipeAt=Date.now();
-      if(dx<0)fcNext();
-      else fcPrev();
+      if(dx<0){
+        spawnFlyMarker('right', card);
+        fcNext();
+      } else {
+        spawnFlyMarker('left', card);
+        fcPrev();
+      }
     }
   },{passive:true});
 
@@ -456,6 +506,92 @@ function spawnMascot(){
   el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
 }
 
+// Интерактив 5: маленькие "мыслительные" пузырьки во время ввода.
+function spawnTypingBubbles(){
+  const layer=document.getElementById('mascotLayer');
+  if(!layer)return;
+  if(!mascotTyping)return;
+  const ta=document.querySelector('#cardsArea textarea.solution-input');
+  if(!ta)return;
+
+  const existing=layer.querySelectorAll('.typing-bubble').length;
+  if(existing>=10)return;
+
+  const bubbleEmojis=['💭','🤔','🧠','📝','✨','🎯'];
+  const lr=layer.getBoundingClientRect();
+  const r=ta.getBoundingClientRect();
+
+  const x=(r.left-lr.left)+r.width*(0.15+Math.random()*0.7);
+  const y=(r.top-lr.top)+r.height*(0.18+Math.random()*0.64);
+
+  const el=document.createElement('span');
+  el.className='typing-bubble';
+  el.textContent=bubbleEmojis[Math.floor(Math.random()*bubbleEmojis.length)];
+
+  const dx=(Math.random()*2-1)*30;
+  const dy=-(50+Math.random()*85);
+  const dur=0.9+Math.random()*0.7;
+  const z=0.8+Math.random()*0.35;
+
+  el.style.left=Math.floor(x)+'px';
+  el.style.top=Math.floor(y)+'px';
+  el.style.animationDuration=dur+'s';
+  el.style.opacity=String(z);
+  el.style.setProperty('--dx', dx+'px');
+  el.style.setProperty('--dy', dy+'px');
+
+  layer.appendChild(el);
+  el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
+}
+
+// Интерактив 6: "летящие" эмодзи при навигации по карточкам.
+function spawnFlyMarker(dir, anchorEl){
+  const overlay=document.getElementById('flyOverlay');
+  if(!overlay)return;
+  if(editMode)return;
+
+  const existing=overlay.querySelectorAll('.fly-marker').length;
+  if(existing>=8)return;
+
+  const emojis=dir==='right'
+    ? ['🚀','✨','⚡️','🧩']
+    : ['🔙','⏪','🌪️','✨'];
+
+  // overlay фиксированный к viewport, значит r.left/r.top уже подходят как координаты для left/top
+  let baseX=window.innerWidth*0.5;
+  let baseY=window.innerHeight*0.22;
+
+  if(anchorEl && anchorEl.getBoundingClientRect){
+    const r=anchorEl.getBoundingClientRect();
+    baseX=r.left + r.width/2;
+    baseY=r.top + r.height/2;
+  }
+
+  const count=3;
+  for(let i=0;i<count;i++){
+    const el=document.createElement('span');
+    el.className='fly-marker';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+
+    const x=baseX + (Math.random()*40-20);
+    const y=baseY + (Math.random()*20-10);
+    const dx=(dir==='right'?1:-1)*(70+Math.random()*140);
+    const dy=-(45+Math.random()*95);
+    const rot=(Math.random()*70-35)*(dir==='right'?1:-1);
+    const dur=0.7+Math.random()*0.35;
+
+    el.style.left=Math.floor(x)+'px';
+    el.style.top=Math.floor(y)+'px';
+    el.style.animationDuration=dur+'s';
+    el.style.setProperty('--dx', dx+'px');
+    el.style.setProperty('--dy', dy+'px');
+    el.style.setProperty('--rot', rot+'deg');
+
+    overlay.appendChild(el);
+    el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
+  }
+}
+
 function setupMascots(){
   if(editMode){stopMascots();return;}
   const layer=document.getElementById('mascotLayer');
@@ -469,6 +605,7 @@ function setupMascots(){
   else interval=fcFlipped?(prof.readInterval?Math.floor(prof.readInterval*0.92):1050):(prof.readInterval||1500);
 
   mascotTimer=setInterval(()=>{
+    if(mascotTyping && Math.random()<0.65)spawnTypingBubbles();
     // Иногда подкидываем по 2 “питомца”, чтобы было веселее
     spawnMascot();
     if(!mascotTyping && Math.random()<(prof.extraSpawnProb||0.2))spawnMascot();
@@ -662,8 +799,8 @@ function renderCard(){
     </div>
     <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
-      <button type="button" class="side-nav left" onclick="event.stopPropagation();fcPrev()">←</button>
-      <button type="button" class="side-nav right" onclick="event.stopPropagation();fcNext()">→</button>
+      <button type="button" class="side-nav left" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+      <button type="button" class="side-nav right" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>

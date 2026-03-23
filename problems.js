@@ -4823,8 +4823,7 @@ code:`class Solution {
         queue.add(root);
         while (!queue.isEmpty()) {
             int size = queue.size();
-            LinkedList<Integer> level =
-                new LinkedList<>();
+            LinkedList<Integer> level = new LinkedList<>();
 
             for (int i = 0; i < size; i++) {
                 TreeNode node = queue.poll();
@@ -4851,7 +4850,7 @@ steps:`1. BFS по уровням в очереди.
 3. Переключаем направление после уровня.`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`BFS по уровням: каждый узел один раз — O(n). Очередь и списки — O(n) памяти.`,
-expl:`BFS по уровням. Чередуем направление: чётные уровни — addLast, нечётные — addFirst (LinkedList как deque). O(n) время и память.`,
+expl:`BFS по уровням. Чередуем направление: чётные уровни — addLast, нечётные — addFirst (LinkedList как deque)`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}]},
 
 {id:"tr7",t:"Same Tree",p:"Trees / DFS",d:"легко",

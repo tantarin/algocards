@@ -2228,7 +2228,7 @@ complexityExpl:`Левый и правый указатели двигаются
 expl:`Сначала нужно отдельным циклом пройти по t и записать какие в массив какие символы на нужны.
 Затем отдельным циклом пройти по s и в окне проверять сколько символов осталось покрыть через отдельную переменную.
 И если все символы покрыты, то ищем минимум и ПРОБУЕМ УМЕНЬШИТЬ ОКНО СЛЕВА`,
-lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],repoSimilar:["sw3"]},
+lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],repoSimilar:["sw3","sw8","sw9"]},
 
 {id:"sw2",t:"Longest Repeating Char Replacement",p:"Sliding Window",d:"средне",
 desc:`Дана строка s и число k. Можно заменить до k символов. Найти ==длину самой длинной подстроки== из одинаковых символов.
@@ -2330,7 +2330,7 @@ diagram:{type:"multi",data:["c","b","a","e","b","a","b","a","c","d"],steps:[
 {type:"int[]",name:"need",data:{"a":1,"b":1,"c":1}},
 {type:"int",name:"missing",data:"0 ✓"}
 ],desc:"Окно [b,a,c] — анаграмма найдена!"}
-]},repoSimilar:["sw1"]},
+]},repoSimilar:["sw1","sw8","sw9"]},
 
 {id:"sw4",t:"Возрастающая подпоследовательность",p:"Sliding Window",d:"легко",
 desc:`Найти длину самого длинного ==непрерывного строго возрастающего подмассива==.
@@ -2562,7 +2562,7 @@ steps:`1. target — число различных символов.
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right идёт один раз, left сдвигается при валидном окне — O(n). Массив freq[128] — O(1) памяти.`,
 expl:`Когда окно содержит все уникальные символы, все расширения вправо (s.length() - right) тоже валидны. Сжимаем left и считаем. O(n).`,
-lcSimilar:[{"t":"Number of Substrings Containing All Three Characters","h":"number-of-substrings-containing-all-three-characters"},{"t":"Substrings with Concatenation of All Words","h":"substrings-with-concatenation-of-all-words"}]},
+lcSimilar:[{"t":"Number of Substrings Containing All Three Characters","h":"number-of-substrings-containing-all-three-characters"},{"t":"Substrings with Concatenation of All Words","h":"substrings-with-concatenation-of-all-words"}],repoSimilar:["sw1","sw3","sw9"]},
 
 {id:"sw9",t:"Поиск мутирующего вируса",p:"Sliding Window",d:"средне",
 desc:`Проверить, содержит ли строка gene какую-либо ==перестановку строки virus==.
@@ -2605,7 +2605,7 @@ steps:`1. need по virus; missing = |virus|.
 3. Если missing = 0 — найдена мутация.`,
 complexity:`Время: O(|gene|), Память: O(1)`,
 complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив 26 счётчиков — O(1) памяти.`,
-expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, частотный массив, счётчик missing. O(n).`},
+expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, частотный массив, счётчик missing. O(n).`,repoSimilar:["sw1","sw3","sw8"]},
 
 {id:"sw10",t:"Инвестор в стране дураков",p:"Sliding Window",d:"средне",
 desc:`==Скользящее окно== произведения k элементов. Корректно обрабатывать нули.

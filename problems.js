@@ -4817,10 +4817,10 @@ code:`class Solution {
         List<List<Integer>> result = new ArrayList<>();
         if (root == null) return result;
 
-        Deque<TreeNode> queue = new ArrayDeque<>();
-        queue.add(root);
         boolean leftToRight = true;
 
+        Deque<TreeNode> queue = new ArrayDeque<>();
+        queue.add(root);
         while (!queue.isEmpty()) {
             int size = queue.size();
             LinkedList<Integer> level =

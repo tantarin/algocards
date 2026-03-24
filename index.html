@@ -46,10 +46,10 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
-.copy-btn{position:absolute;top:8px;right:8px;background:rgba(124,58,237,0.15);border:none;color:#a78bfa;width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;z-index:1;transition:.2s;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(124,58,237,0.3)}
-.copy-btn:hover{background:rgba(124,58,237,0.25);box-shadow:0 0 18px rgba(124,58,237,0.5)}
-.copy-btn:active{background:var(--purple);color:#fff;transform:scale(0.9)}
-.copy-btn.copied{background:rgba(34,197,94,0.2);color:#22c55e;box-shadow:0 0 12px rgba(34,197,94,0.4)}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(124,58,237,0.2);border:none;color:#a78bfa;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;z-index:1;transition:.2s;box-shadow:0 0 10px rgba(124,58,237,0.2)}
+.copy-btn:hover{background:rgba(124,58,237,0.35);box-shadow:0 0 14px rgba(124,58,237,0.4)}
+.copy-btn:active{background:var(--purple);color:#fff;transform:scale(0.95)}
+.copy-btn.copied{background:rgba(34,197,94,0.25);color:#4ade80;box-shadow:0 0 10px rgba(34,197,94,0.3)}
 .enter-btn-inline{position:absolute;top:34px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
 .enter-btn-inline:active{background:var(--purple);color:#fff}
 .enter-btn-inline{min-width:72px;text-align:center;line-height:1}
@@ -1566,7 +1566,7 @@ function renderCard(){
         <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
-          <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">📋</button>
+          <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <div class="desc-copy-body" style="white-space:pre-wrap;font-size:14px;line-height:1.6;padding-top:32px">${esc(p.desc)}</div>
         </div>
         <div class="spoiler-row">
@@ -1583,7 +1583,7 @@ function renderCard(){
       <div class="fc-face${fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         <div class="code-wrap">
-          <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">📋</button>
+          <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <button type="button" class="enter-btn-inline${input1Open?' active':''}" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
           <div class="solution-editor">
             <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code1Bg)}</code></pre>
@@ -1593,7 +1593,7 @@ function renderCard(){
 
         ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
         <div class="code-wrap" style="margin-top:10px">
-          <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">📋</button>
+          <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <button type="button" class="enter-btn-inline${input2Open?' active':''}" onclick="event.stopPropagation();openSolutionInput(2)">${input2Open?'Закрыть':'Ввести'}</button>
           <div class="solution-editor">
             <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code2Bg)}</code></pre>
@@ -1622,10 +1622,10 @@ function copyProblemBundle(btn){
   const sel=window.getSelection?window.getSelection().toString().trim():'';
   if(sel){
     navigator.clipboard.writeText(sel).then(()=>{
-      btn.textContent='✓';
+      btn.textContent='Copied ✓';
       btn.classList.add('copied');
-      setTimeout(()=>{btn.textContent='📋';btn.classList.remove('copied')},1500);
-    }).catch(()=>{btn.textContent='✗'});
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+    }).catch(()=>{btn.textContent='Error'});
     return;
   }
   const num=P.indexOf(p)+1;
@@ -1636,10 +1636,10 @@ function copyProblemBundle(btn){
   }
   const text=parts.join('\n');
   navigator.clipboard.writeText(text).then(()=>{
-    btn.textContent='✓';
+    btn.textContent='Copied ✓';
     btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='📋';btn.classList.remove('copied')},1500);
-  }).catch(()=>{btn.textContent='✗'});
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+  }).catch(()=>{btn.textContent='Error'});
 }
 
 function flipCard(){setMascotTyping(false);fcFlipped=!fcFlipped;renderCard()}

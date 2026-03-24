@@ -2412,26 +2412,31 @@ desc:`Дан бинарный массив. Можно ==перевернуть 
 Ввод: [1, 1, 0, 1, 1, 1, 1, 0, 1]
 Вывод: 7 (переворачиваем ноль на позиции 2)`,
 hint:`Отслеживаем count единиц до нуля и после. Ответ = prev + 1 + count.`,
-code:`class Solution {
-    public int maxOnesWithFlip(int[] nums) {
-        int prev = 0;
-        int count = 0;
-        int maxCount = 0;
-
-        for (int num : nums) {
-            if (num == 1) {
-                count++;
-            } else {
-                maxCount = Math.max(maxCount, prev + 1 + count);
-                prev = count;
-                count = 0;
-            }
+code:`public int maxOnesWithFlip(int[] nums) {
+    int prev = 0;
+    int count = 0;
+    int maxCount = 0;
+    boolean hasZero = false;  // флаг: был ли ноль
+    
+    for (int num : nums) {
+        if (num == 1) {
+            count++;
+        } else {
+            hasZero = true;  // встретили ноль
+            maxCount = Math.max(maxCount, prev + 1 + count);
+            prev = count;
+            count = 0;
         }
-
-        maxCount = Math.max(maxCount, prev + 1 + count);
-
-        return Math.min(maxCount, nums.length);
     }
+    
+    maxCount = Math.max(maxCount, prev + 1 + count);
+    
+    // Если не было ни одного нуля, вычитаем лишнюю единицу
+    if (!hasZero) {
+        maxCount--;
+    }
+    
+    return maxCount;
 }`,
 steps:`1. На единицах count++; на нуле: max = prev + 1 + count.
 2. prev = count, count = 0.

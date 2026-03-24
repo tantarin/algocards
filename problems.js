@@ -2422,8 +2422,7 @@ code:`class Solution {
             if (num == 1) {
                 count++;
             } else {
-                maxCount = Math.max(maxCount,
-                    prev + 1 + count);
+                maxCount = Math.max(maxCount, prev + 1 + count);
                 prev = count;
                 count = 0;
             }

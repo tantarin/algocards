@@ -5745,38 +5745,44 @@ desc:`Дан отсортированный массив уникальных ч
 
 Ввод: nums = [], lower = 1, upper = 1
 Вывод: ["1"]`,
-hint:`Идём по массиву, отслеживая ожидаемое следующее число. Если nums[i] > expected — формируем диапазон.`,
+hint:`while (idx < nums.length): смотрим nums[idx], держим expect. Если num > expect — formatRange(expect, num − 1).`,
 code:`class Solution {
     public List<String> findMissingRanges(
             int[] nums, int lower, int upper) {
         List<String> result = new ArrayList<>();
-        long next = lower;
+        long expect = lower;
+        int idx = 0;
 
-        for (int num : nums) {
-            if (num > next) {
-                result.add(formatRange(next, (long) num - 1));
+        while (idx < nums.length) {
+            int num = nums[idx];
+            if (num > expect) {
+                result.add(formatRange(expect,
+                    (long) num - 1));
             }
-            next = (long) num + 1;
+            expect = (long) num + 1;
+            idx++;
         }
 
-        if (next <= upper) {
-            result.add(formatRange(next, upper));
+        if (expect <= upper) {
+            result.add(formatRange(expect, upper));
         }
 
         return result;
     }
 
     private String formatRange(long from, long to) {
-        if (from == to) return String.valueOf(from);
+        if (from == to) {
+            return String.valueOf(from);
+        }
         return from + "->" + to;
     }
 }`,
-steps:`1. next = lower — ожидаемое число.
-2. Если num > next — добавляем диапазон [next, num−1].
-3. next = num + 1; после массива — хвост до upper.`,
+steps:`1. expect = lower, idx = 0.
+2. while (idx < nums.length): num = nums[idx]; при num > expect — formatRange(expect, num − 1); expect = num + 1; idx++.
+3. После цикла: если expect ≤ upper — formatRange(expect, upper).`,
 complexity:`Время: O(n), Память: O(1)`,
-complexityExpl:`Один проход по nums с next — O(n). Список диапазонов — O(1) доп. памяти.`,
-expl:`Отслеживаем следующее ожидаемое число (next). Если текущий элемент > next — есть пропуск. Форматируем одиночное число или диапазон. O(n) время.`},
+complexityExpl:`Один проход по nums с expect — O(n). Список строк — O(1) доп. памяти кроме вывода.`,
+expl:`Ожидаемое значение expect; при разрыве добавляем диапазон через formatRange (как в Summary Ranges). O(n).`},
 
 {id:"iss7",t:"Summary Ranges",p:"Intervals Sweep",d:"легко",
 desc:`Дан отсортированный массив без дубликатов. Свернуть ==последовательные числа в диапазоны== "a->b".
@@ -5787,36 +5793,39 @@ desc:`Дан отсортированный массив без дубликат
 
 Ввод: [0, 2, 3, 4, 6, 8, 9]
 Вывод: ["0", "2->4", "6", "8->9"]`,
-hint:`Два указателя: start и i расширяют диапазон последовательных чисел.`,
+hint:`Индекс idx на начале отрезка; расширяем пока nums[idx+1] == nums[idx] + 1; в конец — formatRange.`,
 code:`class Solution {
     public List<String> summaryRanges(int[] nums) {
         List<String> result = new ArrayList<>();
-        int i = 0;
+        int idx = 0;
 
-        while (i < nums.length) {
-            int start = nums[i];
-            while (i + 1 < nums.length
-                && nums[i + 1] == nums[i] + 1) {
-                i++;
+        while (idx < nums.length) {
+            long rangeStart = nums[idx];
+            while (idx + 1 < nums.length
+                && nums[idx + 1] == nums[idx] + 1) {
+                idx++;
             }
-
-            if (start == nums[i]) {
-                result.add(String.valueOf(start));
-            } else {
-                result.add(start + "->" + nums[i]);
-            }
-            i++;
+            long rangeEnd = nums[idx];
+            result.add(formatRange(rangeStart, rangeEnd));
+            idx++;
         }
 
         return result;
     }
+
+    private String formatRange(long from, long to) {
+        if (from == to) {
+            return String.valueOf(from);
+        }
+        return from + "->" + to;
+    }
 }`,
-steps:`1. Для начала непрерывного отрезка берём start.
-2. Расширяем пока nums[i+1] = nums[i] + 1.
-3. start = конец → одно число, иначе «start->end».`,
+steps:`1. idx на начале подряд идущих чисел, rangeStart = nums[idx].
+2. Пока nums[idx+1] = nums[idx] + 1 — двигаем idx.
+3. rangeEnd = nums[idx], result.add(formatRange(rangeStart, rangeEnd)), idx++.`,
 complexity:`Время: O(n), Память: O(1)`,
-complexityExpl:`Указатель с расширением непрерывных отрезков — O(n). Список строк — O(1) доп. памяти.`,
-expl:`Группируем последовательные числа (nums[i+1] == nums[i] + 1). Одиночные — как число, диапазоны — как "start->end". O(n) время, O(1) доп. память.`,
+complexityExpl:`Один проход с расширением отрезков — O(n). Список строк — O(1) доп. памяти кроме вывода.`,
+expl:`Подряд идущие элементы сжимаем в один вызов formatRange(rangeStart, rangeEnd) — тот же формат, что и в Missing Ranges. O(n).`,
 lcSimilar:[{"t":"Summary Ranges","h":"summary-ranges"},{"t":"Missing Ranges","h":"missing-ranges"}]},
 
 {id:"iss8",t:"Interval List Intersections",p:"Intervals Sweep",d:"средне",

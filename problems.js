@@ -2215,16 +2215,14 @@ code:`class Solution {
 
         for (int right = 0; right < s.length(); right++) {
             freq[s.charAt(right) - 'A']++;
-            maxFreq = Math.max(maxFreq,
-                freq[s.charAt(right) - 'A']);
+            maxFreq = Math.max(maxFreq, freq[s.charAt(right) - 'A']);
 
             while (right - left + 1 - maxFreq > k) {
                 freq[s.charAt(left) - 'A']--;
                 left++;
             }
 
-            result = Math.max(result,
-                right - left + 1);
+            result = Math.max(result, right - left + 1);
         }
 
         return result;
@@ -2235,7 +2233,7 @@ steps:`1. Окно [left, right], частоты букв, maxFreq.
 3. Максимальная допустимая длина окна.`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right проходит строку один раз, left тоже не более n раз — O(n). Массив частот на 26 букв — O(1) памяти.`,
-expl:`O(n) время. Поддерживаем maxFreq — максимальную частоту символа в окне. Количество замен = windowSize - maxFreq. Если > k — сжимаем окно слева.`},
+expl:`Выгоднее всего заменять символы, которые НЕ являются самыми частыми.`},
 
 // ===== SW + STRING =====
 {id:"sw3",t:"Поиск анаграмм",p:"SW + String",d:"средне",

@@ -2343,7 +2343,7 @@ code:`class Solution {
         for (int right = 0; right < nums.length; right++) {
             if (nums[right] == 0) zerosCount++;
 
-            while (zerosCount > k) { //пропускаем все единицы и затем только ноль
+            while (zerosCount > k) { //пропускаем все единицы слева пока не дойдем до нуля
                 if (nums[left] == 0) zerosCount--;
                 left++;
             }

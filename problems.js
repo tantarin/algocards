@@ -2217,12 +2217,13 @@ code:`class Solution {
             freq[s.charAt(right) - 'A']++;
             maxFreq = Math.max(maxFreq, freq[s.charAt(right) - 'A']);
 
-            while (right - left + 1 - maxFreq > k) {
+            int winLen  = right - left + 1;
+            while (winLen - maxFreq > k) {
                 freq[s.charAt(left) - 'A']--;
                 left++;
             }
 
-            result = Math.max(result, right - left + 1);
+            result = Math.max(result, winLen);
         }
 
         return result;

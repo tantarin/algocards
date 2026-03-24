@@ -1560,7 +1560,7 @@ function renderCard(){
     <div class="flashcard">
       <div class="mascot-layer" id="mascotLayer"></div>
       <div class="fc-face${!fcFlipped?' visible':''}">
-        <span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span>
+        <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни для теории ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
@@ -1579,7 +1579,7 @@ function renderCard(){
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
-        <span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span>
+        <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни для теории ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         <div class="code-wrap">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Скопировать</button>
           <button type="button" class="enter-btn-inline${input1Open?' active':''}" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>

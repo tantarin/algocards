@@ -2341,16 +2341,15 @@ code:`class Solution {
         int result = 0;
 
         for (int right = 0; right < nums.length; right++) {
-            if (nums[right] == 0) {
-                zerosCount++;
-            }
+            if (nums[right] == 0) zerosCount++;
 
-            while (zerosCount > k) {
+            while (zerosCount > k) { //пропускаем все единицы и затем только ноль
                 if (nums[left] == 0) zerosCount--;
                 left++;
             }
 
-            result = Math.max(result, right - left + 1);
+            result = Math.max(result,
+                right - left + 1);
         }
 
         return result;

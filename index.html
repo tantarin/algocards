@@ -726,7 +726,8 @@ function similarProblemsHtml(p){
       const h=(x.h||'').replace(/[^a-z0-9-]/gi,'');
       if(!h)return '';
       const href='https://leetcode.com/problems/'+h+'/';
-      return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="lc-similar-link">${esc(x.t||h)}</a>`;
+      const label=(x.n?x.n+'. ':'')+esc(x.t||h);
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="lc-similar-link">${label}</a>`;
     }).filter(Boolean).join('');
     if(items) lcBlock=`<div class="lc-similar-subtitle">LeetCode</div><div class="lc-similar-links">${items}</div>`;
   }

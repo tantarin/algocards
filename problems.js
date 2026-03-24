@@ -2348,8 +2348,7 @@ code:`class Solution {
                 left++;
             }
 
-            result = Math.max(result,
-                right - left + 1);
+            result = Math.max(result, right - left + 1);
         }
 
         return result;

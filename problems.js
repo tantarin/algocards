@@ -4577,8 +4577,7 @@ code:`class Solution {
                     hi = mid - 1;
                 }
             }
-            if (pos < r
-                && nums[r] - nums[pos] >= k) {
+            if (pos < r && nums[r] - nums[pos] >= k) {
                 count += (r - pos);
             }
         }

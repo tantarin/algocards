@@ -1,5 +1,4 @@
 const P = [
-// repoSimilar: похожие карточки из этого файла — массив id (строки) или {id:"bt1",t:"опц. подпись"}.
 // ===== BACKTRACKING =====
 {id:"bt1",t:"Generate Parentheses",p:"Backtracking",d:"средне",
 desc:`средне
@@ -105,17 +104,7 @@ complexityExpl:`На каждом уровне перебираем элемен
 expl:`На каждом уровне рекурсии выбираем элемент из соответствующего массива. После возврата удаляем последний элемент (backtrack). Когда idx == arrays.size() — комбинация готова.`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}],
 repoSimilar:["bt1","bt3"],
-diagram:{type:"cartesian",input:[[1,2],[3],[4,5]],steps:[
-{idx:0,current:[],result:[],activeArr:0,activeVal:-1,desc:"**Вход**: arrays = [[1,2],[3],[4,5]]. Начинаем с idx=0, current=[]"},
-{idx:1,current:[1],result:[],activeArr:0,activeVal:0,desc:"Из arrays[0]=[1,2] берём **1** → current=[1], переходим к idx=1"},
-{idx:2,current:[1,3],result:[],activeArr:1,activeVal:0,desc:"Из arrays[1]=[3] берём **3** → current=[1,3], переходим к idx=2"},
-{idx:3,current:[1,3,4],result:[[1,3,4]],activeArr:2,activeVal:0,desc:"Из arrays[2]=[4,5] берём **4** → idx=3 (конец), сохраняем [1,3,4]"},
-{idx:3,current:[1,3,5],result:[[1,3,4],[1,3,5]],activeArr:2,activeVal:1,desc:"Backtrack в arrays[2], берём **5** → сохраняем [1,3,5]"},
-{idx:1,current:[2],result:[[1,3,4],[1,3,5]],activeArr:0,activeVal:1,desc:"Backtrack до idx=0, теперь берём **2** → current=[2]"},
-{idx:2,current:[2,3],result:[[1,3,4],[1,3,5]],activeArr:1,activeVal:0,desc:"Из arrays[1] снова берём **3** → current=[2,3]"},
-{idx:3,current:[2,3,4],result:[[1,3,4],[1,3,5],[2,3,4]],activeArr:2,activeVal:0,desc:"Берём **4** из arrays[2] → сохраняем [2,3,4]"},
-{idx:3,current:[2,3,5],result:[[1,3,4],[1,3,5],[2,3,4],[2,3,5]],activeArr:2,activeVal:1,desc:"Берём **5** из arrays[2] → сохраняем [2,3,5]. Готово!"}
-]}},
+diagram:{"type":"cartesian","input":[[1,2],[3],[4,5]],"steps":[{"idx":0,"current":[],"result":[],"activeArr":0,"activeVal":-1,"desc":"**Вход**: arrays = [[1,2],[3],[4,5]]. Начинаем с idx=0, current=[]"},{"idx":1,"current":[1],"result":[],"activeArr":0,"activeVal":0,"desc":"Из arrays[0]=[1,2] берём **1** → current=[1], переходим к idx=1"},{"idx":2,"current":[1,3],"result":[],"activeArr":1,"activeVal":0,"desc":"Из arrays[1]=[3] берём **3** → current=[1,3], переходим к idx=2"},{"idx":3,"current":[1,3,4],"result":[[1,3,4]],"activeArr":2,"activeVal":0,"desc":"Из arrays[2]=[4,5] берём **4** → idx=3 (конец), сохраняем [1,3,4]"},{"idx":3,"current":[1,3,5],"result":[[1,3,4],[1,3,5]],"activeArr":2,"activeVal":1,"desc":"Backtrack в arrays[2], берём **5** → сохраняем [1,3,5]"},{"idx":1,"current":[2],"result":[[1,3,4],[1,3,5]],"activeArr":0,"activeVal":1,"desc":"Backtrack до idx=0, теперь берём **2** → current=[2]"},{"idx":2,"current":[2,3],"result":[[1,3,4],[1,3,5]],"activeArr":1,"activeVal":0,"desc":"Из arrays[1] снова берём **3** → current=[2,3]"},{"idx":3,"current":[2,3,4],"result":[[1,3,4],[1,3,5],[2,3,4]],"activeArr":2,"activeVal":0,"desc":"Берём **4** из arrays[2] → сохраняем [2,3,4]"},{"idx":3,"current":[2,3,5],"result":[[1,3,4],[1,3,5],[2,3,4],[2,3,5]],"activeArr":2,"activeVal":1,"desc":"Берём **5** из arrays[2] → сохраняем [2,3,5]. Готово!"}]}},
 
 {id:"bt3",t:"Перебор IP-адресов",p:"Backtracking",d:"средне",
 desc:`Дана строка, содержащая только цифры. Вернуть ==все возможные валидные== IP-адреса.
@@ -879,11 +868,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл со скользящим окном, каждый индекс обрабатывается константное число раз — O(n). Переменные — O(1).`,
 expl:`Все элементы в окне должны быть >= x, и хотя бы один == x. Элементы < x разрывают окно. Сдвигаем left и сбрасываем hasTarget. O(n).`,
 lcSimilar:[{"t":"Best Time to Buy and Sell Stock II","h":"best-time-to-buy-and-sell-stock-ii"},{"t":"Best Time to Buy and Sell Stock","h":"best-time-to-buy-and-sell-stock"}],
-diagram:{type:"window",data:[2,3,1,5,4,2],steps:[
-{wl:1,wr:1,desc:"Ищем min ≥ 3. [3] ✓ длина=1"},
-{wl:3,wr:4,desc:"[5,4] min=4 ≥ 3 ✓ длина=2"},
-{wl:3,wr:4,desc:"Ответ: макс длина = 2"}
-]}},
+diagram:{"type":"window","data":[2,3,1,5,4,2],"steps":[{"wl":1,"wr":1,"desc":"Ищем min ≥ 3. [3] ✓ длина=1"},{"wl":3,"wr":4,"desc":"[5,4] min=4 ≥ 3 ✓ длина=2"},{"wl":3,"wr":4,"desc":"Ответ: макс длина = 2"}]}},
 
 {id:"gop5",t:"Поиск монотонной последовательности",p:"Greedy",d:"средне",
 desc:`Найти самый длинный ==строго монотонный== (возрастающий или убывающий) подотрезок. Вернуть [start, end].
@@ -1154,14 +1139,7 @@ complexity:`Время: O(n·L), Память: O(n·L)`,
 complexityExpl:`Для каждой строки считаем частоты за O(длина) — суммарно O(n·L). HashMap хранит группы и строки — O(n·L) памяти.`,
 expl:`O(n × k) время, O(n × k) память, где k — максимальная длина строки. Все анаграммы дают одинаковый частотный ключ.`,
 lcSimilar:[{"t":"Group Anagrams","h":"group-anagrams"},{"t":"Valid Anagram","h":"valid-anagram"}],
-diagram:{type:"array",data:["eat","tea","tan","ate","nat","bat"],steps:[
-{active:[0],labels:{},desc:"eat → ключ a1e1t1"},
-{active:[1],labels:{},desc:"tea → тот же ключ! Группа 1"},
-{active:[2],labels:{},desc:"tan → новый ключ. Группа 2"},
-{active:[3],labels:{},desc:"ate → как eat. Группа 1"},
-{active:[5],labels:{},desc:"bat → Группа 3"},
-{active:[],labels:{},desc:"[[eat,tea,ate],[tan,nat],[bat]]"}
-]}},
+diagram:{"type":"array","data":["eat","tea","tan","ate","nat","bat"],"steps":[{"active":[0],"labels":{},"desc":"eat → ключ a1e1t1"},{"active":[1],"labels":{},"desc":"tea → тот же ключ! Группа 1"},{"active":[2],"labels":{},"desc":"tan → новый ключ. Группа 2"},{"active":[3],"labels":{},"desc":"ate → как eat. Группа 1"},{"active":[5],"labels":{},"desc":"bat → Группа 3"},{"active":[],"labels":{},"desc":"[[eat,tea,ate],[tan,nat],[bat]]"}]}},
 
 {id:"hf2",t:"Слово-анаграмма",p:"HashMap",d:"легко",
 desc:`Проверить, является ли строка t ==анаграммой== строки s.
@@ -1794,13 +1772,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`fast уходит на n+1 шагов, затем оба идут до конца — O(n). Константные указатели — O(1) памяти.`,
 expl:`Два указателя с разницей n+1. Когда fast достигает null, slow стоит перед удаляемым узлом. Dummy-узел обрабатывает случай удаления head. O(n) время, O(1) память.`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}],
-diagram:{type:"twoptr",data:["D",1,2,3,4,5,"∅"],steps:[
-{l:0,r:0,desc:"dummy→1→2→3→4→5, n=2"},
-{l:0,r:3,desc:"fast на n+1=3 шага вперёд"},
-{l:2,r:5,desc:"Двигаем оба..."},
-{l:3,r:6,desc:"fast=null, slow перед 4"},
-{l:3,r:6,found:[4],desc:"Удаляем 4 ✓"}
-]}},
+diagram:{"type":"twoptr","data":["D",1,2,3,4,5,"∅"],"steps":[{"l":0,"r":0,"desc":"dummy→1→2→3→4→5, n=2"},{"l":0,"r":3,"desc":"fast на n+1=3 шага вперёд"},{"l":2,"r":5,"desc":"Двигаем оба..."},{"l":3,"r":6,"desc":"fast=null, slow перед 4"},{"l":3,"r":6,"found":[4],"desc":"Удаляем 4 ✓"}]}},
 
 // ===== MATH / SIMULATION =====
 {id:"ms1",t:"Умножение длинного числа",p:"Math / Simulation",d:"средне",
@@ -1973,13 +1945,7 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход для buckets размера n+1, второй — накопление справа — O(n). Массив buckets — O(n) памяти.`,
 expl:`O(n) с bucket sort. Создаём buckets[0..n], где buckets[i] = количество статей с i цитированиями (или >= n). Суммируем справа налево: когда count >= i, нашли h-индекс.`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}],
-diagram:{type:"array",data:[6,5,3,1,0],steps:[
-{active:[],labels:{},desc:"Сортируем: [6,5,3,1,0]"},
-{active:[0],labels:{"1":0},desc:"i=1: 6≥1 ✓"},
-{active:[1],labels:{"2":1},desc:"i=2: 5≥2 ✓"},
-{active:[2],labels:{"3":2},desc:"i=3: 3≥3 ✓ h=3"},
-{active:[3],labels:{"4":3},desc:"i=4: 1<4 ✗ Ответ: h=3"}
-]}},
+diagram:{"type":"array","data":[6,5,3,1,0],"steps":[{"active":[],"labels":{},"desc":"Сортируем: [6,5,3,1,0]"},{"active":[0],"labels":{"1":0},"desc":"i=1: 6≥1 ✓"},{"active":[1],"labels":{"2":1},"desc":"i=2: 5≥2 ✓"},{"active":[2],"labels":{"3":2},"desc":"i=3: 3≥3 ✓ h=3"},{"active":[3],"labels":{"4":3},"desc":"i=4: 1<4 ✗ Ответ: h=3"}]}},
 
 // ===== PREFIX SUM =====
 {id:"ps1",t:"Subarray Sum Equals K",p:"Prefix Sum",d:"средне",
@@ -2157,7 +2123,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Сумма всех элементов O(n), затем один проход с leftSum — O(n). Пара переменных — O(1) памяти.`,
 expl:`O(n) один проход (после подсчёта суммы). rightSum = totalSum - leftSum - nums[i]. Когда leftSum == rightSum — нашли pivot.`},
 
-// ===== SLIDING WINDOW =====
+// ===== SW + STRING =====
 {id:"sw1",t:"Minimum Window Substring",p:"SW + String",d:"сложно",
 desc:`Даны две строки s и t. Найти ==минимальную по длине подстроку==, которая ==содержит все символы== строки t (включая дубликаты). Если такой подстроки нет — вернуть пустую строку "".
 
@@ -2229,8 +2195,10 @@ complexityExpl:`Левый и правый указатели двигаются
 expl:`Сначала нужно отдельным циклом пройти по t и записать какие в массив какие символы на нужны.
 Затем отдельным циклом пройти по s и в окне проверять сколько символов осталось покрыть через отдельную переменную.
 И если все символы покрыты, то ищем минимум и ПРОБУЕМ УМЕНЬШИТЬ ОКНО СЛЕВА`,
-lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],repoSimilar:["sw3","sw8","sw9"]},
+lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
+repoSimilar:["sw3","sw8","sw9"]},
 
+// ===== SLIDING WINDOW =====
 {id:"sw2",t:"Longest Repeating Char Replacement",p:"Sliding Window",d:"средне",
 desc:`Дана строка s и число k. Можно заменить до k символов. Найти ==длину самой длинной подстроки== из одинаковых символов.
 
@@ -2269,6 +2237,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right проходит строку один раз, left тоже не более n раз — O(n). Массив частот на 26 букв — O(1) памяти.`,
 expl:`O(n) время. Поддерживаем maxFreq — максимальную частоту символа в окне. Количество замен = windowSize - maxFreq. Если > k — сжимаем окно слева.`},
 
+// ===== SW + STRING =====
 {id:"sw3",t:"Поиск анаграмм",p:"SW + String",d:"средне",
 desc:`Найти все стартовые индексы ==анаграмм строки t в строке s==.
 
@@ -2320,24 +2289,10 @@ complexity:`Время: O(|s|), Память: O(1)`,
 complexityExpl:`Один проход с окном длины |t|, на каждом шаге обновляем freq и needCount — O(|s|). Массив freq[128] — O(1) памяти.`,
 expl:`Фиксированное окно размера |t|. Массив freq отслеживает, сколько каждого символа ещё нужно. needCount = 0 означает все символы покрыты — это анаграмма. O(n).`,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
-diagram:{type:"multi",data:["c","b","a","e","b","a","b","a","c","d"],steps:[
-{structs:[
-{type:"String",name:"s",data:["c","b","a","e","b","a","b","a","c","d"],active:[0,1,2]},
-{type:"int[]",name:"freq",data:{"a":1,"b":1,"c":1}},
-{type:"int",name:"needCount",data:"0 ✓"}
-],desc:"Окно [c,b,a] — freq покрыт, needCount=0"},
-{structs:[
-{type:"String",name:"s",data:["c","b","a","e","b","a","b","a","c","d"],active:[1,2,3]},
-{type:"int[]",name:"freq",data:{"a":1,"b":1,"c":0,"e":-1}},
-{type:"int",name:"needCount",data:"1"}
-],desc:"Окно [b,a,e] — e лишняя, needCount=1"},
-{structs:[
-{type:"String",name:"s",data:["c","b","a","e","b","a","b","a","c","d"],active:[6,7,8]},
-{type:"int[]",name:"freq",data:{"a":1,"b":1,"c":1}},
-{type:"int",name:"needCount",data:"0 ✓"}
-],desc:"Окно [b,a,c] — анаграмма найдена!"}
-]},repoSimilar:["sw1","sw8","sw9"]},
+repoSimilar:["sw1","sw8","sw9"],
+diagram:{"type":"multi","data":["c","b","a","e","b","a","b","a","c","d"],"steps":[{"structs":[{"type":"String","name":"s","data":["c","b","a","e","b","a","b","a","c","d"],"active":[0,1,2]},{"type":"int[]","name":"freq","data":{"a":1,"b":1,"c":1}},{"type":"int","name":"needCount","data":"0 ✓"}],"desc":"Окно [c,b,a] — freq покрыт, needCount=0"},{"structs":[{"type":"String","name":"s","data":["c","b","a","e","b","a","b","a","c","d"],"active":[1,2,3]},{"type":"int[]","name":"freq","data":{"a":1,"b":1,"c":0,"e":-1}},{"type":"int","name":"needCount","data":"1"}],"desc":"Окно [b,a,e] — e лишняя, needCount=1"},{"structs":[{"type":"String","name":"s","data":["c","b","a","e","b","a","b","a","c","d"],"active":[6,7,8]},{"type":"int[]","name":"freq","data":{"a":1,"b":1,"c":1}},{"type":"int","name":"needCount","data":"0 ✓"}],"desc":"Окно [b,a,c] — анаграмма найдена!"}]}},
 
+// ===== SLIDING WINDOW =====
 {id:"sw4",t:"Возрастающая подпоследовательность",p:"Sliding Window",d:"легко",
 desc:`Найти длину самого длинного ==непрерывного строго возрастающего подмассива==.
 
@@ -2386,15 +2341,16 @@ code:`class Solution {
         int result = 0;
 
         for (int right = 0; right < nums.length; right++) {
-            if (nums[right] == 0) zerosCount++;
+            if (nums[right] == 0) {
+                zerosCount++;
+            }
 
             while (zerosCount > k) {
                 if (nums[left] == 0) zerosCount--;
                 left++;
             }
 
-            result = Math.max(result,
-                right - left + 1);
+            result = Math.max(result, right - left + 1);
         }
 
         return result;
@@ -2407,14 +2363,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два указателя: right проходит массив, left только увеличивается — O(n). Счётчики — O(1) памяти.`,
 expl:`Окно с не более чем k нулями. Расширяем right, при превышении нулей — сжимаем left. O(n) время, O(1) память.`,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
-diagram:{type:"window",data:[1,0,1,1,0,1,1,0],steps:[
-{wl:0,wr:0,desc:"Начало: окно [0], нулей=0, k=2"},
-{wl:0,wr:1,desc:"Расширяем → нулей=1"},
-{wl:0,wr:4,desc:"Расширяем → нулей=2, ОК"},
-{wl:0,wr:6,desc:"[1,0,1,1,0,1,1] длина=7"},
-{wl:0,wr:7,desc:"Нулей=3 > k! Сжимаем"},
-{wl:2,wr:7,desc:"Сжали → нулей=2. Ответ: 7"}
-]}},
+diagram:{"type":"window","data":[1,0,1,1,0,1,1,0],"steps":[{"wl":0,"wr":0,"desc":"Начало: окно [0], нулей=0, k=2"},{"wl":0,"wr":1,"desc":"Расширяем → нулей=1"},{"wl":0,"wr":4,"desc":"Расширяем → нулей=2, ОК"},{"wl":0,"wr":6,"desc":"[1,0,1,1,0,1,1] длина=7"},{"wl":0,"wr":7,"desc":"Нулей=3 > k! Сжимаем"},{"wl":2,"wr":7,"desc":"Сжали → нулей=2. Ответ: 7"}]}},
 
 {id:"sw6",t:"Максимальный отрезок единиц с удалением",p:"Sliding Window",d:"средне",
 desc:`Дан бинарный массив. ==Удалить ровно один элемент==. Найти ==максимальную длину подмассива из единиц==.
@@ -2492,14 +2441,9 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,
 expl:`prev — единицы перед последним нулём, count — единицы после. При нуле: prev + 1 + count (1 — перевёрнутый ноль). Ограничиваем длиной массива. O(n).`,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
-diagram:{type:"window",data:["a","b","c","a","b","c","b","b"],steps:[
-{wl:0,wr:0,desc:"Окно [a], все уникальны"},
-{wl:0,wr:2,desc:"Окно [a,b,c], 3 уникальных"},
-{wl:0,wr:3,desc:"Добавили a — повтор! Сжимаем"},
-{wl:1,wr:3,desc:"Окно [b,c,a], снова ОК"},
-{wl:4,wr:7,desc:"Сжали до [c,b,b] — финал"}
-]}},
+diagram:{"type":"window","data":["a","b","c","a","b","c","b","b"],"steps":[{"wl":0,"wr":0,"desc":"Окно [a], все уникальны"},{"wl":0,"wr":2,"desc":"Окно [a,b,c], 3 уникальных"},{"wl":0,"wr":3,"desc":"Добавили a — повтор! Сжимаем"},{"wl":1,"wr":3,"desc":"Окно [b,c,a], снова ОК"},{"wl":4,"wr":7,"desc":"Сжали до [c,b,b] — финал"}]}},
 
+// ===== SW + STRING =====
 {id:"sw8",t:"Подстроки с полным алфавитом",p:"SW + String",d:"средне",
 desc:`Подсчитать ==количество подстрок==, содержащих ==все уникальные символы== s.
 
@@ -2549,7 +2493,8 @@ steps:`1. target — число уникальных символов.
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right идёт один раз, left сдвигается при валидном окне — O(n). Массив freq[128] — O(1) памяти.`,
 expl:`Когда окно содержит все уникальные символы, все расширения вправо (s.length() - right) тоже валидны. Сжимаем left и считаем. O(n).`,
-lcSimilar:[{"t":"Number of Substrings Containing All Three Characters","h":"number-of-substrings-containing-all-three-characters"},{"t":"Substrings with Concatenation of All Words","h":"substrings-with-concatenation-of-all-words"}],repoSimilar:["sw1","sw3","sw9"]},
+lcSimilar:[{"t":"Number of Substrings Containing All Three Characters","h":"number-of-substrings-containing-all-three-characters"},{"t":"Substrings with Concatenation of All Words","h":"substrings-with-concatenation-of-all-words"}],
+repoSimilar:["sw1","sw3","sw9"]},
 
 {id:"sw9",t:"Поиск мутирующего вируса",p:"SW + String",d:"средне",
 desc:`Проверить, содержит ли строка gene какую-либо ==перестановку строки virus==.
@@ -2596,8 +2541,10 @@ steps:`1. freq по virus; needCount = |virus|; windowSize = |virus|.
 3. Если needCount = 0 — найдена мутация.`,
 complexity:`Время: O(|gene|), Память: O(1)`,
 complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив freq[128] — O(1) памяти.`,
-expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, freq массив, счётчик needCount. O(n).`,repoSimilar:["sw1","sw3","sw8"]},
+expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, freq массив, счётчик needCount. O(n).`,
+repoSimilar:["sw1","sw3","sw8"]},
 
+// ===== SLIDING WINDOW =====
 {id:"sw10",t:"Инвестор в стране дураков",p:"Sliding Window",d:"средне",
 desc:`==Скользящее окно== произведения k элементов. Корректно обрабатывать нули.
 
@@ -3299,12 +3246,7 @@ complexity:`Время: O(|t|), Память: O(1)`,
 complexityExpl:`Указатель по t проходит строку один раз — O(|t|). Два индекса — O(1) памяти.`,
 expl:`Два указателя: p1 по s, p2 по t. При совпадении продвигаем оба, иначе только p2. Если p1 дошёл до конца — s является подпоследовательностью t. O(|t|).`,
 lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{"t":"Valid Parentheses","h":"valid-parentheses"}],
-diagram:{type:"twoptr",data:["a","1","b","2","c","3"],steps:[
-{l:0,r:0,desc:"s=abc, t=a1b2c3"},
-{l:0,r:0,found:[0],desc:"a == a ✓"},
-{l:1,r:2,found:[2],desc:"b == b ✓"},
-{l:2,r:4,found:[4],desc:"c == c ✓ Найдено!"}
-]}},
+diagram:{"type":"twoptr","data":["a","1","b","2","c","3"],"steps":[{"l":0,"r":0,"desc":"s=abc, t=a1b2c3"},{"l":0,"r":0,"found":[0],"desc":"a == a ✓"},{"l":1,"r":2,"found":[2],"desc":"b == b ✓"},{"l":2,"r":4,"found":[4],"desc":"c == c ✓ Найдено!"}]}},
 
 {id:"tp6",t:"Сумма в сортированном массиве",p:"Two Pointers",d:"легко",
 desc:`Найти ==два элемента в отсортированном массиве, дающих в сумме target==. Вернуть их индексы (1-based). O(1) доп. памяти.
@@ -3831,28 +3773,7 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Каждый индекс входит/выходит из деков один раз — O(n) амортизированно. Деки до O(n) элементов — O(n) памяти.`,
 expl:`Два монотонных дека: maxD хранит индексы в убывающем порядке значений (голова = максимум окна), minD — в возрастающем (голова = минимум). Когда max - min > limit, сжимаем окно слева. Каждый элемент push/pop один раз → O(n).`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}],
-diagram:{type:"multi",data:[8,2,4,7],steps:[
-{structs:[
-{type:"int[]",name:"nums",data:[8,2,4,7],active:[0]},
-{type:"Deque",name:"maxD (убыв.)",data:[8],hl:[0]},
-{type:"Deque",name:"minD (возр.)",data:[8],hl:[0]}
-],desc:"[8]: max=8, min=8, размах=0 ≤ limit"},
-{structs:[
-{type:"int[]",name:"nums",data:[8,2,4,7],active:[0,1]},
-{type:"Deque",name:"maxD (убыв.)",data:[8,2]},
-{type:"Deque",name:"minD (возр.)",data:[2],hl:[0]}
-],desc:"[8,2]: max=8, min=2, размах=6 > limit!"},
-{structs:[
-{type:"int[]",name:"nums",data:[8,2,4,7],active:[1,2]},
-{type:"Deque",name:"maxD (убыв.)",data:[4],hl:[0]},
-{type:"Deque",name:"minD (возр.)",data:[2,4]}
-],desc:"Сжали → [2,4]: max=4, min=2, размах=2 ✓"},
-{structs:[
-{type:"int[]",name:"nums",data:[8,2,4,7],active:[2,3]},
-{type:"Deque",name:"maxD (убыв.)",data:[7],hl:[0]},
-{type:"Deque",name:"minD (возр.)",data:[4,7],hl:[0]}
-],desc:"[4,7]: max=7, min=4, размах=3. Ответ: 2"}
-]}},
+diagram:{"type":"multi","data":[8,2,4,7],"steps":[{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[0]},{"type":"Deque","name":"maxD (убыв.)","data":[8],"hl":[0]},{"type":"Deque","name":"minD (возр.)","data":[8],"hl":[0]}],"desc":"[8]: max=8, min=8, размах=0 ≤ limit"},{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[0,1]},{"type":"Deque","name":"maxD (убыв.)","data":[8,2]},{"type":"Deque","name":"minD (возр.)","data":[2],"hl":[0]}],"desc":"[8,2]: max=8, min=2, размах=6 > limit!"},{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[1,2]},{"type":"Deque","name":"maxD (убыв.)","data":[4],"hl":[0]},{"type":"Deque","name":"minD (возр.)","data":[2,4]}],"desc":"Сжали → [2,4]: max=4, min=2, размах=2 ✓"},{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[2,3]},{"type":"Deque","name":"maxD (убыв.)","data":[7],"hl":[0]},{"type":"Deque","name":"minD (возр.)","data":[4,7],"hl":[0]}],"desc":"[4,7]: max=7, min=4, размах=3. Ответ: 2"}]}},
 
 // ===== DYNAMIC PROG. =====
 {id:"dp1",t:"Longest Palindromic Substring",p:"Dynamic Prog.",d:"средне",
@@ -4218,12 +4139,7 @@ complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка копии O(n log n), построение рангов + второй проход O(n). Копия, карта, результат — O(n) памяти.`,
 expl:`Сортируем копию массива. Назначаем ранги уникальным значениям (1, 2, 3, ...). Затем заменяем каждый элемент его рангом. O(n log n).`,
 lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{"t":"Valid Parentheses","h":"valid-parentheses"}],
-diagram:{type:"twoptr",data:[1,1,2,2,2,3],steps:[
-{l:0,r:0,desc:"Сжимаем дубликаты"},
-{l:0,r:1,desc:"1==1, пропускаем"},
-{l:1,r:2,desc:"2≠1, записываем"},
-{l:2,r:5,found:[0,1,2],desc:"Итог: [1,2,3]"}
-]}},
+diagram:{"type":"twoptr","data":[1,1,2,2,2,3],"steps":[{"l":0,"r":0,"desc":"Сжимаем дубликаты"},{"l":0,"r":1,"desc":"1==1, пропускаем"},{"l":1,"r":2,"desc":"2≠1, записываем"},{"l":2,"r":5,"found":[0,1,2],"desc":"Итог: [1,2,3]"}]}},
 
 // ===== MATH / SIMULATION =====
 {id:"ms5",t:"Скалярное произведение векторов",p:"Math / Simulation",d:"легко",
@@ -4331,11 +4247,7 @@ complexity:`Время: O(log(n−k) + k), Память: O(k)`,
 complexityExpl:`Бинарный поиск по [0, n−k] — O(log(n−k)), затем копируем k элементов. Список из k элементов — O(k) памяти.`,
 expl:`Бинарный поиск левой границы окна размером k. Если расстояние до arr[mid] больше, чем до arr[mid+k], сдвигаем окно вправо. O(log(n-k) + k).`,
 lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{"t":"Valid Parentheses","h":"valid-parentheses"}],
-diagram:{type:"bsearch",data:[1,2,3,4,5],steps:[
-{l:0,r:1,m:0,desc:"k=4, x=3. Ищем начало окна"},
-{l:0,r:0,m:0,desc:"|3-1|=2 vs |5-3|=2 → right=mid"},
-{l:0,r:0,m:0,found:0,desc:"Окно [1,2,3,4] ✓"}
-]}},
+diagram:{"type":"bsearch","data":[1,2,3,4,5],"steps":[{"l":0,"r":1,"m":0,"desc":"k=4, x=3. Ищем начало окна"},{"l":0,"r":0,"m":0,"desc":"|3-1|=2 vs |5-3|=2 → right=mid"},{"l":0,"r":0,"m":0,"found":0,"desc":"Окно [1,2,3,4] ✓"}]}},
 
 {id:"tp16",t:"К ближайших чисел",p:"Two Pointers",d:"средне",
 desc:`Дан ==отсортированный массив== и число target. Найти ==k ближайших к target чисел==. Если расстояния равны — меньший элемент предпочтительнее.
@@ -4741,11 +4653,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода: подсчёт пробелов + заполнение с конца — O(n). In-place в char[] — O(1) доп. памяти.`,
 expl:`Два прохода: считаем пробелы, затем заполняем с конца. Каждый пробел заменяется на '%20' (3 символа вместо 1). O(n) время, O(1) дополнительная память.`,
 lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{"t":"Valid Parentheses","h":"valid-parentheses"}],
-diagram:{type:"twoptr",data:["M","r"," ","S","m","i","t","h"," "," "," "," "],steps:[
-{l:7,r:11,desc:"Mr Smith → заполняем с конца"},
-{l:2,r:7,desc:"Пробел → %20"},
-{l:0,r:4,found:[0,1,2,3,4],desc:"Итог: Mr%20Smith"}
-]}},
+diagram:{"type":"twoptr","data":["M","r"," ","S","m","i","t","h"," "," "," "," "],"steps":[{"l":7,"r":11,"desc":"Mr Smith → заполняем с конца"},{"l":2,"r":7,"desc":"Пробел → %20"},{"l":0,"r":4,"found":[0,1,2,3,4],"desc":"Итог: Mr%20Smith"}]}},
 
 {id:"tp22",t:"Самый большой контейнер",p:"Two Pointers",d:"средне",
 desc:`Дан массив heights. Найти ==два столбца==, которые вместе с осью X образуют ==контейнер с наибольшим количеством воды==.
@@ -4892,6 +4800,7 @@ complexity:`Время: O(h), Память: O(1)`,
 complexityExpl:`Спуск по BST от корня к листу — O(h). Один указатель и closest — O(1) памяти.`,
 expl:`Итеративный спуск по BST. На каждом шаге обновляем closest, если текущий узел ближе к target. Идём влево если target < val, иначе вправо. O(h) время, O(1) память.`},
 
+// ===== TREES / BFS =====
 {id:"tr6",t:"Обход дерева зигзагом",p:"Trees / BFS",d:"легко",
 desc:`Дан корень бинарного дерева. Вернуть ==зигзагообразный обход по уровням==: чётные уровни слева направо, нечётные — справа налево.
 
@@ -4963,13 +4872,9 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`BFS по уровням: каждый узел один раз — O(n). Очередь и списки — O(n) памяти.`,
 expl:`BFS по уровням. Чередуем направление: чётные уровни — addLast, нечётные — addFirst (LinkedList как deque). O(n) время и память.`,
 lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"find-first-and-last-position-of-element-in-sorted-array"},{"t":"Binary Search","h":"binary-search"}],
-diagram:{type:"tree",data:[1,2,3,4,5,null,6],steps:[
-{active:[0],visited:[],desc:"Уровень 0: [1] →"},
-{active:[1,2],visited:[0],desc:"Уровень 1: [3,2] ←"},
-{active:[3,4,6],visited:[0,1,2],desc:"Уровень 2: [4,5,6] →"},
-{active:[],visited:[0,1,2,3,4,6],desc:"Итог: [[1],[3,2],[4,5,6]]"}
-]}},
+diagram:{"type":"tree","data":[1,2,3,4,5,null,6],"steps":[{"active":[0],"visited":[],"desc":"Уровень 0: [1] →"},{"active":[1,2],"visited":[0],"desc":"Уровень 1: [3,2] ←"},{"active":[3,4,6],"visited":[0,1,2],"desc":"Уровень 2: [4,5,6] →"},{"active":[],"visited":[0,1,2,3,4,6],"desc":"Итог: [[1],[3,2],[4,5,6]]"}]}},
 
+// ===== TREES / DFS =====
 {id:"tr7",t:"Same Tree",p:"Trees / DFS",d:"легко",
 desc:`легко
 # Amazon, Google, Bloomberg

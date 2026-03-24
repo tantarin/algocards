@@ -56,6 +56,15 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .enter-btn-inline.active{box-shadow:0 0 0 2px rgba(124,58,237,.25)}
 .mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
 .fly-overlay{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
+.peek-cat{position:fixed;z-index:400;pointer-events:none;transition:transform .8s cubic-bezier(.34,1.56,.64,1);font-size:40px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.peek-cat.from-right{right:-50px;bottom:15%;transform:translateX(0)}
+.peek-cat.from-right.visible{transform:translateX(-45px)}
+.peek-cat.from-left{left:-50px;bottom:25%;transform:translateX(0) scaleX(-1)}
+.peek-cat.from-left.visible{transform:translateX(45px) scaleX(-1)}
+.peek-cat.from-bottom{bottom:-45px;right:20%;transform:translateY(0)}
+.peek-cat.from-bottom.visible{transform:translateY(-40px)}
+.peek-cat-face{display:block;line-height:1}
+.peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
 .mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
 .mascot-bird{animation:mascotBird 2.8s ease-in-out both}
 .mascot-butterfly{animation:mascotButterfly 3.2s linear both}
@@ -494,6 +503,10 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 
 <h1>AlgoCards</h1>
 <div id="flyOverlay" class="fly-overlay" aria-hidden="true"></div>
+<div id="peekCat" class="peek-cat from-right" aria-hidden="true">
+  <span class="peek-cat-face">🐱</span>
+  <span class="peek-cat-paws">🐾</span>
+</div>
 <div class="subtitle" id="info"></div>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
 <div class="filter-row" id="filters"></div>
@@ -999,6 +1012,26 @@ let mascotTimer=null;
 let mascotTyping=false;
 let mascotProfile=null;
 let lastSwipeAt=0;
+let peekCatTimer=null;
+
+// Рыжий кот выглядывает из-за края экрана
+function initPeekCat(){
+  const cat=document.getElementById('peekCat');
+  if(!cat)return;
+  const positions=['from-right','from-left','from-bottom'];
+  function peekOnce(){
+    const pos=positions[Math.floor(Math.random()*positions.length)];
+    cat.className='peek-cat '+pos;
+    setTimeout(()=>cat.classList.add('visible'),50);
+    setTimeout(()=>cat.classList.remove('visible'),2500);
+  }
+  // Первое появление через 5-15 сек, потом каждые 30-60 сек
+  setTimeout(()=>{
+    peekOnce();
+    peekCatTimer=setInterval(peekOnce,30000+Math.random()*30000);
+  },5000+Math.random()*10000);
+}
+initPeekCat();
 
 function setupSwipeNav(){
   if(editMode)return;

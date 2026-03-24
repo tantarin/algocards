@@ -1664,7 +1664,8 @@ function renderCard(){
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
-        <div class="code-wrap">
+        <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
+        <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         </div>
@@ -1679,7 +1680,6 @@ function renderCard(){
           <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
           ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
         </div>`:''}
-        <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
         ${diagramHtml(p)}
       </div>
     </div>

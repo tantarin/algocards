@@ -5754,8 +5754,7 @@ code:`class Solution {
 
         for (int num : nums) {
             if (num > next) {
-                result.add(formatRange(next,
-                    (long) num - 1));
+                result.add(formatRange(next, (long) num - 1));
             }
             next = (long) num + 1;
         }

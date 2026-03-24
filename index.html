@@ -1036,11 +1036,11 @@ function initPeekCat(){
     setTimeout(()=>cat.classList.add('visible'),50);
     setTimeout(()=>cat.classList.remove('visible'),2500);
   }
-  // Первое появление через 5-15 сек, потом каждые 30-60 сек
+  // Первое появление через 3-6 сек, потом каждые 10-20 сек
   setTimeout(()=>{
     peekOnce();
-    peekCatTimer=setInterval(peekOnce,30000+Math.random()*30000);
-  },5000+Math.random()*10000);
+    peekCatTimer=setInterval(peekOnce,10000+Math.random()*10000);
+  },3000+Math.random()*3000);
 }
 initPeekCat();
 
@@ -1071,11 +1071,11 @@ function spawnFlower(){
 }
 
 function initFlowers(){
-  // Первый цветок через 8-20 сек, потом каждые 20-40 сек
+  // Первый цветок через 2-5 сек, потом каждые 8-15 сек
   setTimeout(()=>{
     spawnFlower();
-    setInterval(spawnFlower,20000+Math.random()*20000);
-  },8000+Math.random()*12000);
+    setInterval(spawnFlower,8000+Math.random()*7000);
+  },2000+Math.random()*3000);
 }
 initFlowers();
 

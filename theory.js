@@ -72,48 +72,48 @@ for (int right = 0; right < n; right++) {
     desc: `Скользящее окно с массивом частот для поиска анаграмм/подстрок.
 
 <div style="background:rgba(124,58,237,0.15);border-left:3px solid #7c3aed;padding:10px 12px;border-radius:8px;margin:12px 0">
-<div style="color:#a78bfa;font-weight:600;margin-bottom:6px">💡 Ключевая идея — знак need[c]:</div>
-<div style="color:#c4b5fd">• need[c] > 0 → символ <b>нужен</b> (был в t, ещё не покрыт)</div>
-<div style="color:#c4b5fd">• need[c] = 0 → символ покрыт ровно</div>
-<div style="color:#c4b5fd">• need[c] < 0 → символ <b>лишний</b> (не было в t, или взяли больше)</div>
+<div style="color:#a78bfa;font-weight:600;margin-bottom:6px">💡 Ключевая идея — знак freq[c]:</div>
+<div style="color:#c4b5fd">• freq[c] > 0 → символ <b>нужен</b> (был в t, ещё не покрыт)</div>
+<div style="color:#c4b5fd">• freq[c] = 0 → символ покрыт ровно</div>
+<div style="color:#c4b5fd">• freq[c] < 0 → символ <b>лишний</b> (не было в t, или взяли больше)</div>
 </div>
 
-Символы НЕ из t начинают с 0 → уходят в минус и <b style="color:#a78bfa">никогда не влияют на missing</b>.`,
+Символы НЕ из t начинают с 0 → уходят в минус и <b style="color:#a78bfa">никогда не влияют на needCount</b>.`,
     code: `public List<Integer> findAnagrams(String s, String t) {
     List<Integer> result = new ArrayList<>();
     if (s.length() < t.length()) return result;
 
     // ШАГ 1: ЧАСТОТНЫЙ МАССИВ
-    // need[c] > 0  → символ НУЖЕН (из t, ещё не покрыт)
-    // need[c] = 0  → символ покрыт / не был в t
-    // need[c] < 0  → символ ЛИШНИЙ (взяли больше или не из t)
-    int[] need = new int[128];
+    // freq[c] > 0  → символ НУЖЕН (из t, ещё не покрыт)
+    // freq[c] = 0  → символ покрыт / не был в t
+    // freq[c] < 0  → символ ЛИШНИЙ (взяли больше или не из t)
+    int[] freq = new int[128];
     for (char c : t.toCharArray()) {
-        need[c]++;  // изначально need > 0 только для символов из t
+        freq[c]++;  // изначально freq > 0 только для символов из t
     }
 
     // ШАГ 2: СЧЁТЧИКИ
-    int missing = t.length();  // сколько символов ещё не найдено
-    int windowLen = t.length();
+    int needCount = t.length();  // сколько символов ещё нужно
+    int windowSize = t.length(); // фиксированный размер окна
 
     // ШАГ 3: СКОЛЬЗЯЩЕЕ ОКНО
-    for (int i = 0; i < s.length(); i++) {
+    for (int right = 0; right < s.length(); right++) {
 
-        // 3.1. Добавляем символ справа
-        char rChar = s.charAt(i);
-        if (need[rChar] > 0) missing--;  // был нужен → теперь покрыт
-        need[rChar]--;  // уменьшаем (может уйти в минус = лишний)
+        // 3.1. Добавляем правый символ
+        char rightChar = s.charAt(right);
+        if (freq[rightChar] > 0) needCount--;  // был нужен → покрыт
+        freq[rightChar]--;  // уменьшаем (может уйти в минус = лишний)
 
-        // 3.2. Удаляем символ слева (если окно полное)
-        if (i >= windowLen) {
-            char lChar = s.charAt(i - windowLen);
-            need[lChar]++;  // возвращаем символ
-            if (need[lChar] > 0) missing++;  // снова нужен
+        // 3.2. Удаляем левый символ (когда окно полное)
+        if (right >= windowSize) {
+            char leftChar = s.charAt(right - windowSize);
+            freq[leftChar]++;  // возвращаем символ
+            if (freq[leftChar] > 0) needCount++;  // снова нужен
         }
 
         // 3.3. Проверяем анаграмму
-        if (missing == 0) {
-            result.add(i - windowLen + 1);
+        if (needCount == 0) {
+            result.add(right - windowSize + 1);
         }
     }
     return result;

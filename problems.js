@@ -2185,33 +2185,34 @@ code:`class Solution {
         if (s == null || t == null
             || s.length() < t.length()) return "";
 
-        int[] need = new int[128];
-        for (char c : t.toCharArray()) need[c]++;
+        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
+        int[] freq = new int[128];
+        for (char c : t.toCharArray()) freq[c]++;
 
-        int remaining = t.length();
+        int needCount = t.length();  // сколько символов ещё нужно
         int left = 0;
         int bestStart = 0;
         int minLen = Integer.MAX_VALUE;
 
         for (int right = 0; right < s.length(); right++) {
-            char rChar = s.charAt(right);
-            
-            if (need[rChar] > 0) {
-                remaining--;
-            }
-            need[rChar]--;
+            char rightChar = s.charAt(right);
 
-            while (remaining == 0) {
-                int windowLen = right - left + 1;
-                if (windowLen < minLen) {
-                    minLen = windowLen;
+            // Добавляем правый символ
+            if (freq[rightChar] > 0) needCount--;
+            freq[rightChar]--;
+
+            // Пока всё покрыто — сжимаем окно слева
+            while (needCount == 0) {
+                int windowSize = right - left + 1;
+                if (windowSize < minLen) {
+                    minLen = windowSize;
                     bestStart = left;
                 }
 
-                //попробуем уменьшить окно слева
-                char lChar = s.charAt(left);
-                need[lChar]++;
-                if (need[lChar] > 0) remaining++;
+                // Удаляем левый символ
+                char leftChar = s.charAt(left);
+                freq[leftChar]++;
+                if (freq[leftChar] > 0) needCount++;
                 left++;
             }
         }
@@ -2220,9 +2221,9 @@ code:`class Solution {
             : s.substring(bestStart, bestStart + minLen);
     }
 }`,
-steps:`1. need по символам t; remaining = |t|.
-2. Расширяем right: уменьшаем need и remaining.
-3. Пока remaining = 0 — обновляем лучший, сдвигаем left.`,
+steps:`1. freq по символам t; needCount = |t|.
+2. Расширяем right: уменьшаем freq и needCount.
+3. Пока needCount = 0 — обновляем лучший, сдвигаем left.`,
 complexity:`Время: O(|s|), Память: O(1)`,
 complexityExpl:`Левый и правый указатели двигаются только вправо — O(|s|) амортизированно. Массив need фиксированного размера — O(1) памяти.`,
 expl:`Сначала нужно отдельным циклом пройти по t и записать какие в массив какие символы на нужны.
@@ -2282,53 +2283,58 @@ code:`class Solution {
         List<Integer> result = new ArrayList<>();
         if (s.length() < t.length()) return result;
 
-        int[] need = new int[128];
-        for (char c : t.toCharArray()) need[c]++;
+        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
+        int[] freq = new int[128];
+        for (char c : t.toCharArray()) freq[c]++;
 
-        int missing = t.length();
-        int winLen = t.length();
+        int needCount = t.length();  // сколько символов ещё нужно
+        int windowSize = t.length(); // фиксированный размер окна
 
-        for (int i = 0; i < s.length(); i++) {
-            char rChar = s.charAt(i);
-            if (need[rChar] > 0) missing--;
-            need[rChar]--;
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
 
-            if (i >= winLen) {
-                char lChar = s.charAt(i - winLen);
-                need[lChar]++;
-                if (need[lChar] > 0) missing++;
+            // Добавляем правый символ
+            if (freq[rightChar] > 0) needCount--;
+            freq[rightChar]--;
+
+            // Удаляем левый символ (когда окно полное)
+            if (right >= windowSize) {
+                char leftChar = s.charAt(right - windowSize);
+                freq[leftChar]++;
+                if (freq[leftChar] > 0) needCount++;
             }
 
-            if (missing == 0) {
-                result.add(i - winLen + 1);
+            // Проверяем анаграмму
+            if (needCount == 0) {
+                result.add(right - windowSize + 1);
             }
         }
 
         return result;
     }
 }`,
-steps:`1. need по t; missing = |t|; окно длины |t|.
-2. Двигаем окно, корректируя need и missing.
-3. Где missing = 0 — начало анаграммы.`,
+steps:`1. freq по t; needCount = |t|; windowSize = |t|.
+2. Двигаем окно, корректируя freq и needCount.
+3. Где needCount = 0 — начало анаграммы.`,
 complexity:`Время: O(|s|), Память: O(1)`,
-complexityExpl:`Один проход с окном длины |t|, на каждом шаге обновляем need и missing — O(|s|). Массив need[128] — O(1) памяти.`,
-expl:`Фиксированное окно размера len(t). Массив need отслеживает, сколько каждого символа ещё нужно. missing = 0 означает все символы покрыты — это анаграмма. O(n).`,
+complexityExpl:`Один проход с окном длины |t|, на каждом шаге обновляем freq и needCount — O(|s|). Массив freq[128] — O(1) памяти.`,
+expl:`Фиксированное окно размера |t|. Массив freq отслеживает, сколько каждого символа ещё нужно. needCount = 0 означает все символы покрыты — это анаграмма. O(n).`,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
 diagram:{type:"multi",data:["c","b","a","e","b","a","b","a","c","d"],steps:[
 {structs:[
 {type:"String",name:"s",data:["c","b","a","e","b","a","b","a","c","d"],active:[0,1,2]},
-{type:"int[]",name:"need",data:{"a":1,"b":1,"c":1}},
-{type:"int",name:"missing",data:"0 ✓"}
-],desc:"Окно [c,b,a] — need покрыт, missing=0"},
+{type:"int[]",name:"freq",data:{"a":1,"b":1,"c":1}},
+{type:"int",name:"needCount",data:"0 ✓"}
+],desc:"Окно [c,b,a] — freq покрыт, needCount=0"},
 {structs:[
 {type:"String",name:"s",data:["c","b","a","e","b","a","b","a","c","d"],active:[1,2,3]},
-{type:"int[]",name:"need",data:{"a":1,"b":1,"c":0,"e":-1}},
-{type:"int",name:"missing",data:"1"}
-],desc:"Окно [b,a,e] — e лишняя, missing=1"},
+{type:"int[]",name:"freq",data:{"a":1,"b":1,"c":0,"e":-1}},
+{type:"int",name:"needCount",data:"1"}
+],desc:"Окно [b,a,e] — e лишняя, needCount=1"},
 {structs:[
 {type:"String",name:"s",data:["c","b","a","e","b","a","b","a","c","d"],active:[6,7,8]},
-{type:"int[]",name:"need",data:{"a":1,"b":1,"c":1}},
-{type:"int",name:"missing",data:"0 ✓"}
+{type:"int[]",name:"freq",data:{"a":1,"b":1,"c":1}},
+{type:"int",name:"needCount",data:"0 ✓"}
 ],desc:"Окно [b,a,c] — анаграмма найдена!"}
 ]},repoSimilar:["sw1","sw8","sw9"]},
 
@@ -2503,52 +2509,33 @@ desc:`Подсчитать ==количество подстрок==, содер
 hint:`Скользящее окно. Расширяем пока не покроем все уникальные символы. Когда покрыли — все расширения вправо тоже валидны.`,
 code:`class Solution {
     public int countComplete(String s) {
-
-        // target — количество уникальных символов во всей строке
-        // именно столько должно быть в "полном" (complete) подстроке
+        // target — сколько уникальных символов нужно собрать
         int target = (int) s.chars().distinct().count();
 
-        // freq[c] — сколько раз символ c встречается в текущем окне
+        // freq[c] — сколько раз символ в текущем окне
         int[] freq = new int[128];
 
-        // сколько разных символов сейчас в окне [left, right]
-        int uniqueInWindow = 0;
-
+        int haveCount = 0;  // сколько уникальных уже в окне
         int left = 0;
         int count = 0;
 
-        // Двигаем правую границу окна
         for (int right = 0; right < s.length(); right++) {
-            char rc = s.charAt(right);
+            char rightChar = s.charAt(right);
 
-            // Добавляем символ в окно
-            freq[rc]++;
+            // Добавляем правый символ
+            freq[rightChar]++;
+            if (freq[rightChar] == 1) haveCount++;
 
-            // Если символ появился в окне впервые — увеличиваем число уникальных
-            if (freq[rc] == 1) uniqueInWindow++;
-
-            // =========================
-            // Когда окно стало "полным"
-            // =========================
-            // То есть содержит все уникальные символы строки
-            while (uniqueInWindow == target) {
-
-                // Все подстроки:
-                // [left, right], [left, right+1], ..., [left, n-1]
-                // тоже будут валидны, потому что добавление символов справа
-                // не уменьшит количество уникальных
+            // Пока окно "полное" — сжимаем слева
+            while (haveCount == target) {
+                // Все суффиксы от right до конца тоже валидны
                 count += s.length() - right;
 
-                // Пытаемся сжать окно слева (минимизировать его)
-                char lc = s.charAt(left);
-                freq[lc]--;
+                // Удаляем левый символ
+                char leftChar = s.charAt(left);
+                freq[leftChar]--;
+                if (freq[leftChar] == 0) haveCount--;
 
-                // Одинаковых символов могло быть несколько в окне. 
-                // Но если символ полностью исчез из окна —
-                // уменьшаем число уникальных
-                if (freq[lc] == 0) uniqueInWindow--;
-
-                // Сдвигаем левую границу
                 left++;
             }
         }
@@ -2556,9 +2543,9 @@ code:`class Solution {
         return count;
     }
 }`,
-steps:`1. target — число различных символов.
-2. Когда в окне target различных — добавляем (n − right) суффиксов.
-3. Сдвигаем left, уменьшая частоты.`,
+steps:`1. target — число уникальных символов.
+2. Когда haveCount == target — добавляем (n − right) суффиксов.
+3. Сдвигаем left, уменьшая freq.`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right идёт один раз, left сдвигается при валидном окне — O(n). Массив freq[128] — O(1) памяти.`,
 expl:`Когда окно содержит все уникальные символы, все расширения вправо (s.length() - right) тоже валидны. Сжимаем left и считаем. O(n).`,
@@ -2576,36 +2563,41 @@ code:`class Solution {
                                     String virus) {
         if (gene.length() < virus.length()) return false;
 
-        int[] need = new int[26];
+        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
+        int[] freq = new int[26];
         for (char c : virus.toCharArray())
-            need[c - 'a']++;
+            freq[c - 'a']++;
 
-        int missing = virus.length();
-        int winLen = virus.length();
+        int needCount = virus.length();  // сколько символов ещё нужно
+        int windowSize = virus.length(); // фиксированный размер окна
 
-        for (int i = 0; i < gene.length(); i++) {
-            int rc = gene.charAt(i) - 'a';
-            if (need[rc] > 0) missing--;
-            need[rc]--;
+        for (int right = 0; right < gene.length(); right++) {
+            int rightIdx = gene.charAt(right) - 'a';
 
-            if (i >= winLen) {
-                int lc = gene.charAt(i - winLen) - 'a';
-                need[lc]++;
-                if (need[lc] > 0) missing++;
+            // Добавляем правый символ
+            if (freq[rightIdx] > 0) needCount--;
+            freq[rightIdx]--;
+
+            // Удаляем левый символ (когда окно полное)
+            if (right >= windowSize) {
+                int leftIdx = gene.charAt(right - windowSize) - 'a';
+                freq[leftIdx]++;
+                if (freq[leftIdx] > 0) needCount++;
             }
 
-            if (missing == 0) return true;
+            // Проверяем мутацию
+            if (needCount == 0) return true;
         }
 
         return false;
     }
 }`,
-steps:`1. need по virus; missing = |virus|.
-2. Скользящее окно длины |virus| по gene.
-3. Если missing = 0 — найдена мутация.`,
+steps:`1. freq по virus; needCount = |virus|; windowSize = |virus|.
+2. Скользящее окно по gene, корректируя freq и needCount.
+3. Если needCount = 0 — найдена мутация.`,
 complexity:`Время: O(|gene|), Память: O(1)`,
-complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив 26 счётчиков — O(1) памяти.`,
-expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, частотный массив, счётчик missing. O(n).`,repoSimilar:["sw1","sw3","sw8"]},
+complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив freq[26] — O(1) памяти.`,
+expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, freq массив, счётчик needCount. O(n).`,repoSimilar:["sw1","sw3","sw8"]},
 
 {id:"sw10",t:"Инвестор в стране дураков",p:"Sliding Window",d:"средне",
 desc:`==Скользящее окно== произведения k элементов. Корректно обрабатывать нули.

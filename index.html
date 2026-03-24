@@ -65,17 +65,13 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .peek-cat.from-bottom.visible{transform:translateY(-40px)}
 .peek-cat-face{display:block;line-height:1}
 .peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
-.flower-container{position:fixed;bottom:0;pointer-events:none;z-index:50}
-.flower{display:flex;flex-direction:column;align-items:center;transform-origin:bottom center}
-.flower-head{font-size:28px;opacity:0;transform:scale(0) rotate(-30deg);animation:bloomFlower 1.5s ease-out forwards;animation-delay:var(--bloom-delay,1.5s)}
-.flower-stem{width:3px;background:linear-gradient(to top,#22c55e,#4ade80);border-radius:2px;height:0;animation:growStem 1.8s ease-out forwards}
-.flower-leaf{position:absolute;font-size:14px;opacity:0;animation:showLeaf .5s ease-out forwards}
-.flower-leaf.left{left:-12px;transform:scaleX(-1);animation-delay:var(--leaf-delay,0.8s)}
-.flower-leaf.right{right:-12px;animation-delay:var(--leaf-delay,1s)}
-@keyframes growStem{0%{height:0}100%{height:var(--stem-height,60px)}}
-@keyframes bloomFlower{0%{opacity:0;transform:scale(0) rotate(-30deg)}50%{opacity:1;transform:scale(1.2) rotate(10deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
-@keyframes showLeaf{0%{opacity:0;transform:scale(0)}100%{opacity:1;transform:scale(1)}}
-@keyframes swayFlower{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.sky-star{position:fixed;pointer-events:none;z-index:50;font-size:var(--star-size,18px);opacity:0;filter:drop-shadow(0 0 8px rgba(255,240,150,0.9))}
+@keyframes starAppear{0%{opacity:0;transform:scale(0) rotate(-20deg)}40%{opacity:1;transform:scale(1.3) rotate(8deg)}100%{opacity:0.9;transform:scale(1) rotate(0deg)}}
+@keyframes starTwinkle{0%,100%{opacity:0.25;transform:scale(0.8)}35%{opacity:1;transform:scale(1.3)}65%{opacity:0.55;transform:scale(0.95)}}
+.sky-moon{position:fixed;pointer-events:none;z-index:50;opacity:0;font-size:54px;filter:drop-shadow(0 0 30px rgba(255,220,100,0.85)) drop-shadow(0 0 60px rgba(255,180,60,0.4))}
+@keyframes moonAppear{0%{opacity:0;transform:scale(0.4) rotate(-15deg)}30%{opacity:1;transform:scale(1.1) rotate(3deg)}70%{opacity:1;transform:scale(1) rotate(0deg)}100%{opacity:0;transform:scale(0.85) rotate(-5deg)}}
+.sky-sunset{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0;background:radial-gradient(ellipse 120% 80% at 50% 110%,rgba(255,90,40,0.15) 0%,rgba(255,160,70,0.10) 35%,rgba(200,80,160,0.06) 60%,transparent 75%)}
+@keyframes sunsetGlow{0%{opacity:0}30%{opacity:1}70%{opacity:1}100%{opacity:0}}
 .mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
 .mascot-bird{animation:mascotBird 2.8s ease-in-out both}
 .mascot-butterfly{animation:mascotButterfly 3.2s linear both}
@@ -1044,40 +1040,53 @@ function initPeekCat(){
 }
 initPeekCat();
 
-// Цветы растут и расцветают
-const FLOWERS=['🌸','🌺','🌻','🌷','🌹','💐','🌼','🏵️'];
-function spawnFlower(){
-  const container=document.createElement('div');
-  container.className='flower-container';
-  container.style.left=Math.random()*90+5+'%';
+// Атмосфера: звёзды, луна и закат на весь экран
+const STARS_SKY=['⭐','🌟','✨','💫','🌠'];
+const MOONS_SKY=['🌙','🌛','🌜'];
 
-  const stemHeight=50+Math.random()*40;
-  const flower=document.createElement('div');
-  flower.className='flower';
-  flower.innerHTML=`
-    <span class="flower-head" style="--bloom-delay:${1.2+Math.random()*0.5}s">${FLOWERS[Math.floor(Math.random()*FLOWERS.length)]}</span>
-    <div class="flower-stem" style="--stem-height:${stemHeight}px"></div>
-    <span class="flower-leaf left" style="--leaf-delay:${0.6+Math.random()*0.3}s">🌿</span>
-    <span class="flower-leaf right" style="--leaf-delay:${0.8+Math.random()*0.3}s">🌿</span>
-  `;
-  container.appendChild(flower);
-  document.body.appendChild(container);
-
-  // После анимации добавляем покачивание и потом удаляем
-  setTimeout(()=>{
-    flower.style.animation='swayFlower 3s ease-in-out infinite';
-  },2500);
-  setTimeout(()=>container.remove(),12000);
+function spawnStar(){
+  const el=document.createElement('div');
+  el.className='sky-star';
+  el.textContent=STARS_SKY[Math.floor(Math.random()*STARS_SKY.length)];
+  const size=10+Math.floor(Math.random()*22);
+  const left=2+Math.random()*96;
+  const top=2+Math.random()*80;
+  const twinkleDur=(1.4+Math.random()*1.8).toFixed(2);
+  const twinkleDelay=(1.5+Math.random()*1).toFixed(2);
+  el.style.cssText=`--star-size:${size}px;left:${left}%;top:${top}%;animation:starAppear 1.1s ease-out forwards,starTwinkle ${twinkleDur}s ease-in-out ${twinkleDelay}s infinite`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),13000);
 }
 
-function initFlowers(){
-  // Первый цветок через 2-5 сек, потом каждые 8-15 сек
+function spawnMoon(){
+  const el=document.createElement('div');
+  el.className='sky-moon';
+  el.textContent=MOONS_SKY[Math.floor(Math.random()*MOONS_SKY.length)];
+  const left=10+Math.random()*75;
+  const top=5+Math.random()*45;
+  el.style.cssText=`left:${left}%;top:${top}%;animation:moonAppear 13s ease-in-out forwards`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),13000);
+}
+
+function spawnSkyScene(){
+  const sunset=document.createElement('div');
+  sunset.className='sky-sunset';
+  sunset.style.animation='sunsetGlow 16s ease-in-out forwards';
+  document.body.appendChild(sunset);
+  setTimeout(()=>sunset.remove(),16000);
+  setTimeout(spawnMoon,800+Math.random()*1200);
+  const count=5+Math.floor(Math.random()*6);
+  for(let i=0;i<count;i++) setTimeout(spawnStar,i*600+Math.random()*400);
+}
+
+function initSkyScene(){
   setTimeout(()=>{
-    spawnFlower();
-    setInterval(spawnFlower,8000+Math.random()*7000);
+    spawnSkyScene();
+    setInterval(spawnSkyScene,18000+Math.random()*10000);
   },2000+Math.random()*3000);
 }
-initFlowers();
+initSkyScene();
 
 function setupSwipeNav(){
   if(editMode)return;
@@ -1623,12 +1632,6 @@ function renderCard(){
   if(editMode){renderEditCard();return}
   const p=fcList[fcIdx];
   setMascotProfile(p);
-  const input1Open=isSolutionInputOpen(p.id,1);
-  const input1Draft=input1Open?loadSolutionInput(p.id,1):'';
-  const input2Open=isSolutionInputOpen(p.id,2);
-  const input2Draft=input2Open?loadSolutionInput(p.id,2):'';
-  const code1Bg=input1Open?stripCodeComments(p.code):p.code;
-  const code2Bg=input2Open?stripCodeComments(p.code2):p.code2;
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter-row">
       <div class="counter">${fcIdx+1} / ${fcList.length}</div>
@@ -1663,21 +1666,13 @@ function renderCard(){
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         <div class="code-wrap">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
-          <button type="button" class="enter-btn-inline${input1Open?' active':''}" onclick="event.stopPropagation();openSolutionInput(1)">${input1Open?'Закрыть':'Ввести'}</button>
-          <div class="solution-editor">
-            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input1Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code1Bg)}</code></pre>
-            ${input1Open?`<textarea id="solutionInput_${p.id}_1" class="solution-input" data-problem-id="${p.id}" data-which="1" spellcheck="false" oninput="saveSolutionDraft(this)" onfocus="setMascotTyping(true)" onblur="setMascotTyping(false)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input1Draft)}</textarea>`:''}
-          </div>
+          <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         </div>
 
         ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
         <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
-          <button type="button" class="enter-btn-inline${input2Open?' active':''}" onclick="event.stopPropagation();openSolutionInput(2)">${input2Open?'Закрыть':'Ввести'}</button>
-          <div class="solution-editor">
-            <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java${input2Open?' solution-bg no-hljs':''}" style="font-size:11px;line-height:1.5">${escCode(code2Bg)}</code></pre>
-            ${input2Open?`<textarea id="solutionInput_${p.id}_2" class="solution-input" data-problem-id="${p.id}" data-which="2" spellcheck="false" oninput="saveSolutionDraft(this)" onfocus="setMascotTyping(true)" onblur="setMascotTyping(false)" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">${escCode(input2Draft)}</textarea>`:''}
-          </div>
+          <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
         </div>
         `:''}
         ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">

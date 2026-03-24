@@ -5830,17 +5830,13 @@ desc:`Даны два списка ==непересекающихся отсор
 Вывод: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]`,
 hint:`Два указателя. Пересечение: [max(start1,start2), min(end1,end2)]. Двигаем указатель с меньшим end.`,
 code:`class Solution {
-    public int[][] intervalIntersection(
-            int[][] firstList, int[][] secondList) {
+    public int[][] intervalIntersection(int[][] firstList, int[][] secondList) {
         List<int[]> result = new ArrayList<>();
         int i = 0, j = 0;
 
-        while (i < firstList.length
-            && j < secondList.length) {
-            int lo = Math.max(firstList[i][0],
-                secondList[j][0]);
-            int hi = Math.min(firstList[i][1],
-                secondList[j][1]);
+        while (i < firstList.length && j < secondList.length) {
+            int lo = Math.max(firstList[i][0], secondList[j][0]);
+            int hi = Math.min(firstList[i][1], secondList[j][1]);
 
             if (lo <= hi) {
                 result.add(new int[]{lo, hi});

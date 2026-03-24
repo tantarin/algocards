@@ -1486,8 +1486,7 @@ code:`class Solution {
         int n = segs.length;
         Integer[] idx = new Integer[n];
         for (int i = 0; i < n; i++) idx[i] = i;
-        Arrays.sort(idx,
-            Comparator.comparingInt(i -> segs[i][0]));
+        Arrays.sort(idx, Comparator.comparingInt(i -> segs[i][0]));
 
         boolean[] overlaps = new boolean[n];
         int bestEnd = segs[idx[0]][1];

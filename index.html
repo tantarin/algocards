@@ -1041,14 +1041,14 @@ function initPeekCat(){
 initPeekCat();
 
 // Атмосфера: звёзды, луна и закат на весь экран
-const STARS_SKY=['⭐','🌟','✨','💫','🌠'];
+const STARS_SKY=['🌟','✨','💫'];
 const MOONS_SKY=['🌙','🌛','🌜'];
 
 function spawnStar(){
   const el=document.createElement('div');
   el.className='sky-star';
   el.textContent=STARS_SKY[Math.floor(Math.random()*STARS_SKY.length)];
-  const size=10+Math.floor(Math.random()*22);
+  const size=8+Math.floor(Math.random()*10);
   const left=2+Math.random()*96;
   const top=2+Math.random()*80;
   const twinkleDur=(1.4+Math.random()*1.8).toFixed(2);
@@ -1062,9 +1062,7 @@ function spawnMoon(){
   const el=document.createElement('div');
   el.className='sky-moon';
   el.textContent=MOONS_SKY[Math.floor(Math.random()*MOONS_SKY.length)];
-  const left=10+Math.random()*75;
-  const top=5+Math.random()*45;
-  el.style.cssText=`left:${left}%;top:${top}%;animation:moonAppear 13s ease-in-out forwards`;
+  el.style.cssText=`left:2%;top:3%;animation:moonAppear 13s ease-in-out forwards`;
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),13000);
 }

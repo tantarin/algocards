@@ -2564,25 +2564,24 @@ code:`class Solution {
         if (gene.length() < virus.length()) return false;
 
         // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
-        int[] freq = new int[26];
-        for (char c : virus.toCharArray())
-            freq[c - 'a']++;
+        int[] freq = new int[128];
+        for (char c : virus.toCharArray()) freq[c]++;
 
         int needCount = virus.length();  // сколько символов ещё нужно
         int windowSize = virus.length(); // фиксированный размер окна
 
         for (int right = 0; right < gene.length(); right++) {
-            int rightIdx = gene.charAt(right) - 'a';
+            char rightChar = gene.charAt(right);
 
             // Добавляем правый символ
-            if (freq[rightIdx] > 0) needCount--;
-            freq[rightIdx]--;
+            if (freq[rightChar] > 0) needCount--;
+            freq[rightChar]--;
 
             // Удаляем левый символ (когда окно полное)
             if (right >= windowSize) {
-                int leftIdx = gene.charAt(right - windowSize) - 'a';
-                freq[leftIdx]++;
-                if (freq[leftIdx] > 0) needCount++;
+                char leftChar = gene.charAt(right - windowSize);
+                freq[leftChar]++;
+                if (freq[leftChar] > 0) needCount++;
             }
 
             // Проверяем мутацию
@@ -2596,7 +2595,7 @@ steps:`1. freq по virus; needCount = |virus|; windowSize = |virus|.
 2. Скользящее окно по gene, корректируя freq и needCount.
 3. Если needCount = 0 — найдена мутация.`,
 complexity:`Время: O(|gene|), Память: O(1)`,
-complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив freq[26] — O(1) памяти.`,
+complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив freq[128] — O(1) памяти.`,
 expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, freq массив, счётчик needCount. O(n).`,repoSimilar:["sw1","sw3","sw8"]},
 
 {id:"sw10",t:"Инвестор в стране дураков",p:"Sliding Window",d:"средне",

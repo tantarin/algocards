@@ -65,6 +65,17 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .peek-cat.from-bottom.visible{transform:translateY(-40px)}
 .peek-cat-face{display:block;line-height:1}
 .peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
+.flower-container{position:fixed;bottom:0;pointer-events:none;z-index:50}
+.flower{display:flex;flex-direction:column;align-items:center;transform-origin:bottom center}
+.flower-head{font-size:28px;opacity:0;transform:scale(0) rotate(-30deg);animation:bloomFlower 1.5s ease-out forwards;animation-delay:var(--bloom-delay,1.5s)}
+.flower-stem{width:3px;background:linear-gradient(to top,#22c55e,#4ade80);border-radius:2px;height:0;animation:growStem 1.8s ease-out forwards}
+.flower-leaf{position:absolute;font-size:14px;opacity:0;animation:showLeaf .5s ease-out forwards}
+.flower-leaf.left{left:-12px;transform:scaleX(-1);animation-delay:var(--leaf-delay,0.8s)}
+.flower-leaf.right{right:-12px;animation-delay:var(--leaf-delay,1s)}
+@keyframes growStem{0%{height:0}100%{height:var(--stem-height,60px)}}
+@keyframes bloomFlower{0%{opacity:0;transform:scale(0) rotate(-30deg)}50%{opacity:1;transform:scale(1.2) rotate(10deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
+@keyframes showLeaf{0%{opacity:0;transform:scale(0)}100%{opacity:1;transform:scale(1)}}
+@keyframes swayFlower{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
 .mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
 .mascot-bird{animation:mascotBird 2.8s ease-in-out both}
 .mascot-butterfly{animation:mascotButterfly 3.2s linear both}
@@ -1032,6 +1043,41 @@ function initPeekCat(){
   },5000+Math.random()*10000);
 }
 initPeekCat();
+
+// Цветы растут и расцветают
+const FLOWERS=['🌸','🌺','🌻','🌷','🌹','💐','🌼','🏵️'];
+function spawnFlower(){
+  const container=document.createElement('div');
+  container.className='flower-container';
+  container.style.left=Math.random()*90+5+'%';
+
+  const stemHeight=50+Math.random()*40;
+  const flower=document.createElement('div');
+  flower.className='flower';
+  flower.innerHTML=`
+    <span class="flower-head" style="--bloom-delay:${1.2+Math.random()*0.5}s">${FLOWERS[Math.floor(Math.random()*FLOWERS.length)]}</span>
+    <div class="flower-stem" style="--stem-height:${stemHeight}px"></div>
+    <span class="flower-leaf left" style="--leaf-delay:${0.6+Math.random()*0.3}s">🌿</span>
+    <span class="flower-leaf right" style="--leaf-delay:${0.8+Math.random()*0.3}s">🌿</span>
+  `;
+  container.appendChild(flower);
+  document.body.appendChild(container);
+
+  // После анимации добавляем покачивание и потом удаляем
+  setTimeout(()=>{
+    flower.style.animation='swayFlower 3s ease-in-out infinite';
+  },2500);
+  setTimeout(()=>container.remove(),12000);
+}
+
+function initFlowers(){
+  // Первый цветок через 8-20 сек, потом каждые 20-40 сек
+  setTimeout(()=>{
+    spawnFlower();
+    setInterval(spawnFlower,20000+Math.random()*20000);
+  },8000+Math.random()*12000);
+}
+initFlowers();
 
 function setupSwipeNav(){
   if(editMode)return;

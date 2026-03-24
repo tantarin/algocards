@@ -2215,14 +2215,16 @@ code:`class Solution {
 
         for (int right = 0; right < s.length(); right++) {
             freq[s.charAt(right) - 'A']++;
-            maxFreq = Math.max(maxFreq, freq[s.charAt(right) - 'A']);
+            maxFreq = Math.max(maxFreq,
+                freq[s.charAt(right) - 'A']);
 
             while (right - left + 1 - maxFreq > k) {
                 freq[s.charAt(left) - 'A']--;
                 left++;
             }
 
-            result = Math.max(result, right - left + 1);
+            result = Math.max(result,
+                right - left + 1);
         }
 
         return result;
@@ -2339,9 +2341,11 @@ code:`class Solution {
         int result = 0;
 
         for (int right = 0; right < nums.length; right++) {
-            if (nums[right] == 0) zerosCount++;
+            if (nums[right] == 0) {
+                zerosCount++;
+            }
 
-            while (zerosCount > k) { //пропускаем все единицы слева пока не дойдем до нуля
+            while (zerosCount > k) {
                 if (nums[left] == 0) zerosCount--;
                 left++;
             }
@@ -2357,7 +2361,7 @@ steps:`1. Расширяем right, считаем нули.
 3. Максимум длины окна.`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два указателя: right проходит массив, left только увеличивается — O(n). Счётчики — O(1) памяти.`,
-expl:`Окно с не более чем k нулями. Расширяем right, при превышении нулей — сжимаем left. O(n) время, O(1) память.`,
+expl:`Выгоднее всего заменять символы, которые НЕ являются самыми частыми`,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
 diagram:{"type":"window","data":[1,0,1,1,0,1,1,0],"steps":[{"wl":0,"wr":0,"desc":"Начало: окно [0], нулей=0, k=2"},{"wl":0,"wr":1,"desc":"Расширяем → нулей=1"},{"wl":0,"wr":4,"desc":"Расширяем → нулей=2, ОК"},{"wl":0,"wr":6,"desc":"[1,0,1,1,0,1,1] длина=7"},{"wl":0,"wr":7,"desc":"Нулей=3 > k! Сжимаем"},{"wl":2,"wr":7,"desc":"Сжали → нулей=2. Ответ: 7"}]}},
 

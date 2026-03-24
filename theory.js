@@ -69,16 +69,25 @@ for (int right = 0; right < n; right++) {
   'SW + String': {
     icon: '🔤',
     title: 'Окно + частоты символов',
-    desc: 'Скользящее окно фиксированного размера с массивом частот для поиска анаграмм/подстрок.',
+    desc: `Скользящее окно с массивом частот для поиска анаграмм/подстрок.
+
+**Ключевая идея — знак need[c]:**
+• need[c] > 0 → символ нужен (был в t, ещё не покрыт)
+• need[c] = 0 → символ покрыт ровно
+• need[c] < 0 → символ лишний (не было в t, или взяли больше чем надо)
+
+Символы НЕ из t начинают с 0, поэтому при добавлении уходят в минус и **никогда не влияют на missing** (условие need[c] > 0 для них ложно).`,
     code: `public List<Integer> findAnagrams(String s, String t) {
     List<Integer> result = new ArrayList<>();
     if (s.length() < t.length()) return result;
 
     // ШАГ 1: ЧАСТОТНЫЙ МАССИВ
-    // need[char] = сколько раз символ нужен из t
+    // need[c] > 0  → символ НУЖЕН (из t, ещё не покрыт)
+    // need[c] = 0  → символ покрыт / не был в t
+    // need[c] < 0  → символ ЛИШНИЙ (взяли больше или не из t)
     int[] need = new int[128];
     for (char c : t.toCharArray()) {
-        need[c]++;
+        need[c]++;  // изначально need > 0 только для символов из t
     }
 
     // ШАГ 2: СЧЁТЧИКИ
@@ -90,14 +99,14 @@ for (int right = 0; right < n; right++) {
 
         // 3.1. Добавляем символ справа
         char rChar = s.charAt(i);
-        if (need[rChar] > 0) missing--;
-        need[rChar]--;
+        if (need[rChar] > 0) missing--;  // был нужен → теперь покрыт
+        need[rChar]--;  // уменьшаем (может уйти в минус = лишний)
 
         // 3.2. Удаляем символ слева (если окно полное)
         if (i >= windowLen) {
             char lChar = s.charAt(i - windowLen);
-            need[lChar]++;
-            if (need[lChar] > 0) missing++;
+            need[lChar]++;  // возвращаем символ
+            if (need[lChar] > 0) missing++;  // снова нужен
         }
 
         // 3.3. Проверяем анаграмму

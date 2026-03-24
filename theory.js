@@ -71,12 +71,14 @@ for (int right = 0; right < n; right++) {
     title: 'Окно + частоты символов',
     desc: `Скользящее окно с массивом частот для поиска анаграмм/подстрок.
 
-**Ключевая идея — знак need[c]:**
-• need[c] > 0 → символ нужен (был в t, ещё не покрыт)
-• need[c] = 0 → символ покрыт ровно
-• need[c] < 0 → символ лишний (не было в t, или взяли больше чем надо)
+<div style="background:rgba(124,58,237,0.15);border-left:3px solid #7c3aed;padding:10px 12px;border-radius:8px;margin:12px 0">
+<div style="color:#a78bfa;font-weight:600;margin-bottom:6px">💡 Ключевая идея — знак need[c]:</div>
+<div style="color:#c4b5fd">• need[c] > 0 → символ <b>нужен</b> (был в t, ещё не покрыт)</div>
+<div style="color:#c4b5fd">• need[c] = 0 → символ покрыт ровно</div>
+<div style="color:#c4b5fd">• need[c] < 0 → символ <b>лишний</b> (не было в t, или взяли больше)</div>
+</div>
 
-Символы НЕ из t начинают с 0, поэтому при добавлении уходят в минус и **никогда не влияют на missing** (условие need[c] > 0 для них ложно).`,
+Символы НЕ из t начинают с 0 → уходят в минус и <b style="color:#a78bfa">никогда не влияют на missing</b>.`,
     code: `public List<Integer> findAnagrams(String s, String t) {
     List<Integer> result = new ArrayList<>();
     if (s.length() < t.length()) return result;

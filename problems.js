@@ -1285,14 +1285,20 @@ desc:`Даны авиабилеты в виде пар [откуда, куда].
 hint:`Начальный город — тот, которого нет во множестве городов назначения. Далее следуем по цепочке через HashMap.`,
 code:`class Solution {
     public List<String> reconstructRoute(String[][] tickets) {
+        // Шаг 1: хранилище всех пунктов назначения
         Set<String> destinations = new HashSet<>();
+        
+        // Шаг 2: маппинг "откуда → куда"
         Map<String, String> mapping = new HashMap<>();
 
+        // Заполняем структуры
         for (String[] ticket : tickets) {
-            mapping.put(ticket[0], ticket[1]);
-            destinations.add(ticket[1]);
+            mapping.put(ticket[0], ticket[1]);  // откуда → куда
+            destinations.add(ticket[1]);        // запоминаем все пункты назначения
         }
 
+        // Шаг 3: находим стартовую точку
+        // Ищем город, который есть в "откуда", но НЕТ в "куда"
         String start = null;
         for (String[] ticket : tickets) {
             if (!destinations.contains(ticket[0])) {
@@ -1301,11 +1307,12 @@ code:`class Solution {
             }
         }
 
+        // Шаг 4: восстанавливаем маршрут
         List<String> route = new ArrayList<>();
         String current = start;
         while (current != null) {
             route.add(current);
-            current = mapping.get(current);
+            current = mapping.get(current);  // переходим к следующему городу
         }
 
         return route;

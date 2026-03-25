@@ -5751,6 +5751,125 @@ lcSimilar:[
   {"n":845,"t":"Longest Mountain in Array","h":"longest-mountain-in-array"}
 ]},
 
+{id:"tp28",t:"Product of Array Except Self",p:"Two Pointers",d:"средне",
+desc:`Дан массив nums. Вернуть массив result, где result[i] = ==произведение всех элементов кроме nums[i]==.
+Без деления, за O(n).
+
+Пример:
+Ввод: [1,2,3,4]
+Вывод: [24,12,8,6]`,
+hint:`Два прохода: накапливай prefix-произведение слева, потом suffix-произведение справа. Умножай на месте.`,
+code:`class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+
+        result[0] = 1;
+        for (int i = 1; i < n; i++) {
+            result[i] = result[i - 1] * nums[i - 1]; // prefix
+        }
+
+        int suffix = 1;
+        for (int i = n - 1; i >= 0; i--) {
+            result[i] *= suffix; // домножаем suffix справа
+            suffix *= nums[i];
+        }
+
+        return result;
+    }
+}`,
+steps:`1. Первый проход слева: result[i] = произведение всех элементов левее i.
+2. Второй проход справа: умножаем на произведение всех элементов правее i.
+3. O(1) доп. памяти — обновляем тот же массив.`,
+complexity:`Время: O(n), Память: O(1)`,
+complexityExpl:`Два прохода по массиву — O(n). result не считается доп. памятью (это ответ). Только переменная suffix — O(1).`,
+expl:`Для каждого i нужно произведение всего, кроме nums[i]. Делим задачу: prefix[i] = product(0..i-1), suffix[i] = product(i+1..n-1). Первый проход строит prefix в result[], второй — досчитывает suffix на ходу переменной suffix и умножает. Деление не нужно.`,
+lcSimilar:[
+  {"n":821,"t":"Shortest Distance to a Character","h":"shortest-distance-to-a-character"},
+  {"n":42,"t":"Trapping Rain Water","h":"trapping-rain-water"},
+  {"n":845,"t":"Longest Mountain in Array","h":"longest-mountain-in-array"}
+]},
+
+{id:"tp29",t:"Trapping Rain Water",p:"Two Pointers",d:"сложно",
+desc:`Дан массив высот столбиков. Посчитать ==сколько воды задерживается== после дождя.
+
+Пример:
+Ввод: [0,1,0,2,1,0,1,3,2,1,2,1]
+Вывод: 6`,
+hint:`Два указателя с краёв. Вода в позиции i = min(maxLeft, maxRight) − height[i]. Двигай тот указатель, где высота меньше.`,
+code:`class Solution {
+    public int trap(int[] height) {
+        int left = 0, right = height.length - 1;
+        int maxLeft = 0, maxRight = 0;
+        int water = 0;
+
+        while (left < right) {
+            if (height[left] <= height[right]) {
+                if (height[left] >= maxLeft) maxLeft = height[left];
+                else water += maxLeft - height[left];
+                left++;
+            } else {
+                if (height[right] >= maxRight) maxRight = height[right];
+                else water += maxRight - height[right];
+                right--;
+            }
+        }
+
+        return water;
+    }
+}`,
+steps:`1. Два указателя: left=0, right=n-1.
+2. Если height[left] ≤ height[right]: вода слева = maxLeft − height[left], двигай left++.
+3. Иначе: вода справа = maxRight − height[right], двигай right--.
+4. Обновляй maxLeft и maxRight по ходу.`,
+complexity:`Время: O(n), Память: O(1)`,
+complexityExpl:`Один проход двумя указателями — O(n). Только 4 переменные — O(1) памяти.`,
+expl:`Вода над позицией i ограничена min(maxLeft, maxRight) − height[i]. Два указателя: если левая стенка меньше — правая уже достаточно высока, считаем воду слева и двигаем left. Иначе — считаем справа и двигаем right.`,
+lcSimilar:[
+  {"n":821,"t":"Shortest Distance to a Character","h":"shortest-distance-to-a-character"},
+  {"n":238,"t":"Product of Array Except Self","h":"product-of-array-except-self"},
+  {"n":845,"t":"Longest Mountain in Array","h":"longest-mountain-in-array"}
+]},
+
+{id:"tp30",t:"Longest Mountain in Array",p:"Two Pointers",d:"средне",
+desc:`Найти длину ==самой длинной горы== в массиве. Гора: строго возрастает, затем строго убывает, длина ≥ 3.
+
+Пример:
+Ввод: [2,1,4,7,3,2,5]
+Вывод: 5 (подмассив [1,4,7,3,2])`,
+hint:`Два прохода: up[i] — длина подъёма до i, down[i] — длина спуска от i. Гора там, где up[i]>0 и down[i]>0.`,
+code:`class Solution {
+    public int longestMountain(int[] arr) {
+        int n = arr.length;
+        int[] up = new int[n];
+        int[] down = new int[n];
+
+        for (int i = 1; i < n; i++)
+            if (arr[i] > arr[i - 1]) up[i] = up[i - 1] + 1;
+
+        for (int i = n - 2; i >= 0; i--)
+            if (arr[i] > arr[i + 1]) down[i] = down[i + 1] + 1;
+
+        int result = 0;
+        for (int i = 0; i < n; i++)
+            if (up[i] > 0 && down[i] > 0)
+                result = Math.max(result, up[i] + down[i] + 1);
+
+        return result;
+    }
+}`,
+steps:`1. Проход слева: up[i] = длина строго возрастающей серии, заканчивающейся в i.
+2. Проход справа: down[i] = длина строго убывающей серии, начинающейся в i.
+3. Гора в i: up[i]>0 и down[i]>0, длина = up[i]+down[i]+1.`,
+complexity:`Время: O(n), Память: O(n)`,
+complexityExpl:`Три прохода по массиву — O(n). Два вспомогательных массива up[] и down[] — O(n) памяти.`,
+expl:`up[i] считает сколько шагов строго вверх завершается в i, down[i] — сколько шагов строго вниз начинается в i. Вершина горы — позиция, где оба > 0. Длина горы = up[i] + down[i] + 1 (сама вершина).`,
+lcSimilar:[
+  {"n":821,"t":"Shortest Distance to a Character","h":"shortest-distance-to-a-character"},
+  {"n":238,"t":"Product of Array Except Self","h":"product-of-array-except-self"},
+  {"n":42,"t":"Trapping Rain Water","h":"trapping-rain-water"}
+]},
+
 // ===== INTERVALS SWEEP =====
 {id:"iss6",t:"Missing Ranges",p:"Intervals Sweep",d:"легко",
 desc:`Дан отсортированный массив уникальных чисел и границы [lower, upper]. Найти все ==пропущенные диапазоны==.

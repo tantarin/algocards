@@ -1284,8 +1284,7 @@ desc:`Даны авиабилеты в виде пар [откуда, куда].
 Вывод: ["Vladivostok", "Moscow", "Yerevan"]`,
 hint:`Начальный город — тот, которого нет во множестве городов назначения. Далее следуем по цепочке через HashMap.`,
 code:`class Solution {
-    public List<String> reconstructRoute(
-            String[][] tickets) {
+    public List<String> reconstructRoute(String[][] tickets) {
         Set<String> destinations = new HashSet<>();
         Map<String, String> mapping = new HashMap<>();
 

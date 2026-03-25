@@ -1096,6 +1096,7 @@ function setupSwipeNav(){
     if(document.querySelector('#cardsArea textarea.solution-input'))return true;
     if(target.closest && target.closest('textarea.solution-input'))return true;
     if(target.closest && target.closest('button, a'))return true;
+    if(target.closest && target.closest('.code-wrap, pre, code, .solution-pre, .solution-editor'))return true;
     return false;
   }
 

@@ -32,10 +32,8 @@ code:`class Solution {
         return result;
     }
 
-    private void backtrack(int openCount, int closeCount,
-                           String currentString) {
-        if (openCount > pairCount || closeCount > pairCount
-            || openCount < closeCount) {
+    private void backtrack(int openCount, int closeCount, String currentString) {
+        if (openCount > pairCount || closeCount > pairCount || openCount < closeCount) {
             return;
         }
 
@@ -44,10 +42,8 @@ code:`class Solution {
             return;
         }
 
-        backtrack(openCount + 1, closeCount,
-                  currentString + "(");
-        backtrack(openCount, closeCount + 1,
-                  currentString + ")");
+        backtrack(openCount + 1, closeCount, currentString + "(");
+        backtrack(openCount, closeCount + 1, currentString + ")");
     }
 }`,
 steps:`1. Backtrack(open, close, текущая строка).

@@ -4387,9 +4387,8 @@ complexityExpl:`Для каждого числа сортируем d цифр O
 expl:`Для каждого числа сортируем его цифры — это ключ в HashMap. Числа с одинаковым ключом — анаграммы. O(n × d log d), где d — кол-во цифр.`},
 
 // ===== TWO POINTERS =====
-{id:"tp18",t:"Односторонняя разница",p:"Two Pointers",d:"легко",
-desc:`Дан ==отсортированный массив== и число k >= 0. Посчитать ==количество пар== (i, j), где i < j и nums[j] - nums[i] == k.
-ОТСОРТИРОВАННОСТЬ ДАЕТ МОНОТОННОСТЬ и благодаря этому можно использовать 2 указателя.
+{id:"tp18",t:"Односторонняя разница",p:"HashMap",d:"легко",
+desc:`Дан массив и число k >= 0. Посчитать ==количество пар== (i, j), где i < j и nums[j] - nums[i] == k.
 
 Пример:
 Ввод: nums = [1, 2, 3, 4, 5], k = 2
@@ -4397,143 +4396,29 @@ desc:`Дан ==отсортированный массив== и число k >= 
 
 Ввод: nums = [1, 1, 1], k = 0
 Вывод: 3`,
-hint:`Два указателя. Если разница < k — двигаем правый. Если > k — двигаем левый. Если == k — считаем.`,
+hint:`Кладём все числа в HashSet. Для k == 0 считаем дубликаты через второй set. Для k > 0 проверяем, есть ли num + k в set.`,
 code:`class Solution {
-    public int countPairsWithDiff(int[] nums, int k) {
-        int n = nums.length;
+    public int findPairs(int[] nums, int k) {
+        if (k < 0) return 0;
 
-        // Если меньше 2 элементов — пар быть не может
-        if (n < 2) return 0;
-
+        Set<Integer> set = new HashSet<>();
+        Set<Integer> counted = new HashSet<>();
         int count = 0;
-
-        // =========================
-        // СЛУЧАЙ k == 0
-        // =========================
-        // Нам нужно найти количество пар одинаковых элементов.
-        // Так как массив отсортирован, одинаковые значения идут подряд.
-        //
-        // Если подряд идет блок длины len,
-        // количество пар внутри него:
-        // len * (len - 1) / 2
-        //
-        // Пример: [1,1,1] → len = 3 → 3 пары
-        if (k == 0) {
-            int i = 0;
-
-            while (i < n) {
-                int j = i;
-
-                // Ищем конец блока одинаковых элементов nums[i]
-                while (j < n && nums[j] == nums[i]) {
-                    j++;
-                }
-
-                // Длина блока одинаковых значений
-                int len = j - i;
-
-                // Добавляем число пар внутри этого блока
-                count += len * (len - 1) / 2;
-
-                // Переходим к следующему блоку
-                i = j;
-            }
-
-            return count;
-        }
-
-        // =========================
-        // СЛУЧАЙ k > 0
-        // =========================
-        // Используем два указателя (two pointers)
-        //
-        // Инвариант:
-        // left < right
-        // массив отсортирован → nums[right] >= nums[left]
-        //
-        // diff = nums[right] - nums[left]
-        int left = 0;
-        int right = 1;
-
-        while (right < n) {
-
-            // Защита от ситуации, когда указатели совпали
-            if (left == right) {
-                right++;
-                continue;
-            }
-
-            int diff = nums[right] - nums[left];
-
-            if (diff < k) {
-                // Разница слишком маленькая → нужно увеличить diff
-                // так как массив отсортирован, увеличиваем right
-                right++;
-
-            } else if (diff > k) {
-                // Разница слишком большая → нужно уменьшить diff
-                // двигаем left вправо
-                left++;
-
-            } else {
-                // =========================
-                // diff == k → нашли подходящие значения
-                // =========================
-                //
-                // Но важно: могут быть дубликаты!
-                //
-                // Например:
-                // nums = [1,1,1,3,3]
-                // k = 2
-                //
-                // Тогда:
-                // 1 (x3) и 3 (x2)
-                // количество пар = 3 * 2 = 6
-
-                int leftVal = nums[left];
-                int rightVal = nums[right];
-
-                // Считаем, сколько одинаковых элементов подряд слева
-                int leftCount = 0;
-                while (left < n && nums[left] == leftVal) {
-                    left++;
-                    leftCount++;
-                }
-
-                // Считаем, сколько одинаковых элементов подряд справа
-                int rightCount = 0;
-                while (right < n && nums[right] == rightVal) {
-                    right++;
-                    rightCount++;
-                }
-
-                // Каждое значение слева можно сочетать
-                // с каждым значением справа
-                count += leftCount * rightCount;
-            }
-        }
-
-        return count;
-    }
-}`,
-code2:`class Solution {
-    public int countPairsWithDiff(int[] nums, int k) {
-        Map<Integer, Integer> freq = new HashMap<>();
 
         for (int num : nums) {
-            freq.merge(num, 1, Integer::sum);
+            if (k == 0) {
+                if (set.contains(num) && !counted.contains(num)) {
+                    count++;
+                    counted.add(num);
+                }
+            }
+            set.add(num);
         }
 
-        int count = 0;
-
-        if (k == 0) {
-            for (int f : freq.values()) {
-                count += f * (f - 1) / 2;
-            }
-        } else {
-            for (int x : freq.keySet()) {
-                if (freq.containsKey(x + k)) {
-                    count += freq.get(x) * freq.get(x + k);
+        if (k > 0) {
+            for (int num : set) {
+                if (set.contains(num + k)) {
+                    count++;
                 }
             }
         }
@@ -4541,14 +4426,12 @@ code2:`class Solution {
         return count;
     }
 }`,
-steps:`1.diff = nums[right] − nums[left].
-2. При diff = k — считаем блоки; < k — right++; > k — left++.`,
-complexity:`Время: O(n log n), Память: O(1)`,
-complexityExpl:`Итоговая сложность — O(n) по времени и O(1) по памяти.`,
-expl:`Так как массив уже отсортирован, использую два указателя.
-Для k > 0 сравниваю nums[right] - nums[left] и двигаю один из указателей, пока не найду нужную разность.
-При совпадении сразу считаю количество дубликатов слева и справа, чтобы учесть все пары.
-Для k == 0 отдельно считаю количество пар внутри каждого блока одинаковых чисел.`,
+steps:`1. k < 0 → return 0.
+2. k == 0: за один проход считаем дубликаты через counted.
+3. k > 0: для каждого num проверяем наличие num + k в set.`,
+complexity:`Время: O(n), Память: O(n)`,
+complexityExpl:`Один-два прохода по массиву — O(n). HashSet занимает O(n) памяти.`,
+expl:`Используем HashSet: для k == 0 ищем дубликаты (num уже есть в set и ещё не посчитан). Для k > 0 проверяем, есть ли num + k в set. Оба случая — O(n).`,
 lcSimilar:[{"t":"K-diff Pairs in an Array","h":"k-diff-pairs-in-an-array"},{"t":"Two Sum II - Input Array Is Sorted","h":"two-sum-ii-input-array-is-sorted"}]},
 
 {id:"tp19",t:"Подсчёт пар с разницей >= К",p:"Two Pointers",d:"средне",
@@ -4595,7 +4478,7 @@ complexity:`Время: O(n log n), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n), для каждого r бинпоиск O(log n) — O(n log n). Константная доп. память.`,
 expl:`Сортируем массив. Для каждого r бинарным поиском находим самый правый l, где nums[r] - nums[l] >= k. Все элементы от l до r-1 образуют подходящие пары. O(n log n).`},
 
-{id:"tp20",t:"Рост акций компании",p:"Two Pointers",d:"средне",
+{id:"tp20",t:"Рост акций компании",p:"Sliding Window",d:"средне",
 desc:`Дан массив цен акций по дням. Найти ==максимальную прибыль от одной покупки и одной продажи== (купить раньше, продать позже).
 
 Пример:
@@ -5819,7 +5702,7 @@ complexityExpl:`Один проход двумя указателями — O(n)
 expl:`Вода над позицией i ограничена min(maxLeft, maxRight) − height[i]. Два указателя: если левая стенка меньше — правая уже достаточно высока, считаем воду слева и двигаем left. Иначе — считаем справа и двигаем right.`,
 lcSimilar:[{"n":821,"t":"Shortest Distance to a Character","h":"shortest-distance-to-a-character"},{"n":238,"t":"Product of Array Except Self","h":"product-of-array-except-self"},{"n":845,"t":"Longest Mountain in Array","h":"longest-mountain-in-array"}]},
 
-{id:"tp30",t:"Longest Mountain in Array",p:"Two Pointers",d:"средне",
+{id:"tp30",t:"Longest Mountain in Array",p:"Dynamic Programming",d:"средне",
 desc:`Найти длину ==самой длинной горы== в массиве. Гора: строго возрастает, затем строго убывает, длина ≥ 3.
 
 Пример:

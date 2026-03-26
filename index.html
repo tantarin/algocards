@@ -1689,6 +1689,16 @@ function copyProblemBundle(btn){
     }).catch(()=>{btn.textContent='Error'});
     return;
   }
+  if(btn.classList.contains('solution-copy')){
+    const codeEl=btn.closest('.code-wrap').querySelector('pre code');
+    const text=codeEl?codeEl.textContent:'';
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+    }).catch(()=>{btn.textContent='Error'});
+    return;
+  }
   const num=P.indexOf(p)+1;
   const parts=['#'+num+' '+p.t,'','Условие:',p.desc||'','','Решение:',p.code||''];
   if(p.code2){
@@ -1792,7 +1802,9 @@ async function saveCard(){
         status.textContent='Неверный токен. Нажмите ✏️ чтобы обновить.';
         localStorage.removeItem('gh_token');
         editMode=false;
-        document.getElementById('editToggle').classList.remove('active');
+        const editToggle=document.getElementById('editToggle');
+        if(editToggle) editToggle.classList.remove('active');
+        renderCard(); // выходим из режима редактирования
         btn.disabled=false;
         return;
       }
@@ -1823,6 +1835,12 @@ async function saveCard(){
     status.style.color='var(--green)';
     status.textContent='✅ Запушено!';
     btn.disabled=false;
+
+    // После успешного пуша выходим из режима редактирования
+    editMode=false;
+    const editToggle=document.getElementById('editToggle');
+    if(editToggle) editToggle.classList.remove('active');
+    renderCard();
   }catch(e){
     status.style.color='var(--red)';
     status.textContent='❌ '+e.message;
@@ -1895,7 +1913,11 @@ async function saveTheory(){
         status.textContent='Неверный токен. Нажмите ✏️ чтобы обновить.';
         localStorage.removeItem('gh_token');
         editMode=false;
-        document.getElementById('editToggle').classList.remove('active');
+        const editToggle=document.getElementById('editToggle');
+        if(editToggle) editToggle.classList.remove('active');
+        theoryEditMode=false;
+        renderCard();
+        showTheory(pattern);
         btn.disabled=false;
         return;
       }
@@ -1925,6 +1947,10 @@ async function saveTheory(){
     status.style.color='var(--green)';
     status.textContent='✅ Запушено!';
     btn.disabled=false;
+
+    // После успешного пуша выходим из режима редактирования теории
+    theoryEditMode=false;
+    showTheory(pattern);
   }catch(e){
     status.style.color='var(--red)';
     status.textContent='❌ '+e.message;

@@ -1574,12 +1574,33 @@ const EDIT_FIELDS=[
   {key:'expl',label:'Объяснение алгоритма',rows:3}
 ];
 
+function lcSimilarToText(arr){
+  if(!Array.isArray(arr)||!arr.length)return '';
+  return arr.map(x=>(x.n?x.n+' ':'')+x.t).join('\n');
+}
+
+function textToLcSimilar(text){
+  return text.split('\n').map(line=>{
+    line=line.trim();
+    if(!line)return null;
+    const m=line.match(/^(\d+)\s+(.+)$/);
+    let n,t;
+    if(m){n=parseInt(m[1]);t=m[2].trim();}else{t=line;}
+    const h=t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    return n?{n,t,h}:{t,h};
+  }).filter(Boolean);
+}
+
 function renderEditCard(){
   const p=fcList[fcIdx];
   let fields=EDIT_FIELDS.map(f=>`
     <div class="edit-label">${f.label}</div>
     <textarea class="edit-field" data-key="${f.key}" rows="${f.rows||3}">${p[f.key]||''}</textarea>
   `).join('');
+  fields+=`
+    <div class="edit-label">LeetCode похожие (одна строка = «532 Two Sum II»)</div>
+    <textarea class="edit-field" data-key="lcSimilar" rows="4">${lcSimilarToText(p.lcSimilar)}</textarea>
+  `;
 
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter-row">
@@ -1779,7 +1800,11 @@ async function saveCard(){
   const status=document.getElementById('editStatus');
   
   document.querySelectorAll('.edit-field').forEach(el=>{
-    p[el.dataset.key]=el.value;
+    if(el.dataset.key==='lcSimilar'){
+      p.lcSimilar=textToLcSimilar(el.value);
+    }else{
+      p[el.dataset.key]=el.value;
+    }
   });
 
   btn.disabled=true;

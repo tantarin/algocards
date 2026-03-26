@@ -2222,20 +2222,28 @@ code:`class Solution {
         int maxFreq = 0;
         int left = 0;
         int result = 0;
-
+        
         for (int right = 0; right < s.length(); right++) {
-            freq[s.charAt(right) - 'A']++;
-            maxFreq = Math.max(maxFreq, freq[s.charAt(right) - 'A']);
-
-            int winLen  = right - left + 1;
-            while (winLen - maxFreq > k) {
+            // Расширяем окно вправо
+            char c = s.charAt(right);
+            freq[c - 'A']++;
+            maxFreq = Math.max(maxFreq, freq[c - 'A']);
+            
+            // Проверяем, нужно ли сужать окно
+            int windowLength = right - left + 1;
+            if (windowLength - maxFreq > k) {
+                // Сужаем окно слева
                 freq[s.charAt(left) - 'A']--;
                 left++;
+                // maxFreq может уменьшиться, но мы его не обновляем вниз
+                // Это оптимизация: если maxFreq был достигнут, он остаётся
+                // Актуальное значение не нужно, так как мы проверяем только windowLength - maxFreq > k
             }
-
-            result = Math.max(result, winLen);
+            
+            // Обновляем результат
+            result = Math.max(result, right - left + 1);
         }
-
+        
         return result;
     }
 }`,

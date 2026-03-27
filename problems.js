@@ -4785,9 +4785,9 @@ diagram:{"type":"tree","data":[1,2,3,4,5,null,6],"steps":[{"active":[0],"visited
 
 // ===== TREES / DFS =====
 {id:"tr7",t:"Same Tree",p:"Trees / DFS",d:"легко",
+p2:"Preorder",
 desc:`легко
 # Amazon, Google, Bloomberg, Яндекс
-# preorder
 
 Даны корни двух бинарных деревьев p и q. Проверить, являются ли они ==одинаковыми== (совпадают ==структура и все значения узлов==).
 

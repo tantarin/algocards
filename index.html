@@ -1571,7 +1571,8 @@ const EDIT_FIELDS=[
   {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
   {key:'complexity',label:'Сложность',rows:1},
   {key:'complexityExpl',label:'Объяснение сложности',rows:2},
-  {key:'expl',label:'Объяснение алгоритма',rows:3}
+  {key:'expl',label:'Объяснение алгоритма',rows:3},
+  {key:'p2',label:'Доп. тег (паттерн, опционально)',rows:1}
 ];
 
 function lcSimilarToText(arr){
@@ -1653,6 +1654,7 @@ function renderCard(){
       <div class="mascot-layer" id="mascotLayer"></div>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
+        ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
         <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
@@ -1672,6 +1674,7 @@ function renderCard(){
       </div>
       <div class="fc-face${fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
+        ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
         <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
         <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
@@ -1770,6 +1773,7 @@ function buildProblemsJs(){
     out+='complexity:`'+escVal(p.complexity)+'`,\n';
     out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
     out+='expl:`'+escVal(p.expl)+'`';
+    if(p.p2)out+=',\np2:"'+p.p2.replace(/"/g,'\\"')+'"';
     if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length)out+=',\nlcSimilar:'+JSON.stringify(p.lcSimilar);
     if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length)out+=',\nrepoSimilar:'+JSON.stringify(p.repoSimilar);
     // Иначе при пуше из редактора пропадают все diagram:{...} в problems.js

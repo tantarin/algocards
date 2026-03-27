@@ -28,6 +28,31 @@ const THEORY = {
     return result;
 }`
   },
+  'Preorder': {
+    icon: '🔢',
+    title: 'Preorder (обход в глубину)',
+    desc: 'Preorder: сначала обрабатываем текущий узел, затем левое поддерево, затем правое. Применяется когда нужно обработать узел до его детей — копирование дерева, сериализация, поиск путей.',
+    code: `void preorder(TreeNode node) {
+    if (node == null) return;
+
+    process(node);       // 1. Текущий узел
+    preorder(node.left); // 2. Левое поддерево
+    preorder(node.right);// 3. Правое поддерево
+}
+
+// Итеративно (через стек):
+void preorderIterative(TreeNode root) {
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    stack.push(root);
+    while (!stack.isEmpty()) {
+        TreeNode node = stack.pop();
+        if (node == null) continue;
+        process(node);
+        stack.push(node.right); // правое кладём первым
+        stack.push(node.left);  // левое обработается раньше
+    }
+}`
+  },
   'Trees / DFS': {
     icon: '🌲',
     title: 'DFS обход дерева',

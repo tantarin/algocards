@@ -1560,8 +1560,17 @@ function saveToken(){
 function getFiltered(){
   let list=activeFilter?P.filter(p=>p.p===activeFilter):[...P];
   if(searchQuery){
-    const q=searchQuery.toLowerCase();
-    list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p).toLowerCase().includes(q));
+    const q=searchQuery.toLowerCase().trim();
+    const lcNumMatch=q.match(/^(?:lc\s*)?(\d{2,5})$/);
+    if(lcNumMatch){
+      const num=parseInt(lcNumMatch[1]);
+      list=list.filter(p=>
+        (p.t&&p.t.includes('LC '+num+'.'))||
+        (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
+      );
+    }else{
+      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p).toLowerCase().includes(q));
+    }
   }
   return list;
 }

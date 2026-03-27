@@ -710,6 +710,74 @@ complexity:`Время: O(V + E), Память: O(V + E)`,
 complexityExpl:`Kahn: каждое ребро снимается один раз при уменьшении indegree — O(V+E). Граф, очередь и счётчики — O(V+E) памяти.`,
 expl:`Алгоритм Кана: считаем in-degree для каждой вершины, добавляем в очередь вершины с 0 входящих. Удаляем их, уменьшая in-degree соседей. Если не все вершины обработаны — граф содержит цикл. O(V+E).`},
 
+{id:"gts2",t:"Course Schedule",p:"Graph Toposort",d:"средне",
+desc:`средне
+# Amazon, Meta, Google
+
+Всего необходимо пройти numCourses курсов, обозначенных от 0 до numCourses - 1. Дан массив prerequisites, где prerequisites[i] = [ai, bi] означает: чтобы пройти курс ai, ==сначала нужно пройти курс bi==.
+
+Верните ==true, если можно закончить все курсы==. Иначе — false.
+
+Пример 1:
+Ввод: numCourses = 2, prerequisites = [[1, 0]]
+Вывод: true
+Пояснение: сначала курс 0, потом курс 1
+
+Пример 2:
+Ввод: numCourses = 2, prerequisites = [[1, 0], [0, 1]]
+Вывод: false
+Пояснение: цикл 0 → 1 → 0
+
+Ключевое наблюдение: если в графе зависимостей ==нет цикла==, то все курсы можно пройти.`,
+hint:`Алгоритм Кана: строим граф (prerequisite → course) и массив indegree. Кладём в очередь курсы с indegree = 0. Снимаем рёбра, уменьшаем indegree соседей. Если обработали все n курсов — цикла нет.`,
+steps:`1. Построить список смежности adj[] и массив indegree[].
+2. Для каждой пары [a, b]: adj[b].add(a), indegree[a]++.
+3. В очередь — все курсы с indegree == 0.
+4. BFS: берём курс, добавляем в ans, снимаем рёбра (indegree[next]--), если indegree[next] == 0 — в очередь.
+5. Если ans.size() == n — цикла нет, вернуть true.`,
+code:`class Solution {
+    public boolean canFinish(int n,
+                             int[][] prerequisites) {
+        List<Integer>[] adj = new List[n];
+        int[] indegree = new int[n];
+        List<Integer> ans = new ArrayList<>();
+
+        // 1. Строим граф
+        for (int[] pair : prerequisites) {
+            int course = pair[0];
+            int prereq  = pair[1];
+            if (adj[prereq] == null)
+                adj[prereq] = new ArrayList<>();
+            adj[prereq].add(course);
+            indegree[course]++;
+        }
+
+        // 2. Стартовые вершины (нет prerequisites)
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < n; i++)
+            if (indegree[i] == 0) queue.offer(i);
+
+        // 3. BFS (алгоритм Кана)
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+            ans.add(cur);
+            if (adj[cur] != null) {
+                for (int next : adj[cur]) {
+                    if (--indegree[next] == 0)
+                        queue.offer(next);
+                }
+            }
+        }
+
+        // 4. Если обработали все — цикла нет
+        return ans.size() == n;
+    }
+}`,
+complexity:`Время: O(V + E), Память: O(V + E)`,
+complexityExpl:`Каждая вершина и каждое ребро обрабатываются один раз. Граф, очередь и indegree — O(V+E) памяти.`,
+expl:`Задача сводится к поиску цикла в ориентированном графе. Алгоритм Кана: начинаем с курсов без prerequisites (indegree = 0), поочерёдно «снимаем» их и уменьшаем indegree соседей. Если удалось обработать все n курсов — цикла нет → true. Иначе — в графе есть цикл → false.`,
+lcSimilar:[{"n":207,"t":"Course Schedule","h":"course-schedule"}]},
+
 // ===== GREEDY =====
 {id:"gop1",t:"Best Time to Buy and Sell Stock II",p:"Greedy",d:"легко",
 desc:`Дан массив prices, где prices[i] — цена акции в день i.

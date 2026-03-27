@@ -692,7 +692,11 @@ function rebuildDailyList(){
     const pat=allPatterns[idx];
     pool=P.filter(p=>p.p===pat);
   }
-  fcList=pickDailyProblems(pool,k+'|'+(activeFilter||dailyMode),DAILY_LIMIT);
+  if(activeFilter){
+    fcList=pool;
+  }else{
+    fcList=pickDailyProblems(pool,k+'|'+dailyMode,DAILY_LIMIT);
+  }
 }
 
 function setDailyMode(mode){
@@ -705,8 +709,9 @@ function setDailyMode(mode){
 
 function isInTodaysDailyBatch(p){
   if(searchQuery)return false;
+  if(activeFilter)return getFiltered().some(x=>x.id===p.id);
   const list=getFiltered();
-  const k=todayLocalDateKey()+'|'+(activeFilter||'all');
+  const k=todayLocalDateKey()+'|all';
   const daily=pickDailyProblems(list,k,DAILY_LIMIT);
   return daily.some(x=>x.id===p.id);
 }
@@ -1658,7 +1663,7 @@ function renderCard(){
   const totalFiltered=getFiltered().length;
   let infoText=fcList.length+' задач';
   // Подсказка под заголовком: «на сегодня» только когда реально действует лимит DAILY_LIMIT
-  if(!searchQuery&&totalFiltered>DAILY_LIMIT)infoText+=' на сегодня';
+  if(!searchQuery&&!activeFilter&&totalFiltered>DAILY_LIMIT)infoText+=' на сегодня';
   else if(searchQuery)infoText+=' по поиску';
   document.getElementById('info').textContent=infoText;
   if(!fcList.length){document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';return;}

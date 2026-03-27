@@ -28,6 +28,33 @@ const THEORY = {
     return result;
 }`
   },
+  'BST Search Pattern': {
+    icon: '🔍',
+    title: 'BST Search Pattern',
+    desc: 'Поиск в BST: используем свойство дерева (левое < root < правое) чтобы спускаться в нужную сторону. На каждом шаге отбрасываем половину дерева — O(h) вместо O(n).',
+    code: `// Итеративный спуск по BST
+TreeNode node = root;
+while (node != null) {
+    if (target == node.val) {
+        return node; // нашли точное совпадение
+    } else if (target < node.val) {
+        node = node.left;  // ищем в левом поддереве
+    } else {
+        node = node.right; // ищем в правом поддереве
+    }
+}
+
+// Поиск ближайшего значения:
+int closest = root.val;
+while (node != null) {
+    if (Math.abs(node.val - target)
+            < Math.abs(closest - target)) {
+        closest = node.val;
+    }
+    node = target < node.val
+        ? node.left : node.right;
+}`
+  },
   'Preorder': {
     icon: '🔢',
     title: 'Preorder (обход в глубину)',

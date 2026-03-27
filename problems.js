@@ -5372,6 +5372,85 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один DFS по всем n узлам. HashMap хранит не более n масок. Битовые операции O(1) (маска 26 бит — int).`,
 expl:`Каждое поддерево кодируется 26-битной маской (OR масок детей + бит своей буквы). Маска = «набор уникальных букв». Храним первый встреченный узел с каждой маской в HashMap. При повторе — возвращаем пару. Ранний выход через Holder обрывает рекурсию.`},
 
+{id:"tr16",t:"Эквивалентные поддеревья максимального суммарного размера",p:"Trees / DFS",d:"сложно",
+desc:`Дан корень бинарного дерева, в каждой вершине которого записана одна буква A–Z.
+
+Найти **две вершины**, поддеревья которых содержат ==одинаковое множество букв== (без учёта частот) и при этом ==сумма количества вершин в этих двух поддеревьях максимальна==. Вернуть корни найденных поддеревьев.
+
+Пример 1:
+Ввод: root = [A,B,E,D,E,B,null,F,null,null,null,D,F]
+Вывод: [B, E] (или [E, B])
+
+Пример 2:
+Ввод: root = [A,A,A,A]
+Вывод: [A, A]
+Объяснение: одна вершина может находиться в поддереве другой
+
+Пример 3:
+Ввод: root = [A,B,C]
+Вывод: [null, null] — если ответ не найден
+
+Ограничения:
+- Число узлов >= 1
+- Высота дерева <= 1000`,
+hint:`DFS: для каждого узла считай ==битовую маску== букв и ==размер поддерева==. В \`Map<mask → (узел, размер)>\` храни ==наибольшее поддерево== с данной маской. При совпадении маски — проверь, не побита ли рекордная сумма размеров.`,
+steps:`1. DFS возвращает [mask, size] для каждого узла.
+2. mask = mask(left) | mask(right) | (1 << (val - 'A')).
+3. size = size(left) + size(right) + 1.
+4. Если mask уже в Map: считаем totalSize = size + other.size; если > resultSum — обновляем ответ.
+5. В Map кладём узел только если его size больше уже сохранённого (нужен максимум).
+6. Вернуть [null, null] если пар не нашли.`,
+code:`import java.util.*;
+
+public class Solution {
+    private Map<Integer,
+        AbstractMap.SimpleEntry<TreeNode, Integer>> best;
+    private List<TreeNode> result;
+    private int resultSum;
+
+    public List<TreeNode> findSubtrees(TreeNode root) {
+        best = new HashMap<>();
+        result = new ArrayList<>(Arrays.asList(null, null));
+        resultSum = -1;
+        dfs(root);
+        return result;
+    }
+
+    // Возвращает [mask, size]
+    private int[] dfs(TreeNode node) {
+        if (node == null) return new int[]{0, 0};
+
+        int[] left  = dfs(node.left);
+        int[] right = dfs(node.right);
+
+        int mask = left[0] | right[0]
+                   | (1 << (node.val - 'A'));
+        int size = left[1] + right[1] + 1;
+
+        if (best.containsKey(mask)) {
+            var other = best.get(mask);
+            int total = size + other.getValue();
+            if (total > resultSum) {
+                resultSum = total;
+                result.set(0, other.getKey());
+                result.set(1, node);
+            }
+        }
+
+        // Сохраняем наибольшее поддерево для данной маски
+        if (!best.containsKey(mask)
+                || size > best.get(mask).getValue()) {
+            best.put(mask,
+                new AbstractMap.SimpleEntry<>(node, size));
+        }
+
+        return new int[]{mask, size};
+    }
+}`,
+complexity:`Время: O(n), Память: O(n)`,
+complexityExpl:`Один DFS — O(n). HashMap хранит не более n масок. Битовые операции O(1).`,
+expl:`Каждое поддерево кодируется 26-битной маской. DFS считает маску и размер снизу вверх. В HashMap храним для каждой маски узел с наибольшим поддеревом — это гарантирует максимальную сумму при совпадении. При каждом совпадении масок обновляем ответ, если сумма больше. Итог: один проход O(n), без повторного обхода.`},
+
 // ===== HASHMAP =====
 {id:"hf8",t:"Count Pairs With Absolute Diff K",p:"HashMap",d:"легко",
 desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i < j и |nums[i] - nums[j]| == k.

@@ -32,6 +32,9 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 .shuffle-mini:focus{outline:none;box-shadow:0 0 0 2px rgba(124,58,237,.25)}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
 .filter-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
+.mode-toggle{display:flex;gap:4px;margin-bottom:8px}
+.mode-btn{flex:1;padding:7px 0;border-radius:10px;border:1px solid #ffffff15;background:var(--card2);color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;text-align:center}
+.mode-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
 #search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none;margin-bottom:8px}
 #search::placeholder{color:var(--dim)}
 #search:focus{border-color:var(--purple)}
@@ -513,6 +516,10 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 </div>
 <div class="subtitle" id="info"></div>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
+<div class="mode-toggle">
+  <button class="mode-btn active" id="modeMixed" onclick="setDailyMode('mixed')">🔀 14 разных тем</button>
+  <button class="mode-btn" id="modeTopic" onclick="setDailyMode('topic')">📚 14 одной темы</button>
+</div>
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>
 <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
@@ -673,11 +680,27 @@ function pickDailyProblems(list,seedStr,maxN){
   return idx.slice(0,n).map(i=>list[i]);
 }
 
-/** Заполняет fcList дневной порцией. Имеет смысл только при пустом поиске: тогда getFiltered() даёт все задачи или только выбранный паттерн. */
+/** Заполняет fcList дневной порцией. Имеет смысл только при пустом поиске. */
 function rebuildDailyList(){
   const k=todayLocalDateKey();
   dailyListDateKey=k;
-  fcList=pickDailyProblems(getFiltered(),k+'|'+(activeFilter||'all'),DAILY_LIMIT);
+  let pool=getFiltered();
+  // Режим «одна тема»: если фильтр не выбран — берём случайную тему дня
+  if(dailyMode==='topic'&&!activeFilter){
+    const rand=mulberry32(hashString(k+'|topic'));
+    const idx=Math.floor(rand()*allPatterns.length);
+    const pat=allPatterns[idx];
+    pool=P.filter(p=>p.p===pat);
+  }
+  fcList=pickDailyProblems(pool,k+'|'+(activeFilter||dailyMode),DAILY_LIMIT);
+}
+
+function setDailyMode(mode){
+  dailyMode=mode;
+  localStorage.setItem('dailyMode',mode);
+  document.getElementById('modeMixed').classList.toggle('active',mode==='mixed');
+  document.getElementById('modeTopic').classList.toggle('active',mode==='topic');
+  if(!searchQuery){rebuildDailyList();fcIdx=0;fcFlipped=false;renderCard();}
 }
 
 function isInTodaysDailyBatch(p){
@@ -1011,6 +1034,7 @@ const allPatterns=[...new Set(P.map(p=>p.p))].sort();
 let activeFilter=null;
 let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
+let dailyMode=localStorage.getItem('dailyMode')||'mixed'; // 'mixed' | 'topic'
 let editMode=false;
 let solutionInputOpen={}; // { [problemId]: {1:boolean,2:boolean} }
 let mascotTimer=null;
@@ -1988,6 +2012,9 @@ async function saveTheory(){
 }
 
 renderFilters();
+// Восстанавливаем состояние кнопок режима из localStorage
+document.getElementById('modeMixed').classList.toggle('active',dailyMode==='mixed');
+document.getElementById('modeTopic').classList.toggle('active',dailyMode==='topic');
 rebuildDailyList(); // старт: fcList = до 14 задач на сегодня (или все, если в наборе меньше)
 renderCard();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');

@@ -5296,6 +5296,82 @@ complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`DFS передаёт число по пути, суммирует на листьях — O(n). Стек — O(h) памяти.`,
 expl:`DFS: на каждом узле формируем число currentNum * 10 + val. На листе возвращаем число. Суммируем все пути. O(n) время, O(h) стек.`},
 
+{id:"tr15",t:"Эквивалентные поддеревья по множеству букв",p:"Trees / DFS",d:"средне",
+desc:`Дано бинарное дерево, в каждой вершине которого записана одна буква A–Z.
+
+Две вершины считаются **эквивалентными**, если поддеревья этих вершин содержат ==одинаковое множество букв== (без учёта частот).
+
+Найти любую пару эквивалентных вершин.
+
+Пример:
+\`\`\`
+        A
+       / \\
+      C   B
+     / \\ / \\
+    A  D A  D
+   /         \\
+  B            C
+\`\`\`
+
+Структура:
+\`\`\`java
+class TNode {
+    char value = '\\0'; // [A-Z]
+    TNode left = null;
+    TNode right = null;
+}
+\`\`\`
+
+Сигнатура:
+\`\`\`java
+Pair<TNode, TNode> findEquivalentSubtrees(TNode root)
+\`\`\``,
+hint:`Для каждой вершины посчитай ==битовую маску== букв в поддереве (26 бит, OR детей + бит текущей буквы). Если две вершины дали одинаковую маску — это ответ. Храни \`Map<Integer, TNode>\`.`,
+steps:`1. DFS: для каждого узла mask = mask(left) | mask(right) | (1 << (value - 'A')).
+2. Проверяем mask в HashMap: если уже есть — вернуть пару.
+3. Иначе кладём узел в map по mask.
+4. Ранний выход, если ответ найден.`,
+code:`import java.util.HashMap;
+import java.util.Map;
+
+public class Solution {
+
+    public Pair<TNode, TNode> findEquivalentSubtrees(TNode root) {
+        if (root == null) return null;
+        Map<Integer, TNode> seen = new HashMap<>();
+        Holder holder = new Holder();
+        dfsMask(root, seen, holder);
+        return holder.answer;
+    }
+
+    private int dfsMask(TNode node,
+                        Map<Integer, TNode> seen,
+                        Holder holder) {
+        if (node == null) return 0;
+
+        int left  = dfsMask(node.left,  seen, holder);
+        if (holder.answer != null) return 0;
+        int right = dfsMask(node.right, seen, holder);
+        if (holder.answer != null) return 0;
+
+        int mask = left | right | (1 << (node.value - 'A'));
+
+        TNode prev = seen.putIfAbsent(mask, node);
+        if (prev != null) {
+            holder.answer = new Pair<>(prev, node);
+        }
+        return mask;
+    }
+
+    private static class Holder {
+        Pair<TNode, TNode> answer = null;
+    }
+}`,
+complexity:`Время: O(n), Память: O(n)`,
+complexityExpl:`Один DFS по всем n узлам. HashMap хранит не более n масок. Битовые операции O(1) (маска 26 бит — int).`,
+expl:`Каждое поддерево кодируется 26-битной маской (OR масок детей + бит своей буквы). Маска = «набор уникальных букв». Храним первый встреченный узел с каждой маской в HashMap. При повторе — возвращаем пару. Ранний выход через Holder обрывает рекурсию.`},
+
 // ===== HASHMAP =====
 {id:"hf8",t:"Count Pairs With Absolute Diff K",p:"HashMap",d:"легко",
 desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i < j и |nums[i] - nums[j]| == k.

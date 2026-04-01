@@ -69,11 +69,18 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .peek-cat-face{display:block;line-height:1}
 .peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
 /* SVG бабочки */
-.butterfly-svg{position:fixed;pointer-events:none;z-index:50;will-change:offset-distance,opacity;animation:butterflyFly var(--dur,12s) ease-in-out forwards;offset-rotate:0deg}
+.butterfly-svg{position:fixed;pointer-events:none;z-index:50;animation:butterflyFly var(--dur,12s) ease-in-out forwards}
 .bfly-wl{transform-box:fill-box;transform-origin:100% 50%;animation:flapClose var(--flap,.28s) ease-in-out infinite alternate}
 .bfly-wr{transform-box:fill-box;transform-origin:0% 50%;animation:flapClose var(--flap,.28s) ease-in-out infinite alternate-reverse}
 @keyframes flapClose{from{transform:scaleX(1)}to{transform:scaleX(0.07)}}
-@keyframes butterflyFly{0%{offset-distance:0%;opacity:0}8%{opacity:.82}88%{opacity:.82}100%{offset-distance:100%;opacity:0}}
+@keyframes butterflyFly{
+  0%{transform:translate(0px,0px);opacity:0}
+  8%{opacity:.82}
+  38%{transform:translate(var(--tx1),var(--ty1))}
+  72%{transform:translate(var(--tx2),var(--ty2))}
+  90%{opacity:.82}
+  100%{transform:translate(var(--tx3),var(--ty3));opacity:0}
+}
 @media(prefers-reduced-motion:reduce){.butterfly-svg{display:none !important}}
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
 .code-wrap:has(.solution-editor),.code-wrap:has(.solution-pre){animation:codeBreathe 6s ease-in-out infinite}
@@ -1031,10 +1038,9 @@ function spawnButterfly(){
   else if(edge===1){x0=vw+50;y0=Math.random()*vh;}
   else if(edge===2){x0=Math.random()*vw;y0=vh+50;}
   else{x0=-50;y0=Math.random()*vh;}
-  const x1=vw*0.1+Math.random()*vw*0.8;
-  const y1=vh*0.1+Math.random()*vh*0.8;
-  const cp1x=Math.random()*vw,cp1y=Math.random()*vh;
-  const cp2x=Math.random()*vw,cp2y=Math.random()*vh;
+  const p1x=vw*(0.15+Math.random()*0.7), p1y=vh*(0.1+Math.random()*0.8);
+  const p2x=vw*(0.15+Math.random()*0.7), p2y=vh*(0.1+Math.random()*0.8);
+  const p3x=vw*(0.1+Math.random()*0.8),  p3y=vh*(0.1+Math.random()*0.8);
   const size=26+Math.random()*18;
   const dur=10+Math.random()*8;
   const flap=(0.22+Math.random()*0.14).toFixed(2);
@@ -1045,7 +1051,16 @@ function spawnButterfly(){
   svg.setAttribute('width',size);
   svg.setAttribute('height',(size*0.73).toFixed(1));
   svg.classList.add('butterfly-svg');
-  svg.style.cssText=`--dur:${dur}s;--flap:${flap}s;offset-path:path('M ${x0.toFixed(1)} ${y0.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)},${cp2x.toFixed(1)} ${cp2y.toFixed(1)},${x1.toFixed(1)} ${y1.toFixed(1)}')`;
+  svg.style.left=x0.toFixed(0)+'px';
+  svg.style.top=y0.toFixed(0)+'px';
+  svg.style.setProperty('--dur',dur+'s');
+  svg.style.setProperty('--flap',flap+'s');
+  svg.style.setProperty('--tx1',(p1x-x0).toFixed(0)+'px');
+  svg.style.setProperty('--ty1',(p1y-y0).toFixed(0)+'px');
+  svg.style.setProperty('--tx2',(p2x-x0).toFixed(0)+'px');
+  svg.style.setProperty('--ty2',(p2y-y0).toFixed(0)+'px');
+  svg.style.setProperty('--tx3',(p3x-x0).toFixed(0)+'px');
+  svg.style.setProperty('--ty3',(p3y-y0).toFixed(0)+'px');
   function grad(id,cx){
     const g=document.createElementNS(N,'radialGradient');
     g.id=id;g.setAttribute('cx',cx);g.setAttribute('cy','35%');g.setAttribute('r','65%');

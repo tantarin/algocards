@@ -2174,7 +2174,8 @@ steps:`1. HashMap: префиксная сумма → количество; {0:
 3. Увеличиваем count для currentSum.`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход: обновляем currentSum и проверяем HashMap за O(1) в среднем — O(n). Карта до n различных сумм — O(n) памяти.`,
-expl:`O(n) время, O(n) память. Один проход: для каждой позиции ищем (currentSum - k) в HashMap. Если найдено — столько подмассивов оканчиваются здесь с суммой k.`},
+expl:`O(n) время, O(n) память. Один проход: для каждой позиции ищем (currentSum - k) в HashMap. Если найдено — столько подмассивов оканчиваются здесь с суммой k.`,
+repoSimilar:["ps2","ps4"]},
 
 {id:"ps2",t:"Последовательность с суммой K",p:"Prefix Sum",d:"легко",
 desc:`легко
@@ -2228,7 +2229,67 @@ steps:`1. HashMap: префиксная сумма → индекс первог
 3. putIfAbsent для текущей суммы.`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Линейный проход с currentSum и проверкой HashMap — O(n). Карта «сумма → индекс» до O(n) записей.`,
-expl:`Префиксная сумма + HashMap (сумма → первый индекс). При нахождении (currentSum - k) в карте — подмассив найден, возвращаем текущий индекс. O(n).`},
+expl:`Префиксная сумма + HashMap (сумма → первый индекс). При нахождении (currentSum - k) в карте — подмассив найден, возвращаем текущий индекс. O(n).`,
+repoSimilar:["ps1","ps4"]},
+
+{id:"ps4",t:"Последовательность с суммой K — диапазон индексов",p:"Prefix Sum",d:"средне",
+desc:`средне
+# new
+# островок
+# яндекс
+
+Дан неотсортированный массив nums целых чисел и число k. Необходимо найти ==непрерывный подмассив==, сумма элементов которого равна k.
+
+Нужно вернуть список из двух элементов — ==индексы начала и конца== любого подходящего подмассива (включительно). Если такого подмассива не существует, вернуть [−1, −1].
+
+Пример 1:
+Ввод: nums = [9, −6, 5, 3, 2, 7], k = 10
+Вывод: [2, 4]
+Объяснение: подмассив [5, 3, 2] с индексами 2…4, сумма 10.
+
+Пример 2:
+Ввод: nums = [1, 2, 3], k = 7
+Вывод: [−1, −1]
+
+Пример 3:
+Ввод: nums = [1, 2, 5, 7], k = 7
+Вывод: [1, 2]
+Объяснение: подходят [2, 5] (индексы 1–2) и [7] (3–3); допустим любой вариант.
+
+Ограничения:
+len(nums) ≥ 1`,
+hint:`Префиксная сумма + HashMap: если currentSum − k уже в карте, подмассив с началом (индекс после сохранённой позиции) и концом в текущем idx. putIfAbsent — берём самое раннее начало.`,
+code:`import java.util.*;
+
+class Solution {
+    public List<Integer> subsequenceSumK(
+            List<Integer> nums, int k) {
+        Map<Integer, Integer> prefixIndex =
+            new HashMap<>();
+        prefixIndex.put(0, -1);
+        int prefixSum = 0;
+
+        for (int idx = 0; idx < nums.size(); idx++) {
+            prefixSum += nums.get(idx);
+            int diff = prefixSum - k;
+            if (prefixIndex.containsKey(diff)) {
+                return Arrays.asList(
+                    prefixIndex.get(diff) + 1, idx);
+            }
+            prefixIndex.putIfAbsent(prefixSum, idx);
+        }
+        return Arrays.asList(-1, -1);
+    }
+}`,
+steps:`1. Карта «префиксная сумма → индекс конца префикса»; {0: −1}.
+2. prefixSum += nums[idx]; если (prefixSum − k) в карте — ответ [prefixIndex(diff)+1, idx].
+3. putIfAbsent(prefixSum, idx) — только первое вхождение суммы.
+4. Не нашли — [−1, −1].`,
+complexity:`Время: O(n), Память: O(n)`,
+complexityExpl:`Один проход с обновлением prefixSum и проверкой HashMap — O(n) в среднем. Карта хранит до O(n) различных префиксных сумм — O(n) памяти.`,
+expl:`Сумма nums[l..r] = prefix[r] − prefix[l−1]. Ищем в карте prefix[r]−k = префикс до l−1. Индекс начала: сохранённый индекс + 1. putIfAbsent даёт самое раннее начало при нескольких вариантах. O(n) время и память.`,
+lcSimilar:[{"t":"Subarray Sum Equals K","h":"subarray-sum-equals-k"}],
+repoSimilar:["ps1","ps2"]},
 
 // ===== PREFIX SUM EXT. =====
 {id:"pse1",t:"Произведение кроме себя",p:"Prefix Sum Ext.",d:"легко",
@@ -4434,6 +4495,7 @@ complexity:`Время: O(log(n−k) + k), Память: O(k)`,
 complexityExpl:`Бинарный поиск по [0, n−k] — O(log(n−k)), затем копируем k элементов. Список из k элементов — O(k) памяти.`,
 expl:`Бинарный поиск левой границы окна размером k. Если расстояние до arr[mid] больше, чем до arr[mid+k], сдвигаем окно вправо. O(log(n-k) + k).`,
 lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{"t":"Valid Parentheses","h":"valid-parentheses"}],
+repoSimilar:["tp16","tp54"],
 diagram:{"type":"bsearch","data":[1,2,3,4,5],"steps":[{"l":0,"r":1,"m":0,"desc":"k=4, x=3. Ищем начало окна"},{"l":0,"r":0,"m":0,"desc":"|3-1|=2 vs |5-3|=2 → right=mid"},{"l":0,"r":0,"m":0,"found":0,"desc":"Окно [1,2,3,4] ✓"}]}},
 
 {id:"tp16",t:"К ближайших чисел",p:"Two Pointers",d:"средне",
@@ -4485,7 +4547,8 @@ steps:`1. Бинпоиск позиции ≥ target.
 3. k раз берём элемент с меньшим |arr−target|.`,
 complexity:`Время: O(log n + k), Память: O(k)`,
 complexityExpl:`binarySearch O(log n), затем k шагов выбора ближайшего — O(k). Список из k чисел — O(k) памяти.`,
-expl:`Бинарный поиск позиции ближайшей к target. Два указателя расходятся от этой позиции: выбираем ближайший из arr[left] и arr[right]. O(log n + k).`},
+expl:`Бинарный поиск позиции ближайшей к target. Два указателя расходятся от этой позиции: выбираем ближайший из arr[left] и arr[right]. O(log n + k).`,
+repoSimilar:["tp15","tp54"]},
 
 {id:"tp17",t:"Минимальная разность",p:"Two Pointers",d:"легко",
 desc:`Даны два ==отсортированных массива==. Найти ==минимальную абсолютную разность== между элементами из разных массивов.
@@ -6794,6 +6857,69 @@ complexity:`Время: O(n+m), Память: O(1) доп.`,
 complexityExpl:`Каждый указатель движется только вперёд — суммарно O(n+m) шагов. Результирующий список не считается за доп. память.`,
 expl:`Два указателя по двум отсортированным массивам. Меньший элемент nums1 не встречается в nums2 — берём его. Равные — пропускаем (есть в обоих). Больший p2 — сдвигаем. O(n+m) время.`,
 lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
+
+{id:"tp54",t:"К ближайших чисел (якорь idx)",p:"Two Pointers",d:"легко",
+desc:`легко
+# решено
+# вк
+# островок
+# яндекс
+
+Дан массив nums, отсортированный в ==неубывающем порядке==, индекс idx и число k. Нужно найти ==k ближайших к значению nums[idx]== чисел в массиве и вернуть в любом порядке. При равных расстояниях предпочтение отдаётся ==меньшим числам==.
+
+Пример 1:
+Ввод: nums = [2,5,5,5,8], idx = 2, k = 4
+Вывод: [2,5,5,5]
+Объяснение: ответ [2,5,5,5], а не [5,5,5,8], потому что 2 < 8 при |8−5| = |2−5|.
+
+Пример 2:
+Ввод: nums = [−100,1,2,5,8,9], idx = 4, k = 2
+Вывод: [8,9]
+
+Ограничения:
+len(nums) ≥ 1
+0 ≤ idx < len(nums)
+k ≥ 0
+
+Ожидается, что ответ — новый список, а не модификация nums и не слайс от исходного списка.`,
+hint:`Стартуем с nums[idx]. Два указателя l = idx−1 и r = idx+1. На каждом шаге сравниваем расстояния до nums[l] и nums[r]; при равенстве берём слева (меньшее значение).`,
+code:`import java.util.*;
+
+class Solution {
+    public List<Integer> findNearestNumbers(
+            List<Integer> nums, int idx, int k) {
+        if (k == 0) {
+            return new ArrayList<>();
+        }
+        List<Integer> result = new ArrayList<>();
+        result.add(nums.get(idx));
+        int l = idx - 1;
+        int r = idx + 1;
+        int ref = nums.get(idx);
+
+        for (int i = 0; i < k - 1; i++) {
+            if (r >= nums.size()
+                    || (l >= 0 && Math.abs(ref - nums.get(l))
+                        <= Math.abs(ref - nums.get(r)))) {
+                result.add(nums.get(l));
+                l--;
+            } else {
+                result.add(nums.get(r));
+                r++;
+            }
+        }
+        return result;
+    }
+}`,
+steps:`1. В результат кладём nums[idx]; l = idx−1, r = idx+1.
+2. k−1 раз: если справа некуда или слева ближе/ровно — берём nums[l], l−−.
+3. Иначе берём nums[r], r++.
+4. При k = 0 вернуть пустой список.`,
+complexity:`Время: O(k), Память: O(k)`,
+complexityExpl:`Ровно k−1 итераций расширения от центра, на шаг константная работа — O(k). Новый список длины k — O(k) памяти.`,
+expl:`Массив отсортирован, опорное значение ref = nums[idx]. Разносим указатели влево и вправо как у слияния: всегда добавляем конец с меньшим расстоянием до ref; при равенстве — левый (меньший элемент). O(k) время и память.`,
+lcSimilar:[{"t":"Find K Closest Elements","h":"find-k-closest-elements"}],
+repoSimilar:["tp16","tp15"]},
 
 // ===== INTERVALS SWEEP =====
 {id:"iss6",t:"Missing Ranges",p:"Intervals Sweep",d:"легко",

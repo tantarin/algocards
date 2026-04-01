@@ -6748,6 +6748,53 @@ complexityExpl:`Один проход по обеим строкам — O(n+m).
 expl:`Два указателя на две строки. Поочерёдный выбор символов, затем дописываем хвост. O(n+m) время и память.`,
 lcSimilar:[{"n":392,"t":"Is Subsequence","h":"is-subsequence"}]},
 
+{id:"tp53",t:"LC 2215. Find the Difference of Two Arrays",p:"Two Pointers",d:"легко",
+desc:`Даны два отсортированных массива nums1 и nums2. Вернуть все ==уникальные элементы nums1, которых нет в nums2==, в порядке неубывания.
+
+Пример 1:
+nums1 = [1, 2, 3], nums2 = [2, 4, 6]
+// Результат: [1, 3]
+
+Пример 2:
+nums1 = [1, 2, 3, 3], nums2 = [1, 1, 2, 2]
+// Результат: [3]`,
+hint:`Два указателя p1 и p2. Если nums1[p1] < nums2[p2] — элемент только в nums1, добавить. Если равны или nums1[p1] > — сдвинуть нужный указатель. Дубли в nums1 пропускать.`,
+code:`import java.util.*;
+
+class Solution {
+    public List<Integer> findDifference(List<Integer> nums1, List<Integer> nums2) {
+        List<Integer> result = new ArrayList<>();
+        int p1 = 0, p2 = 0;
+
+        while (p1 < nums1.size()) {
+            if (p2 >= nums2.size()) {
+                result.add(nums1.get(p1++));
+                continue;
+            }
+
+            if (nums1.get(p1) < nums2.get(p2)) {
+                result.add(nums1.get(p1++));
+            } else if (nums1.get(p1) > nums2.get(p2)) {
+                p2++;
+            } else {
+                p1++; // равны — пропустить дубль из nums1
+            }
+        }
+        return result;
+    }
+}`,
+steps:`1. p1=0 (nums1), p2=0 (nums2).
+2. Пока p1 < nums1.size():
+   — если nums2 закончился → добавить nums1[p1], p1++
+   — nums1[p1] < nums2[p2] → добавить nums1[p1], p1++
+   — nums1[p1] > nums2[p2] → p2++ (догнать)
+   — nums1[p1] == nums2[p2] → p1++ (пропустить, есть в обоих)
+3. Вернуть result.`,
+complexity:`Время: O(n+m), Память: O(1) доп.`,
+complexityExpl:`Каждый указатель движется только вперёд — суммарно O(n+m) шагов. Результирующий список не считается за доп. память.`,
+expl:`Два указателя по двум отсортированным массивам. Меньший элемент nums1 не встречается в nums2 — берём его. Равные — пропускаем (есть в обоих). Больший p2 — сдвигаем. O(n+m) время.`,
+lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
+
 // ===== INTERVALS SWEEP =====
 {id:"iss6",t:"Missing Ranges",p:"Intervals Sweep",d:"легко",
 desc:`Дан отсортированный массив уникальных чисел и границы [lower, upper]. Найти все ==пропущенные диапазоны==.

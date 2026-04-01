@@ -1544,7 +1544,7 @@ function renderCard(){
         <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
-          <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <button class="copy-btn copy-problem-desc" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <div class="desc-copy-body" style="white-space:pre-wrap;font-size:14px;line-height:1.6;padding-top:32px">${esc(p.desc)}</div>
         </div>
         <div class="spoiler-row">
@@ -1603,6 +1603,15 @@ function copyProblemBundle(btn){
   if(btn.classList.contains('solution-copy')){
     const codeEl=btn.closest('.code-wrap').querySelector('pre code');
     const text=codeEl?codeEl.textContent:'';
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+    }).catch(()=>{btn.textContent='Error'});
+    return;
+  }
+  if(btn.classList.contains('copy-problem-desc')){
+    const text=(p.desc||'').trim();
     navigator.clipboard.writeText(text).then(()=>{
       btn.textContent='Copied ✓';
       btn.classList.add('copied');

@@ -68,74 +68,13 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .peek-cat.from-bottom.visible{transform:translateY(-40px)}
 .peek-cat-face{display:block;line-height:1}
 .peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
-.fish{position:fixed;pointer-events:none;z-index:50;font-size:var(--fish-size,28px);opacity:0;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2))}
-@keyframes fishSwimLR{0%{opacity:0;transform:translateX(0) translateY(0) scaleX(1)}8%{opacity:1}50%{transform:translateX(var(--swim-x,40vw)) translateY(var(--swim-y,0px)) scaleX(1)}100%{opacity:0;transform:translateX(var(--swim-x2,80vw)) translateY(var(--swim-y2,20px)) scaleX(1)}}
-@keyframes fishSwimRL{0%{opacity:0;transform:translateX(0) translateY(0) scaleX(-1)}8%{opacity:1}50%{transform:translateX(var(--swim-x,-40vw)) translateY(var(--swim-y,0px)) scaleX(-1)}100%{opacity:0;transform:translateX(var(--swim-x2,-80vw)) translateY(var(--swim-y2,20px)) scaleX(-1)}}
-@keyframes fishBob{0%,100%{margin-top:0}50%{margin-top:var(--bob,6px)}}
-.mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
-.mascot-bird{animation:mascotBird 2.8s ease-in-out both}
-.mascot-butterfly{animation:mascotButterfly 3.2s linear both}
-.mascot-cat{animation:mascotCat 3.6s ease-in-out both}
-
-@keyframes mascotBird{
-  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75) rotate(-8deg)}
-  10%{opacity:1}
-  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1.15) rotate(10deg)}
-}
-@keyframes mascotButterfly{
-  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.70) rotate(0deg)}
-  10%{opacity:1}
-  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1.20) rotate(12deg)}
-}
-@keyframes mascotCat{
-  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75)}
-  12%{opacity:1}
-  30%{transform:translate(calc(var(--x) + var(--dx)),var(--y)) scale(1.25)}
-  60%{transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(1.05)}
-  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.95)}
-}
-
-/* Интерактив 5: "пузырьки" во время ввода решения */
-.typing-bubble{
-  position:absolute;
-  left:0;
-  top:0;
-  pointer-events:none;
-  user-select:none;
-  will-change:transform,opacity;
-  opacity:.95;
-  font-size:18px;
-  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
-  animation:bubbleRise 1200ms ease-out both;
-}
-@keyframes bubbleRise{
-  0%{opacity:0;transform:translate(0,0) scale(.8)}
-  12%{opacity:1}
-  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}
-}
-
-/* Интерактив 6: "вылетающие" эмодзи при переключении карточки */
-.fly-marker{
-  position:absolute;
-  left:0;
-  top:0;
-  pointer-events:none;
-  user-select:none;
-  will-change:transform,opacity;
-  opacity:0;
-  font-size:22px;
-  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
-  animation:flyMarker 850ms ease-out both;
-}
-@keyframes flyMarker{
-  0%{opacity:0;transform:translate(0,0) scale(.75) rotate(0deg)}
-  12%{opacity:1}
-  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(var(--rot))}
-}
-
-@media (prefers-reduced-motion: reduce){
-  .typing-bubble,.fly-marker{display:none !important}
-}
+/* SVG бабочки */
+.butterfly-svg{position:fixed;pointer-events:none;z-index:50;will-change:offset-distance,opacity;animation:butterflyFly var(--dur,12s) ease-in-out forwards;offset-rotate:0deg}
+.bfly-wl{transform-box:fill-box;transform-origin:100% 50%;animation:flapClose var(--flap,.28s) ease-in-out infinite alternate}
+.bfly-wr{transform-box:fill-box;transform-origin:0% 50%;animation:flapClose var(--flap,.28s) ease-in-out infinite alternate-reverse}
+@keyframes flapClose{from{transform:scaleX(1)}to{transform:scaleX(0.07)}}
+@keyframes butterflyFly{0%{offset-distance:0%;opacity:0}8%{opacity:.82}88%{opacity:.82}100%{offset-distance:100%;opacity:0}}
+@media(prefers-reduced-motion:reduce){.butterfly-svg{display:none !important}}
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
 .code-wrap:has(.solution-editor),.code-wrap:has(.solution-pre){animation:codeBreathe 6s ease-in-out infinite}
 @keyframes codeBreathe{0%,100%{box-shadow:0 0 15px rgba(124,58,237,0.2)}50%{box-shadow:0 0 25px rgba(124,58,237,0.4),0 0 40px rgba(236,72,153,0.2)}}
@@ -1073,41 +1012,94 @@ function initPeekCat(){
 }
 initPeekCat();
 
-// Плавающие рыбки по всему экрану
-const FISH_EMOJIS=['🐠','🐟','🐡','🦈','🐙','🦑','🐬','🐳','🦐','🦞'];
+// SVG бабочки
+const BF_PALETTES=[
+  {w1:'#c084fc',w2:'#7c3aed',body:'#4c1d95'},
+  {w1:'#f9a8d4',w2:'#ec4899',body:'#831843'},
+  {w1:'#fcd34d',w2:'#f59e0b',body:'#92400e'},
+  {w1:'#6ee7b7',w2:'#059669',body:'#064e3b'},
+  {w1:'#93c5fd',w2:'#3b82f6',body:'#1e3a8a'},
+  {w1:'#fca5a5',w2:'#ef4444',body:'#7f1d1d'},
+];
 
-function spawnFish(){
-  const el=document.createElement('div');
-  el.className='fish';
-  el.textContent=FISH_EMOJIS[Math.floor(Math.random()*FISH_EMOJIS.length)];
-  const size=20+Math.floor(Math.random()*22);
-  const top=5+Math.random()*88;
-  const dur=(7+Math.random()*7).toFixed(1);
-  const bob=(4+Math.random()*8).toFixed(0);
-  const dy1=((Math.random()-0.5)*60).toFixed(0);
-  const dy2=((Math.random()-0.5)*80).toFixed(0);
-  const goRight=Math.random()<0.5;
-  if(goRight){
-    const startLeft=-(size+10);
-    el.style.cssText=`--fish-size:${size}px;--swim-x:45vw;--swim-y:${dy1}px;--swim-x2:105vw;--swim-y2:${dy2}px;--bob:${bob}px;left:${startLeft}px;top:${top}%;animation:fishSwimLR ${dur}s ease-in-out forwards,fishBob ${(2+Math.random()*1.5).toFixed(1)}s ease-in-out infinite`;
-  } else {
-    const startRight=-(size+10);
-    el.style.cssText=`--fish-size:${size}px;--swim-x:-45vw;--swim-y:${dy1}px;--swim-x2:-105vw;--swim-y2:${dy2}px;--bob:${bob}px;right:${startRight}px;top:${top}%;animation:fishSwimRL ${dur}s ease-in-out forwards,fishBob ${(2+Math.random()*1.5).toFixed(1)}s ease-in-out infinite`;
+function spawnButterfly(){
+  const pal=BF_PALETTES[Math.floor(Math.random()*BF_PALETTES.length)];
+  const vw=window.innerWidth,vh=window.innerHeight;
+  const edge=Math.floor(Math.random()*4);
+  let x0,y0;
+  if(edge===0){x0=Math.random()*vw;y0=-50;}
+  else if(edge===1){x0=vw+50;y0=Math.random()*vh;}
+  else if(edge===2){x0=Math.random()*vw;y0=vh+50;}
+  else{x0=-50;y0=Math.random()*vh;}
+  const x1=vw*0.1+Math.random()*vw*0.8;
+  const y1=vh*0.1+Math.random()*vh*0.8;
+  const cp1x=Math.random()*vw,cp1y=Math.random()*vh;
+  const cp2x=Math.random()*vw,cp2y=Math.random()*vh;
+  const size=26+Math.random()*18;
+  const dur=10+Math.random()*8;
+  const flap=(0.22+Math.random()*0.14).toFixed(2);
+  const uid=Math.random().toString(36).slice(2,7);
+  const N='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(N,'svg');
+  svg.setAttribute('viewBox','0 0 60 44');
+  svg.setAttribute('width',size);
+  svg.setAttribute('height',(size*0.73).toFixed(1));
+  svg.classList.add('butterfly-svg');
+  svg.style.cssText=`--dur:${dur}s;--flap:${flap}s;offset-path:path('M ${x0.toFixed(1)} ${y0.toFixed(1)} C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)},${cp2x.toFixed(1)} ${cp2y.toFixed(1)},${x1.toFixed(1)} ${y1.toFixed(1)}')`;
+  function grad(id,cx){
+    const g=document.createElementNS(N,'radialGradient');
+    g.id=id;g.setAttribute('cx',cx);g.setAttribute('cy','35%');g.setAttribute('r','65%');
+    [[pal.w1,'0%','0.95'],[pal.w2,'100%','0.55']].forEach(([c,o,op])=>{
+      const s=document.createElementNS(N,'stop');
+      s.setAttribute('offset',o);s.setAttribute('stop-color',c);s.setAttribute('stop-opacity',op);g.appendChild(s);
+    });
+    return g;
   }
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),(parseFloat(dur)+0.5)*1000);
+  const defs=document.createElementNS(N,'defs');
+  defs.appendChild(grad('gl'+uid,'65%'));defs.appendChild(grad('gr'+uid,'35%'));
+  svg.appendChild(defs);
+  function wing(d,fill,op){
+    const p=document.createElementNS(N,'path');
+    p.setAttribute('d',d);p.setAttribute('fill',fill);
+    if(op!=null)p.setAttribute('opacity',String(op));
+    return p;
+  }
+  const lG=document.createElementNS(N,'g');lG.setAttribute('class','bfly-wl');
+  lG.appendChild(wing('M 30 18 C 22 4,4 3,6 17 C 8 28,26 30,30 18 Z','url(#gl'+uid+')'));
+  lG.appendChild(wing('M 30 22 C 19 25,8 31,10 37 C 12 42,28 38,30 22 Z','url(#gl'+uid+')',0.8));
+  const rG=document.createElementNS(N,'g');rG.setAttribute('class','bfly-wr');
+  rG.appendChild(wing('M 30 18 C 38 4,56 3,54 17 C 52 28,34 30,30 18 Z','url(#gr'+uid+')'));
+  rG.appendChild(wing('M 30 22 C 41 25,52 31,50 37 C 48 42,32 38,30 22 Z','url(#gr'+uid+')',0.8));
+  const body=document.createElementNS(N,'ellipse');
+  body.setAttribute('cx','30');body.setAttribute('cy','20');
+  body.setAttribute('rx','1.5');body.setAttribute('ry','8');
+  body.setAttribute('fill',pal.body);body.setAttribute('opacity','0.7');
+  function ant(d,tx,ty){
+    const path=document.createElementNS(N,'path');
+    path.setAttribute('d',d);path.setAttribute('stroke',pal.body);
+    path.setAttribute('stroke-width','0.9');path.setAttribute('fill','none');path.setAttribute('opacity','0.5');
+    const tip=document.createElementNS(N,'circle');
+    tip.setAttribute('cx',String(tx));tip.setAttribute('cy',String(ty));tip.setAttribute('r','1.5');
+    tip.setAttribute('fill',pal.body);tip.setAttribute('opacity','0.5');
+    return [path,tip];
+  }
+  svg.appendChild(lG);svg.appendChild(rG);svg.appendChild(body);
+  ant('M 30 12 Q 25 6,22 3',22,3).forEach(el=>svg.appendChild(el));
+  ant('M 30 12 Q 35 6,38 3',38,3).forEach(el=>svg.appendChild(el));
+  document.body.appendChild(svg);
+  setTimeout(()=>{try{svg.remove();}catch(e){}},Math.ceil(dur+1)*1000);
 }
 
-function initFish(){
+function initButterflies(){
   setTimeout(()=>{
-    spawnFish();
+    spawnButterfly();
     setInterval(()=>{
-      const count=1+Math.floor(Math.random()*2);
-      for(let i=0;i<count;i++) setTimeout(spawnFish,i*800+Math.random()*600);
-    },6000+Math.random()*6000);
-  },1500+Math.random()*2000);
+      const n=Math.random()<0.28?2:1;
+      for(let i=0;i<n;i++)setTimeout(spawnButterfly,i*1400+Math.random()*600);
+    },7000+Math.random()*6000);
+  },2000+Math.random()*2000);
 }
-initFish();
+initButterflies();
 
 function setupSwipeNav(){
   if(editMode)return;
@@ -1151,10 +1143,8 @@ function setupSwipeNav(){
     if(Math.abs(dx)>=SWIPE_PX && Math.abs(dx)>(Math.abs(dy)*DY_RATIO) && dt<=MAX_DT){
       lastSwipeAt=Date.now();
       if(dx<0){
-        spawnFlyMarker('right', card);
         fcNext();
       } else {
-        spawnFlyMarker('left', card);
         fcPrev();
       }
     }
@@ -1183,10 +1173,8 @@ function setupSwipeNav(){
     if(Math.abs(dx)>=SWIPE_PX_TOUCH && Math.abs(dx)>(Math.abs(dy)*DY_RATIO_TOUCH) && dt<=MAX_DT_TOUCH){
       lastSwipeAt=Date.now();
       if(dx<0){
-        spawnFlyMarker('right', card);
         fcNext();
       } else {
-        spawnFlyMarker('left', card);
         fcPrev();
       }
     }
@@ -1226,255 +1214,10 @@ function applyCardAccent(p){
   el.style.setProperty('--accent-soft', acc.s);
 }
 
-function mascotProfileFor(problemId){
-  const h=hashString(String(problemId));
-  // разные карты = разные профили поведения питомцев
-  const inputInterval=450 + (h%550); // 450..999
-  const readInterval=1100 + (h%900); // 1100..1999
-  const extraSpawnProb=0.12 + ((h>>3)%20)/100; // 0.12..0.31
-  const catBias=((h>>7)&1)?1:-1;
-
-  const catW=0.25 + ((h>>2)%35)/100; // 0.25..0.60
-  const birdW=0.20 + ((h>>4)%25)/100; // 0.20..0.45
-  const buttW=0.20 + ((h>>6)%25)/100; // 0.20..0.45
-
-  // длительности анимаций тоже разные, чтобы визуально отличалось
-  const durBird=2.2 + (h%80)/100; // 2.2..3.0
-  const durButterfly=2.5 + ((h>>1)%90)/100; // 2.5..3.4
-  const durCat=2.8 + ((h>>5)%120)/100; // 2.8..4.0
-
-  return {
-    inputInterval,
-    readInterval,
-    extraSpawnProb,
-    catBias,
-    catW,
-    birdW,
-    buttW,
-    durBird,
-    durButterfly,
-    durCat,
-    sizeJitter:0.85 + ((h>>9)%40)/100 // 0.85..1.25
-  };
-}
-
-function setMascotProfile(p){
-  mascotProfile=mascotProfileFor(p.id);
-}
-
-function setMascotTyping(v){
-  mascotTyping=!!v;
-  setupMascots();
-}
-
-function stopMascots(){
-  if(mascotTimer)clearInterval(mascotTimer);
-  mascotTimer=null;
-}
-
-function spawnMascot(){
-  const layer=document.getElementById('mascotLayer');
-  if(!layer)return;
-  const existing=layer.querySelectorAll('.mascot');
-  if(existing.length>=12)return;
-  const p=fcList[fcIdx];
-  if(!p)return;
-  if(!mascotProfile)setMascotProfile(p);
-  const prof=mascotProfile||mascotProfileFor(p.id);
-  const hashVal=hashString(String(p.id));
-
-  // Разные эмодзи, но с разной “профильной” вероятностью по карточке.
-  const butterflyEmojis=[
-    {t:'🦋',cls:'mascot-butterfly'},
-    {t:'🪲',cls:'mascot-butterfly'}
-  ];
-  const birdEmojis=[
-    {t:'🐦',cls:'mascot-bird'},
-    {t:'🐧',cls:'mascot-bird'},
-    {t:'🦅',cls:'mascot-bird'}
-  ];
-  const catEmojis=[
-    {t:'🐱',cls:'mascot-cat'},
-    {t:'🐈',cls:'mascot-cat'},
-    {t:'🐅',cls:'mascot-cat'}
-  ];
-
-  // Вес внутри карточки зависит от problemId, а не только от рандома.
-  const hMix=(hashVal%1000)/1000;
-  let pickType;
-  if(mascotTyping){
-    // при вводе чаще котики
-    const wCat=0.55 + prof.catW*0.35;
-    const wBird=0.30 + prof.birdW*0.20;
-    const wBf=1 - wCat - wBird;
-    const r=Math.random();
-    pickType = r < wCat ? 'cat' : (r < wCat+wBird ? 'bird' : 'butterfly');
-  } else if(fcFlipped){
-    // на обороте (но без ввода) чаще птички/жучки
-    const wBird=0.45 + prof.birdW*0.25;
-    const wBf=0.40 + prof.buttW*0.20;
-    const wCat=1 - wBird - wBf;
-    const r=Math.random();
-    pickType = r < wBird ? 'bird' : (r < wBird+wBf ? 'butterfly' : 'cat');
-  } else {
-    // на фронте (читаешь условие) чаще бабочки
-    const wBf=0.55 + prof.buttW*0.25;
-    const wBird=0.35 + prof.birdW*0.15;
-    const wCat=1 - wBf - wBird;
-    const r=Math.random();
-    pickType = r < wBf ? 'butterfly' : (r < wBf+wBird ? 'bird' : 'cat');
-  }
-
-  let pickList=butterflyEmojis;
-  let animDur=prof.durButterfly;
-  if(pickType==='bird'){
-    pickList=birdEmojis;
-    animDur=prof.durBird;
-  } else if(pickType==='cat'){
-    pickList=catEmojis;
-    animDur=prof.durCat;
-  }
-
-  const variantIdx=(hashVal + existing.length + Math.floor(hMix*10))%pickList.length;
-  const pick=pickList[variantIdx];
-
-  const el=document.createElement('span');
-  el.className='mascot '+pick.cls;
-  el.textContent=pick.t;
-  el.style.animationDuration=animDur+'s';
-  const fontScale=prof.sizeJitter;
-  el.style.fontSize=(30*fontScale)+'px';
-
-  const rect=layer.getBoundingClientRect();
-  const w=rect.width||300;
-  const height=rect.height||220;
-  // стартовые точки и траектория тоже меняются по карточке
-  const x=Math.floor((0.05 + (hashVal%20)/100)*w + Math.random()*(w*0.20));
-  const y=Math.floor((0.08 + ((hashVal>>3)%20)/100)*height + Math.random()*(height*0.22));
-
-  const sign = (pickType==='cat'?prof.catBias:1) * (Math.random()<0.5?1:-1);
-  const dxAmp = w * (0.12 + (pickType==='bird'?prof.birdW:pickType==='butterfly'?prof.buttW:prof.catW)*0.25);
-  const dyAmp = height * (0.15 + (pickType==='bird'?prof.birdW:pickType==='butterfly'?prof.buttW:prof.catW)*0.25);
-
-  const dx=Math.floor(sign*Math.random()*dxAmp);
-  const dy=Math.floor((Math.random()*2-1)*dyAmp);
-  const dx2=dx + Math.floor(sign*Math.random()*w*(0.08 + prof.catW*0.10));
-
-  el.style.setProperty('--x', x+'px');
-  el.style.setProperty('--y', y+'px');
-  el.style.setProperty('--dx', dx+'px');
-  el.style.setProperty('--dy', dy+'px');
-  el.style.setProperty('--dx2', dx2+'px');
-
-  layer.appendChild(el);
-  el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
-}
-
-// Интерактив 5: маленькие "мыслительные" пузырьки во время ввода.
-function spawnTypingBubbles(){
-  const layer=document.getElementById('mascotLayer');
-  if(!layer)return;
-  if(!mascotTyping)return;
-  const ta=document.querySelector('#cardsArea textarea.solution-input');
-  if(!ta)return;
-
-  const existing=layer.querySelectorAll('.typing-bubble').length;
-  if(existing>=10)return;
-
-  const bubbleEmojis=['💭','🤔','🧠','📝','✨','🎯'];
-  const lr=layer.getBoundingClientRect();
-  const r=ta.getBoundingClientRect();
-
-  const x=(r.left-lr.left)+r.width*(0.15+Math.random()*0.7);
-  const y=(r.top-lr.top)+r.height*(0.18+Math.random()*0.64);
-
-  const el=document.createElement('span');
-  el.className='typing-bubble';
-  el.textContent=bubbleEmojis[Math.floor(Math.random()*bubbleEmojis.length)];
-
-  const dx=(Math.random()*2-1)*30;
-  const dy=-(50+Math.random()*85);
-  const dur=0.9+Math.random()*0.7;
-  const z=0.8+Math.random()*0.35;
-
-  el.style.left=Math.floor(x)+'px';
-  el.style.top=Math.floor(y)+'px';
-  el.style.animationDuration=dur+'s';
-  el.style.opacity=String(z);
-  el.style.setProperty('--dx', dx+'px');
-  el.style.setProperty('--dy', dy+'px');
-
-  layer.appendChild(el);
-  el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
-}
-
-// Интерактив 6: "летящие" эмодзи при навигации по карточкам.
-function spawnFlyMarker(dir, anchorEl){
-  const overlay=document.getElementById('flyOverlay');
-  if(!overlay)return;
-  if(editMode)return;
-
-  const existing=overlay.querySelectorAll('.fly-marker').length;
-  if(existing>=8)return;
-
-  const emojis=dir==='right'
-    ? ['🚀','✨','⚡️','🧩']
-    : ['🔙','⏪','🌪️','✨'];
-
-  // overlay фиксированный к viewport, значит r.left/r.top уже подходят как координаты для left/top
-  let baseX=window.innerWidth*0.5;
-  let baseY=window.innerHeight*0.22;
-
-  if(anchorEl && anchorEl.getBoundingClientRect){
-    const r=anchorEl.getBoundingClientRect();
-    baseX=r.left + r.width/2;
-    baseY=r.top + r.height/2;
-  }
-
-  const count=3;
-  for(let i=0;i<count;i++){
-    const el=document.createElement('span');
-    el.className='fly-marker';
-    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-
-    const x=baseX + (Math.random()*40-20);
-    const y=baseY + (Math.random()*20-10);
-    const dx=(dir==='right'?1:-1)*(70+Math.random()*140);
-    const dy=-(45+Math.random()*95);
-    const rot=(Math.random()*70-35)*(dir==='right'?1:-1);
-    const dur=0.7+Math.random()*0.35;
-
-    el.style.left=Math.floor(x)+'px';
-    el.style.top=Math.floor(y)+'px';
-    el.style.animationDuration=dur+'s';
-    el.style.setProperty('--dx', dx+'px');
-    el.style.setProperty('--dy', dy+'px');
-    el.style.setProperty('--rot', rot+'deg');
-
-    overlay.appendChild(el);
-    el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
-  }
-}
-
-function setupMascots(){
-  if(editMode){stopMascots();return;}
-  const layer=document.getElementById('mascotLayer');
-  if(!layer){stopMascots();return;}
-  stopMascots();
-
-  // Если пишет — чаще, если читаешь — реже
-  let interval=1400;
-  const prof=mascotProfile||{};
-  if(mascotTyping)interval=prof.inputInterval||650;
-  else interval=fcFlipped?(prof.readInterval?Math.floor(prof.readInterval*0.92):1050):(prof.readInterval||1500);
-
-  mascotTimer=setInterval(()=>{
-    if(mascotTyping && Math.random()<0.65)spawnTypingBubbles();
-    // Иногда подкидываем по 2 “питомца”, чтобы было веселее
-    spawnMascot();
-    if(!mascotTyping && Math.random()<(prof.extraSpawnProb||0.2))spawnMascot();
-  }, interval);
-}
+function setMascotProfile(p){}
+function setMascotTyping(v){mascotTyping=!!v;}
+function stopMascots(){if(mascotTimer)clearInterval(mascotTimer);mascotTimer=null;}
+function setupMascots(){}
 
 function solutionInputKey(problemId, which){
   return 'algocards_solution_input_'+problemId+'_'+which;
@@ -1681,9 +1424,9 @@ function renderEditCard(){
     <div class="counter-row">
       <div class="counter">${fcIdx+1} / ${fcList.length}${!searchQuery?' • на сегодня':''}</div>
       <div class="counter-nav-cluster">
-        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();fcPrev()">←</button>
         <button type="button" class="shuffle-mini" title="Перемешать" onclick="event.stopPropagation();fcShuffle()">🔀</button>
-        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
+        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();fcNext()">→</button>
       </div>
     </div>
     <div class="flashcard" style="cursor:default">
@@ -1719,14 +1462,13 @@ function renderCard(){
     <div class="counter-row">
       <div class="counter">${fcIdx+1} / ${fcList.length}</div>
       <div class="counter-nav-cluster">
-        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();fcPrev()">←</button>
         <button type="button" class="shuffle-mini" title="Перемешать" onclick="event.stopPropagation();fcShuffle()">🔀</button>
-        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
+        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();fcNext()">→</button>
       </div>
     </div>
     <div class="flashcard">
       <button class="mark-btn${markedIds.has(p.id)?' marked':''}" onclick="event.stopPropagation();toggleMark('${p.id}',this)" title="${markedIds.has(p.id)?'Снять метку':'Отметить'}">⭐</button>
-      <div class="mascot-layer" id="mascotLayer"></div>
       <div class="fc-face${!fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}

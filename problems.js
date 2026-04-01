@@ -7173,8 +7173,50 @@ complexity:`Время: O(n), Память: O(min(n, m))`,
 complexityExpl:`Каждый символ добавляется и удаляется из set не более одного раза — O(n). Set хранит символы текущего окна — O(min(n,m)), где m — размер алфавита.`,
 expl:`Переменное скользящее окно. Держим HashSet уникальных символов окна. Встретили повтор — сжимаем слева, пока дубликат не удалён. Классика двух указателей + множества.`,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Longest Repeating Character Replacement","h":"longest-repeating-character-replacement"}],
-repoSimilar:["sw1","sw2","sw7"],
+repoSimilar:["sw1","sw2","sw7","sw17"],
 diagram:{"type":"window","data":["a","b","c","a","b","c","b","b"],"steps":[{"wl":0,"wr":2,"desc":"[a,b,c] — все уникальны, len=3"},{"wl":0,"wr":3,"desc":"Добавляем 'a' — повтор! Сжимаем"},{"wl":1,"wr":3,"desc":"Удалили 'a', окно [b,c,a], len=3"},{"wl":1,"wr":4,"desc":"Добавляем 'b' — повтор! Сжимаем"},{"wl":2,"wr":4,"desc":"Окно [c,a,b], len=3"},{"wl":4,"wr":6,"desc":"Окно [a,b,c], len=3. Ответ: 3"}]}},
+
+{id:"sw17",t:"Подстроки без повторов — число пар (i, j)",p:"Sliding Window",d:"средне",
+desc:`Дана строка s. Требуется найти ==количество пар индексов (i, j)== таких, что 0 ≤ i ≤ j < s.length() и все символы в подстроке s[i..j] (включительно) различны (в подстроке нет повторов).
+
+Пример 1:
+Ввод: s = "a"
+Вывод: 1
+
+Пример 2:
+Ввод: s = "aba"
+Вывод: 5
+Объяснение: подходят подстроки "a", "ab", "b", "ba", "a" — пять пар (i, j).`,
+hint:`Два указателя и HashSet: расширяем правую границу, пока символы уникальны. Для текущего окна [l..r] все подстроки, начинающиеся в l и заканчивающиеся в l..r, валидны — их (r−l+1). Затем сдвигаем l.`,
+code:`class Solution {
+    public int countingPairs(String s) {
+        int cnt = 0;
+        Set<Character> window = new HashSet<>();
+        int l = 0;
+        int r = -1;
+
+        while (l < s.length()) {
+            while (r + 1 < s.length() && !window.contains(s.charAt(r + 1))) {
+                window.add(s.charAt(r + 1));
+                r++;
+            }
+            cnt += r - l + 1;
+            window.remove(s.charAt(l));
+            l++;
+        }
+        return cnt;
+    }
+}`,
+steps:`1. l = 0, r = −1, пустой HashSet, cnt = 0.
+2. Пока r+1 в пределах строки и s[r+1] не в множестве — добавляем символ и сдвигаем r.
+3. К ответу прибавляем (r − l + 1): столько подстрок с левым концом l и уникальными символами.
+4. Удаляем s[l] из множества, l++, пока l не выйдет за строку.`,
+complexity:`Время: O(n), Память: O(min(n, |Σ|))`,
+complexityExpl:`Каждый индекс входит в окно и выходит из него не более одного раза — O(n) по времени. В множестве не больше уникальных символов алфавита — O(min(n, |Σ|)) памяти.`,
+expl:`Максимально расширяем окно вправо без повторов. Для фиксированного l любая подстрока s[l..k] при l ≤ k ≤ r уже уникальна по построению — ровно (r−l+1) штук. Сдвигаем l и повторяем.`,
+lcSimilar:[{"t":"Longest Substring Without Repeating Characters","h":"longest-substring-without-repeating-characters"}],
+repoSimilar:["sw16"],
+diagram:{"type":"window","data":["a","b","a"],"steps":[{"wl":0,"wr":1,"desc":"Окно [a,b], вклад +(r−l+1)=2"},{"wl":1,"wr":2,"desc":"После сдвига l: [b,a], вклад +2"},{"wl":2,"wr":2,"desc":"Окно [a], вклад +1. Итого 5"}]}},
 
 // ===== MATH / SIMULATION =====
 {id:"ms6",t:"Умножение строк",p:"Math / Simulation",d:"средне",

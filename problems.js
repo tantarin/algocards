@@ -2609,7 +2609,7 @@ lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":
 diagram:{"type":"window","data":[1,0,1,1,0,1,1,0],"steps":[{"wl":0,"wr":0,"desc":"Начало: окно [0], нулей=0, k=2"},{"wl":0,"wr":1,"desc":"Расширяем → нулей=1"},{"wl":0,"wr":4,"desc":"Расширяем → нулей=2, ОК"},{"wl":0,"wr":6,"desc":"[1,0,1,1,0,1,1] длина=7"},{"wl":0,"wr":7,"desc":"Нулей=3 > k! Сжимаем"},{"wl":2,"wr":7,"desc":"Сжали → нулей=2. Ответ: 7"}]}},
 
 // ===== ONE PASS WITH STATE =====
-{id:"sw6",t:"Максимальный отрезок единиц с удалением",p:"One Pass with State",d:"средне",
+{id:"sw6",t:"LC 1493. Longest Subarray of 1's After Deleting One Element",p:"One Pass with State",d:"средне",
 desc:`Дан бинарный массив. ==Удалить ровно один элемент==. Найти ==максимальную длину подмассива из единиц==.
 
 Пример:

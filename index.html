@@ -49,6 +49,37 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
+.desc-display{padding-top:32px}
+.problem-desc-stack{display:flex;flex-direction:column;gap:16px}
+.problem-desc-condition{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
+.problem-desc-condition--solo{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
+.problem-desc-examples-wrap{
+  border-radius:14px;
+  border:1px solid rgba(124,58,237,0.28);
+  background:linear-gradient(145deg,rgba(124,58,237,0.11) 0%,rgba(26,26,46,0.92) 42%,rgba(37,37,64,0.75) 100%);
+  box-shadow:0 8px 32px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
+}
+.problem-desc-examples-label{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px 8px;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#c4b5fd;
+  border-bottom:1px solid rgba(124,58,237,0.2);
+  background:rgba(0,0,0,.12);
+}
+.problem-desc-examples-label::before{
+  content:'';
+  width:8px;height:8px;border-radius:50%;
+  background:linear-gradient(135deg,#e9d5ff,#7c3aed);
+  box-shadow:0 0 12px rgba(124,58,237,.55);
+  flex-shrink:0;
+}
+.problem-desc-examples-body{
+  padding:14px 16px 16px;
+  font-size:13px;line-height:1.68;color:var(--text);
+  white-space:pre-wrap;
+}
 .copy-btn{position:absolute;top:8px;right:8px;background:rgba(124,58,237,0.2);border:none;color:#a78bfa;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;z-index:1;transition:.2s;box-shadow:0 0 10px rgba(124,58,237,0.2)}
 .copy-btn:hover{background:rgba(124,58,237,0.35);box-shadow:0 0 14px rgba(124,58,237,0.4)}
 .copy-btn:active{background:var(--purple);color:#fff;transform:scale(0.95)}
@@ -485,6 +516,37 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 <script src="theory.js" charset="UTF-8"></script>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
+/** Делит desc на условие и блок примеров (строка «Пример…:» / «Примеры:»). */
+function splitProblemDesc(desc){
+  if(desc==null||desc==='')return{condition:'',examples:null};
+  const s=String(desc);
+  const re=/\n\s*(?=\s*Пример(?:ы)?\s*\d*\s*:)/;
+  const hit=re.exec(s);
+  if(hit){
+    const i=hit.index;
+    return{
+      condition:s.slice(0,i).trim(),
+      examples:s.slice(i).replace(/^\s+/,'').trim()
+    };
+  }
+  if(/^\s*Пример(?:ы)?\s*\d*\s*:/.test(s))return{condition:'',examples:s.trim()};
+  return{condition:s.trim(),examples:null};
+}
+function renderProblemDescHtml(desc){
+  const sp=splitProblemDesc(desc);
+  if(sp.examples==null){
+    return `<div class="problem-desc-condition problem-desc-condition--solo">${esc(desc||'')}</div>`;
+  }
+  const head=sp.condition
+    ?`<div class="problem-desc-condition">${esc(sp.condition)}</div>`
+    :'';
+  return `<div class="problem-desc-stack">${head}
+    <div class="problem-desc-examples-wrap" role="region" aria-label="Примеры">
+      <div class="problem-desc-examples-label">Примеры</div>
+      <div class="problem-desc-examples-body">${esc(sp.examples)}</div>
+    </div>
+  </div>`;
+}
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
@@ -1526,6 +1588,7 @@ function renderCard(){
   }
   if(editMode){renderEditCard();return}
   const p=fcList[fcIdx];
+  const problemDescHtml=renderProblemDescHtml(p.desc);
   setMascotProfile(p);
   document.getElementById('cardsArea').innerHTML=`
     <div class="counter-row">
@@ -1545,7 +1608,7 @@ function renderCard(){
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
           <button class="copy-btn copy-problem-desc" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
-          <div class="desc-copy-body" style="white-space:pre-wrap;font-size:14px;line-height:1.6;padding-top:32px">${esc(p.desc)}</div>
+          <div class="desc-display">${problemDescHtml}</div>
         </div>
         <div class="spoiler-row">
           <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>

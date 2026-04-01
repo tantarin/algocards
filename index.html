@@ -1364,6 +1364,55 @@ function getFiltered(){
   return list;
 }
 
+/** Адресная строка = ссылка на карточку (?id= из problems.js). Иначе копировать URL бесполезно — состояние только в памяти. */
+function syncBrowserUrlToProblem(id){
+  if(id==null||id==='')return;
+  const sid=String(id);
+  try{
+    const u=new URL(window.location.href);
+    if(u.searchParams.get('id')===sid)return;
+    u.searchParams.set('id',sid);
+    history.replaceState(null,'',u.pathname+u.search+u.hash);
+  }catch(_){/* редкие окружения без URL */}
+}
+
+function clearProblemIdFromUrl(){
+  try{
+    const u=new URL(window.location.href);
+    if(!u.searchParams.has('id'))return;
+    u.searchParams.delete('id');
+    const q=u.search?u.search.slice(1):'';
+    history.replaceState(null,'',u.pathname+(q?'?'+q:'')+u.hash);
+  }catch(_){}
+}
+
+/** При загрузке или popstate: открыть задачу из ?id=; без id — обычный дневной список. */
+function applyProblemIdFromUrlParams(){
+  const params=new URLSearchParams(window.location.search||'');
+  const urlId=params.get('id');
+  if(!urlId){
+    rebuildDailyList();
+    return;
+  }
+  const p=P.find(x=>String(x.id)===String(urlId));
+  if(!p){
+    clearProblemIdFromUrl();
+    rebuildDailyList();
+    return;
+  }
+  searchQuery='';
+  const se=document.getElementById('search');
+  if(se)se.value='';
+  if(showMarkedOnly)showMarkedOnly=false;
+  activeFilter=null;
+  renderFilters();
+  rebuildDailyList();
+  let idx=fcList.findIndex(x=>String(x.id)===String(urlId));
+  if(idx>=0)fcIdx=idx;
+  else{fcList=[p];fcIdx=0;}
+  fcFlipped=false;
+}
+
 function applySearch(){
   searchQuery=document.getElementById('search').value.trim();
   // С поиском — полный список совпадений; без поиска — снова лимит «на сегодня»
@@ -1452,6 +1501,7 @@ function renderEditCard(){
       <div class="edit-status" id="editStatus"></div>
     </div>
     `;
+  syncBrowserUrlToProblem(p.id);
 }
 
 function renderCard(){
@@ -1469,7 +1519,11 @@ function renderCard(){
   if(!searchQuery&&!activeFilter&&totalFiltered>DAILY_LIMIT)infoText+=' на сегодня';
   else if(searchQuery)infoText+=' по поиску';
   document.getElementById('info').textContent=infoText;
-  if(!fcList.length){document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';return;}
+  if(!fcList.length){
+    clearProblemIdFromUrl();
+    document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';
+    return;
+  }
   if(editMode){renderEditCard();return}
   const p=fcList[fcIdx];
   setMascotProfile(p);
@@ -1531,6 +1585,7 @@ function renderCard(){
   document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));
   setupMascots();
   setupSwipeNav();
+  syncBrowserUrlToProblem(p.id);
 }
 
 function copyProblemBundle(btn){
@@ -1823,8 +1878,12 @@ renderFilters();
 // Восстанавливаем состояние кнопок режима из localStorage
 document.getElementById('modeMixed').classList.toggle('active',dailyMode==='mixed');
 document.getElementById('modeTopic').classList.toggle('active',dailyMode==='topic');
-rebuildDailyList(); // старт: fcList = до 10 задач на сегодня (или все, если в наборе меньше)
+applyProblemIdFromUrlParams(); // старт: дневной список или карточка из ?id=
 renderCard();
+window.addEventListener('popstate',function(){
+  applyProblemIdFromUrlParams();
+  renderCard();
+});
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script>
 </body>

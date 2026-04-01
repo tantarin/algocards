@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#32 Пересекающиеся отрезки — Визуализации</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0f0a1e;
+  color: #e2e8f0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 32px 20px 80px;
+  min-height: 100vh;
+}
+h1 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #fde68a, #f472b6, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.subtitle {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 40px;
+}
+.section {
+  max-width: 680px;
+  margin: 0 auto 44px;
+  background: linear-gradient(155deg, #1a0a2e, #2d1b4e 40%, #1e3a5f 80%, #0f172a);
+  border: 1px solid rgba(251,191,36,.3);
+  border-radius: 22px;
+  padding: 28px 24px;
+  box-shadow: 0 4px 32px rgba(91,33,182,.45), 0 0 80px rgba(251,191,36,.05);
+  position: relative;
+  overflow: hidden;
+}
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(ellipse 140% 70% at 50% -20%, rgba(192,132,252,.35), transparent 55%),
+              radial-gradient(ellipse 80% 50% at 100% 100%, rgba(244,114,182,.2), transparent 50%);
+}
+.section > * { position: relative; z-index: 1; }
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #fde68a, #fbbf24, #f472b6, #c4b5fd);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::before { content: '✨'; color: #fde68a; font-size: 14px; -webkit-background-clip: unset; background-clip: unset; }
+
+/* ── Number line ── */
+.nl-wrap { overflow-x: auto; }
+svg text { font-family: 'Segoe UI', monospace; }
+
+/* ── Sort diagram ── */
+.sort-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+.seg-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 10px;
+  font-size: 13px; font-weight: 700; font-family: monospace;
+  border: 2px solid;
+}
+.arrow-label { font-size: 20px; color: #fbbf24; }
+.sort-label { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Step diagram ── */
+.step-box {
+  background: rgba(15,23,42,.55);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(8px);
+}
+.step-header { font-size: 12px; color: #94a3b8; margin-bottom: 14px; font-family: monospace; }
+.nl-mini { overflow-x: auto; margin-bottom: 14px; }
+.vars-row {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;
+}
+.var-chip {
+  background: rgba(124,58,237,.25);
+  border: 1px solid rgba(124,58,237,.5);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: monospace;
+}
+.var-chip .vk { color: #c4b5fd; }
+.var-chip .vv { color: #fde68a; font-weight: 700; }
+.bool-arr { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.bool-cell {
+  padding: 5px 10px; border-radius: 8px; font-size: 12px; font-family: monospace;
+  border: 2px solid;
+  transition: all .3s;
+}
+.bool-cell.t { border-color: #34d399; background: rgba(52,211,153,.2); color: #34d399; font-weight: 700; }
+.bool-cell.f { border-color: #ffffff25; background: rgba(255,255,255,.05); color: #64748b; }
+.step-desc {
+  margin-top: 14px;
+  background: rgba(15,23,42,.4);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+.step-desc .hl { color: #fde68a; font-weight: 700; }
+.step-desc .bad { color: #f87171; font-weight: 700; }
+.step-desc .good { color: #34d399; font-weight: 700; }
+
+/* ── Controls ── */
+.controls {
+  display: flex; gap: 10px; justify-content: center; align-items: center;
+  margin-top: 18px; flex-wrap: wrap;
+}
+.btn {
+  background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+  border: 1px solid rgba(251,191,36,.45);
+  color: #fef3c7;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  box-shadow: 0 2px 12px rgba(91,33,182,.35);
+}
+.btn:hover { border-color: rgba(253,224,71,.85); color: #fff; }
+.btn:active { transform: scale(.96); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.step-counter { font-size: 13px; color: rgba(254,243,199,.85); padding: 6px 14px; font-weight: 600; }
+
+/* ── Explanation grid ── */
+.explain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media(max-width:500px){ .explain-grid { grid-template-columns: 1fr; } }
+.explain-card {
+  background: rgba(15,23,42,.5);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.explain-card h4 { color: #fbbf24; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.explain-card p { color: #cbd5e1; }
+.code-inline {
+  background: rgba(124,58,237,.3); border-radius: 4px;
+  padding: 1px 5px; font-family: monospace; font-size: 12px; color: #c4b5fd;
+}
+</style>
+</head>
+<body>
+
+<h1>#32 Пересекающиеся отрезки</h1>
+<p class="subtitle">Вход: [[6,8],[1,5],[4,7]] · k=1 · Выход: все три пересекаются</p>
+
+<!-- ═══════════════════════════════════════════
+     ДИАГРАММА 1 — Числовая ось
+═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Диаграмма 1 — Отрезки на числовой оси</div>
+  <div class="nl-wrap">
+    <svg width="560" height="185" viewBox="0 0 560 185">
+      <!-- overlap zones -->
+      <rect x="218" y="18" width="57" height="120" rx="6" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)" stroke-width="1" stroke-dasharray="4 3"/>
+      <rect x="334" y="18" width="57" height="120" rx="6" fill="rgba(251,191,36,0.12)" stroke="rgba(251,191,36,0.4)" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="246" y="12" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">пересечение</text>
+      <text x="363" y="12" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">пересечение</text>
+
+      <!-- segment [1,5] pink -->
+      <line x1="44" y1="40" x2="275" y2="40" stroke="#f472b6" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="44"  cy="40" r="6" fill="#f472b6"/>
+      <circle cx="275" cy="40" r="6" fill="#f472b6"/>
+      <text x="155" y="30" text-anchor="middle" fill="#f472b6" font-size="12" font-weight="700">[1, 5]</text>
+
+      <!-- segment [4,7] green -->
+      <line x1="218" y1="80" x2="391" y2="80" stroke="#34d399" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="218" cy="80" r="6" fill="#34d399"/>
+      <circle cx="391" cy="80" r="6" fill="#34d399"/>
+      <text x="304" y="70" text-anchor="middle" fill="#34d399" font-size="12" font-weight="700">[4, 7]</text>
+
+      <!-- segment [6,8] purple -->
+      <line x1="334" y1="120" x2="449" y2="120" stroke="#818cf8" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="334" cy="120" r="6" fill="#818cf8"/>
+      <circle cx="449" cy="120" r="6" fill="#818cf8"/>
+      <text x="391" y="110" text-anchor="middle" fill="#818cf8" font-size="12" font-weight="700">[6, 8]</text>
+
+      <!-- number axis -->
+      <line x1="10" y1="155" x2="520" y2="155" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+      <polygon points="520,152 528,155 520,158" fill="#475569"/>
+      <!-- ticks -->
+      <g fill="#94a3b8" font-size="12" text-anchor="middle">
+        <line x1="44"  y1="151" x2="44"  y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="44"  y="173">1</text>
+        <line x1="102" y1="151" x2="102" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="102" y="173">2</text>
+        <line x1="160" y1="151" x2="160" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="160" y="173">3</text>
+        <line x1="218" y1="151" x2="218" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="218" y="173">4</text>
+        <line x1="275" y1="151" x2="275" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="275" y="173">5</text>
+        <line x1="334" y1="151" x2="334" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="334" y="173">6</text>
+        <line x1="391" y1="151" x2="391" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="391" y="173">7</text>
+        <line x1="449" y1="151" x2="449" y2="160" stroke="#475569" stroke-width="1.5"/>
+        <text x="449" y="173">8</text>
+      </g>
+      <!-- legend -->
+      <rect x="10" y="158" width="12" height="3" rx="1" fill="rgba(251,191,36,0.5)"/>
+      <text x="28" y="168" fill="#fbbf24" font-size="10">область пересечения</text>
+    </svg>
+  </div>
+  <div class="explain-grid" style="margin-top:16px">
+    <div class="explain-card">
+      <h4>Что видно</h4>
+      <p>Все три отрезка пересекаются попарно через зоны [4,5] и [6,7]. Жёлтые зоны — это и есть пересечения.</p>
+    </div>
+    <div class="explain-card">
+      <h4>Почему все помечаются</h4>
+      <p>[1,5] ∩ [4,7] = [4,5] ✓<br>[4,7] ∩ [6,8] = [6,7] ✓<br>Значит все три «пересекаются хотя бы с одним».</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ДИАГРАММА 2 — Сортировка
+═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Диаграмма 2 — Шаг 1: сортировка по началу</div>
+
+  <div class="sort-label">Исходный порядок (segments[]):</div>
+  <div class="sort-row">
+    <div class="seg-pill" style="border-color:#818cf8;background:rgba(129,140,248,.15)">
+      <div class="dot" style="background:#818cf8"></div>[6, 8] <span style="color:#64748b;font-size:11px;margin-left:4px">idx=0</span>
+    </div>
+    <div class="seg-pill" style="border-color:#f472b6;background:rgba(244,114,182,.15)">
+      <div class="dot" style="background:#f472b6"></div>[1, 5] <span style="color:#64748b;font-size:11px;margin-left:4px">idx=1</span>
+    </div>
+    <div class="seg-pill" style="border-color:#34d399;background:rgba(52,211,153,.15)">
+      <div class="dot" style="background:#34d399"></div>[4, 7] <span style="color:#64748b;font-size:11px;margin-left:4px">idx=2</span>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin:14px 0;font-size:22px;color:#fbbf24">↓ сортируем sortedIndices по segments[i][0]</div>
+
+  <div class="sort-label">sortedIndices[] — индексы в порядке возрастания начала:</div>
+  <div class="sort-row">
+    <div style="text-align:center">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">sortedIndices[0]</div>
+      <div class="seg-pill" style="border-color:#f472b6;background:rgba(244,114,182,.15)">
+        <div class="dot" style="background:#f472b6"></div>idx=<span style="color:#fde68a">1</span> → [1, 5]
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">sortedIndices[1]</div>
+      <div class="seg-pill" style="border-color:#34d399;background:rgba(52,211,153,.15)">
+        <div class="dot" style="background:#34d399"></div>idx=<span style="color:#fde68a">2</span> → [4, 7]
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:4px">sortedIndices[2]</div>
+      <div class="seg-pill" style="border-color:#818cf8;background:rgba(129,140,248,.15)">
+        <div class="dot" style="background:#818cf8"></div>idx=<span style="color:#fde68a">0</span> → [6, 8]
+      </div>
+    </div>
+  </div>
+
+  <div class="step-desc" style="margin-top:16px">
+    Сортируем <span class="hl">массив индексов</span>, а не сами отрезки — чтобы в конце
+    <span class="code-inline">intersectsWithAny[i]</span> соответствовал оригинальному <span class="code-inline">segments[i]</span>.
+    После сортировки отрезки идут слева направо: начало первого ≤ начало второго ≤ ...
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ДИАГРАММА 3 — Пошаговый обход (интерактив)
+═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Диаграмма 3 — Пошаговый обход алгоритма</div>
+  <div id="stepBox" class="step-box"></div>
+  <div class="controls">
+    <button class="btn" id="btnPrev" onclick="changeStep(-1)">← Назад</button>
+    <span class="step-counter" id="stepCounter"></span>
+    <button class="btn" id="btnNext" onclick="changeStep(1)">Далее →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ДИАГРАММА 4 — Ключевая идея
+═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Диаграмма 4 — Почему достаточно отслеживать maxEnd</div>
+
+  <div style="overflow-x:auto">
+    <svg width="540" height="200" viewBox="0 0 540 200">
+      <!-- background zones -->
+      <rect x="10" y="10" width="520" height="170" rx="12" fill="rgba(15,23,42,0.4)"/>
+
+      <!-- sorted segments on axis -->
+      <!-- [1,5] -->
+      <line x1="44" y1="55" x2="255" y2="55" stroke="#f472b6" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="44" cy="55" r="5" fill="#f472b6"/>
+      <circle cx="255" cy="55" r="5" fill="#f472b6"/>
+      <text x="150" y="48" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="700">[1,5]</text>
+
+      <!-- maxEnd arrow at x=255 -->
+      <line x1="255" y1="62" x2="255" y2="95" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 2"/>
+      <polygon points="251,95 255,103 259,95" fill="#fbbf24"/>
+      <text x="270" y="88" fill="#fbbf24" font-size="11" font-weight="700">maxEnd=5</text>
+
+      <!-- [4,7] -->
+      <line x1="193" y1="110" x2="358" y2="110" stroke="#34d399" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="193" cy="110" r="5" fill="#34d399"/>
+      <circle cx="358" cy="110" r="5" fill="#34d399"/>
+      <text x="276" y="104" text-anchor="middle" fill="#34d399" font-size="11" font-weight="700">[4,7]</text>
+
+      <!-- 4 <= 5 check -->
+      <text x="193" y="132" text-anchor="middle" fill="#34d399" font-size="11">start=4</text>
+      <text x="255" y="132" text-anchor="middle" fill="#fbbf24" font-size="11">≤ maxEnd=5</text>
+      <text x="320" y="132" text-anchor="middle" fill="#34d399" font-size="11">✓ пересечение!</text>
+
+      <!-- new maxEnd arrow at x=358 -->
+      <line x1="358" y1="117" x2="358" y2="148" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 2"/>
+      <polygon points="354,148 358,156 362,148" fill="#fbbf24"/>
+      <text x="373" y="143" fill="#fbbf24" font-size="11" font-weight="700">maxEnd=7</text>
+
+      <!-- [6,8] -->
+      <line x1="296" y1="165" x2="421" y2="165" stroke="#818cf8" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="296" cy="165" r="5" fill="#818cf8"/>
+      <circle cx="421" cy="165" r="5" fill="#818cf8"/>
+      <text x="358" y="160" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="700">[6,8]</text>
+
+      <!-- 6 <= 7 check -->
+      <text x="296" y="183" text-anchor="middle" fill="#818cf8" font-size="11">start=6</text>
+      <text x="358" y="183" text-anchor="middle" fill="#fbbf24" font-size="11">≤ maxEnd=7</text>
+      <text x="430" y="183" text-anchor="middle" fill="#818cf8" font-size="11">✓ пересечение!</text>
+
+      <!-- axis ticks -->
+      <g fill="none" stroke="#334155" stroke-width="1">
+        <line x1="44" y1="18" x2="44" y2="175"/>
+        <line x1="255" y1="18" x2="255" y2="175"/>
+        <line x1="296" y1="18" x2="296" y2="175"/>
+        <line x1="358" y1="18" x2="358" y2="175"/>
+        <line x1="421" y1="18" x2="421" y2="175"/>
+      </g>
+      <g fill="#475569" font-size="10" text-anchor="middle">
+        <text x="44" y="16">1</text>
+        <text x="255" y="16">5</text>
+        <text x="296" y="16">6</text>
+        <text x="358" y="16">7</text>
+        <text x="421" y="16">8</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="explain-grid" style="margin-top:16px">
+    <div class="explain-card">
+      <h4>Главная идея</h4>
+      <p>Если отрезки отсортированы по началу, то новый отрезок <b>пересекается</b> с уже просмотренными тогда и только тогда, когда его начало ≤ <span class="code-inline">maxEnd</span> — максимальному концу среди просмотренных.</p>
+    </div>
+    <div class="explain-card">
+      <h4>Зачем maxEnd, а не просто предыдущий?</h4>
+      <p>Предыдущий отрезок мог закончиться раньше. <span class="code-inline">maxEnd</span> — самый «длинный хвост» из всех просмотренных. Если новый начинается позже него — он гарантированно не пересекается ни с одним.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const SEG = [[6,8],[1,5],[4,7]]; // original
+const SORTED_IDX = [1, 2, 0];   // sorted by start
+const COLORS = ['#818cf8','#f472b6','#34d399']; // colors by original index
+
+// x coordinate on mini SVG: range 0..9, width 500
+function xp(v, off=20) { return off + v * 52; }
+
+function segSVG(highlights, maxEndVal, maxEndX, curIdx, boolArr) {
+  const W = 520, H = 100;
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">`;
+
+  // overlap highlight
+  s += `<rect x="${xp(4)}" y="0" width="${xp(5)-xp(4)}" height="${H-20}" rx="4" fill="rgba(251,191,36,0.08)" stroke="rgba(251,191,36,0.3)" stroke-width="1" stroke-dasharray="3 2"/>`;
+  s += `<rect x="${xp(6)}" y="0" width="${xp(7)-xp(6)}" height="${H-20}" rx="4" fill="rgba(251,191,36,0.08)" stroke="rgba(251,191,36,0.3)" stroke-width="1" stroke-dasharray="3 2"/>`;
+
+  // segments
+  const positions = [{y:20,oi:1},{y:50,oi:2},{y:80,oi:0}]; // sorted order → original index
+  positions.forEach(({y, oi}, si) => {
+    const seg = SEG[oi];
+    const col = COLORS[oi];
+    const isHighlighted = highlights.includes(oi);
+    const isCurrent = (SORTED_IDX[curIdx] === oi);
+    const x1 = xp(seg[0]), x2 = xp(seg[1]);
+    const opacity = isHighlighted ? 1 : 0.35;
+    const sw = isCurrent ? 7 : 5;
+    s += `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" opacity="${opacity}"/>`;
+    s += `<circle cx="${x1}" cy="${y}" r="${isCurrent?7:5}" fill="${col}" opacity="${opacity}"/>`;
+    s += `<circle cx="${x2}" cy="${y}" r="${isCurrent?7:5}" fill="${col}" opacity="${opacity}"/>`;
+    const label = `[${seg[0]},${seg[1]}]`;
+    s += `<text x="${(x1+x2)/2}" y="${y-8}" text-anchor="middle" fill="${col}" font-size="11" font-weight="700" opacity="${opacity}" font-family="monospace">${label}</text>`;
+    if (isCurrent) {
+      s += `<text x="${x1-12}" y="${y+4}" text-anchor="end" fill="${col}" font-size="11" font-weight="700">▶</text>`;
+    }
+  });
+
+  // maxEnd vertical line
+  if (maxEndX !== null) {
+    const mx = xp(maxEndX);
+    s += `<line x1="${mx}" y1="5" x2="${mx}" y2="${H-22}" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4 3"/>`;
+    s += `<text x="${mx+4}" y="16" fill="#fbbf24" font-size="10" font-weight="700" font-family="monospace">maxEnd=${maxEndX}</text>`;
+  }
+
+  // axis
+  s += `<line x1="${xp(0)}" y1="${H-15}" x2="${xp(9)}" y2="${H-15}" stroke="#334155" stroke-width="1.5"/>`;
+  for (let i=1; i<=8; i++) {
+    s += `<line x1="${xp(i)}" y1="${H-18}" x2="${xp(i)}" y2="${H-12}" stroke="#334155" stroke-width="1.5"/>`;
+    s += `<text x="${xp(i)}" y="${H-3}" text-anchor="middle" fill="#64748b" font-size="11" font-family="monospace">${i}</text>`;
+  }
+
+  s += '</svg>';
+  return s;
+}
+
+const STEPS = [
+  {
+    header: 'Инициализация',
+    highlights: [1], // original index 1 = [1,5]
+    maxEndVal: 5, maxEndX: 5,
+    curIdx: 0,
+    boolArr: [false, false, false],
+    desc: `Берём первый отрезок по порядку: <span class="hl">[1,5]</span> (оригинальный индекс 1).<br>
+    Устанавливаем <span class="hl">maxEnd = 5</span> — правая граница первого отрезка.<br>
+    <span class="code-inline">indexOfMaxEnd = 0</span> (позиция в sortedIndices).`
+  },
+  {
+    header: 'k = 1: обрабатываем [4,7]',
+    highlights: [1, 2],
+    maxEndVal: 5, maxEndX: 5,
+    curIdx: 1,
+    boolArr: [false, false, false],
+    desc: `Текущий: <span class="hl">[4,7]</span> (оригинальный индекс 2).<br>
+    Проверка: <span class="hl">start=4 ≤ maxEnd=5</span> <span class="good">→ ПЕРЕСЕЧЕНИЕ!</span><br>
+    Помечаем текущий [4,7] и держатель maxEnd [1,5].`
+  },
+  {
+    header: 'k = 1: помечаем + обновляем maxEnd',
+    highlights: [1, 2],
+    maxEndVal: 7, maxEndX: 7,
+    curIdx: 1,
+    boolArr: [false, true, true],
+    desc: `<span class="good">intersectsWithAny[2] = true</span> → [4,7]<br>
+    <span class="good">intersectsWithAny[1] = true</span> → [1,5] (держатель maxEnd)<br>
+    Обновляем: <span class="hl">7 > 5</span>, значит <span class="hl">maxEnd = 7</span>, indexOfMaxEnd = 1.`
+  },
+  {
+    header: 'k = 2: обрабатываем [6,8]',
+    highlights: [0, 2],
+    maxEndVal: 7, maxEndX: 7,
+    curIdx: 2,
+    boolArr: [false, true, true],
+    desc: `Текущий: <span class="hl">[6,8]</span> (оригинальный индекс 0).<br>
+    Проверка: <span class="hl">start=6 ≤ maxEnd=7</span> <span class="good">→ ПЕРЕСЕЧЕНИЕ!</span><br>
+    k=2 > 1, поэтому дополнительно помечаем sortedIndices[k-1] = [4,7].`
+  },
+  {
+    header: 'k = 2: помечаем + финал',
+    highlights: [0, 1, 2],
+    maxEndVal: 8, maxEndX: 8,
+    curIdx: 2,
+    boolArr: [true, true, true],
+    desc: `<span class="good">intersectsWithAny[0] = true</span> → [6,8]<br>
+    <span class="good">intersectsWithAny[2] = true</span> → [4,7] (держатель maxEnd)<br>
+    <span class="good">intersectsWithAny[2] = true</span> → [4,7] (k-1, уже true)<br>
+    maxEnd = <span class="hl">8</span>. Все три помечены → результат: <span class="good">[[6,8],[1,5],[4,7]]</span>`
+  }
+];
+
+let currentStep = 0;
+
+function renderStep() {
+  const s = STEPS[currentStep];
+  const svgHtml = segSVG(s.highlights, s.maxEndVal, s.maxEndX, s.curIdx, s.boolArr);
+  const boolHtml = s.boolArr.map((v,i) => {
+    const seg = SEG[i];
+    return `<div class="bool-cell ${v?'t':'f'}">[${seg[0]},${seg[1]}]: ${v?'✓ true':'false'}</div>`;
+  }).join('');
+
+  document.getElementById('stepBox').innerHTML = `
+    <div class="step-header">${s.header}</div>
+    <div class="nl-mini">${svgHtml}</div>
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px;font-family:monospace">intersectsWithAny[]:</div>
+    <div class="bool-arr">${boolHtml}</div>
+    <div class="step-desc">${s.desc}</div>
+  `;
+
+  document.getElementById('stepCounter').textContent = `${currentStep+1} / ${STEPS.length}`;
+  document.getElementById('btnPrev').disabled = currentStep === 0;
+  document.getElementById('btnNext').disabled = currentStep === STEPS.length - 1;
+}
+
+function changeStep(d) {
+  currentStep = Math.max(0, Math.min(STEPS.length-1, currentStep + d));
+  renderStep();
+}
+
+renderStep();
+</script>
+</body>
+</html>

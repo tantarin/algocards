@@ -8,240 +8,2066 @@
 <meta name="theme-color" content="#7c3aed">
 <link rel="manifest" href="manifest.json">
 <title>AlgoCards</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--text:#e2e8f0;--dim:#94a3b8;--radius:16px}
-body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;-webkit-user-select:none;user-select:none}
-.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid #ffffff12;padding:8px 0 env(safe-area-inset-bottom,8px);z-index:99}
-.tab{flex:1;text-align:center;padding:6px 0;font-size:11px;color:var(--dim);cursor:pointer;transition:.2s}
-.tab.active{color:var(--purple)}
-.tab svg{display:block;margin:0 auto 2px;width:24px;height:24px}
-.screen{display:none;padding:16px;padding-top:env(safe-area-inset-top,16px)}
-.screen.active{display:block}
-h1{font-size:28px;margin:8px 0 16px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pcard{background:var(--card);border-radius:var(--radius);padding:14px;cursor:pointer;transition:transform .15s}
-.pcard:active{transform:scale(.97)}
-.pcard .name{font-size:14px;font-weight:700;margin:6px 0 2px}
-.pcard .desc{font-size:11px;color:var(--dim)}
-.pcard .cnt{font-size:11px;color:var(--purple);margin-top:6px}
-.back-btn{background:none;border:none;color:var(--purple);font-size:16px;cursor:pointer;padding:8px 0;display:flex;align-items:center;gap:4px}
-.problem-card{background:var(--card);border-radius:var(--radius);padding:16px;margin:10px 0;cursor:pointer}
-.problem-card .title{font-size:15px;font-weight:600}
-.problem-card .diff{font-size:12px;margin-top:4px}
-.detail-section{background:var(--card);border-radius:var(--radius);padding:16px;margin:10px 0}
-.detail-section h3{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.detail-section pre{font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;background:var(--card2);padding:12px;border-radius:10px;margin-top:8px}
-.spoiler-btn{background:var(--card2);border:none;color:var(--purple);width:100%;padding:12px;border-radius:var(--radius);font-size:15px;cursor:pointer;margin:8px 0}
-.quiz-option{background:var(--card);border:2px solid transparent;border-radius:12px;padding:14px;margin:8px 0;cursor:pointer;font-size:15px;transition:.2s}
-.quiz-option.correct{border-color:var(--green);background:#22c55e20}
-.quiz-option.wrong{border-color:var(--red);background:#ef444420}
-.quiz-option.reveal{border-color:var(--green)}
-.big-btn{background:var(--purple);color:#fff;border:none;border-radius:var(--radius);padding:14px;width:100%;font-size:16px;font-weight:600;cursor:pointer;margin:12px 0}
-.flashcard{background:var(--card);border-radius:20px;min-height:300px;padding:24px;margin:16px 0;cursor:pointer;transition:transform .4s;transform-style:preserve-3d;position:relative}
-.flashcard.flipped{transform:rotateY(180deg)}
-.fc-face{backface-visibility:hidden;position:absolute;top:0;left:0;right:0;bottom:0;padding:24px;overflow-y:auto}
-.fc-back{transform:rotateY(180deg)}
-.fc-nav{display:flex;justify-content:center;gap:32px;margin-top:12px}
-.fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer}
+:root{--bg:#0f0f1a;--card:#1a1a2e;--card2:#252540;--purple:#7c3aed;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--text:#e2e8f0;--dim:#94a3b8;--radius:16px;--accent:var(--purple);--accent-soft:rgba(124,58,237,0.25)}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:16px;padding-top:env(safe-area-inset-top,16px);-webkit-user-select:none;user-select:none}
+h1{font-size:26px;margin:8px 0 4px;text-align:center}
+.subtitle{text-align:center;color:var(--dim);font-size:13px;margin-bottom:14px}
+.flashcard{background:radial-gradient(circle at 20% 0%, var(--accent-soft), var(--card) 55%);border-radius:20px;padding:24px;margin:12px 0;cursor:pointer;position:relative;overflow:hidden;touch-action:pan-y}
+.fc-face{display:none}
+.fc-face.visible{display:block}
+.fc-nav{display:flex;justify-content:center;gap:24px;margin-top:12px}
+.fc-nav button{background:var(--card);border:none;color:var(--purple);width:52px;height:52px;border-radius:50%;font-size:22px;cursor:pointer;transition:transform .1s}
+.fc-nav button:active{transform:scale(.9)}
 .counter{text-align:center;color:var(--dim);font-size:13px;margin:8px 0}
+.counter-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 16px;margin:8px 0}
+.counter-row .counter{margin:0}
+.counter-nav-cluster{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+.shuffle-mini{background:transparent;border:1px solid #ffffff15;color:var(--dim);width:34px;height:34px;border-radius:12px;font-size:16px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;opacity:.9}
+.shuffle-mini:active{background:rgba(124,58,237,0.28);color:#fff;border-color:var(--purple);transform:scale(.98)}
+.shuffle-mini:focus{outline:none;box-shadow:0 0 0 2px rgba(124,58,237,.25)}
 .tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:8px;font-weight:600}
-.progress-bar{height:6px;background:var(--card2);border-radius:3px;margin:8px 0;overflow:hidden}
-.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--purple),#6366f1);border-radius:3px;transition:width .3s}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
+.mode-toggle{display:flex;gap:4px;margin-bottom:8px}
+.mode-btn{flex:1;padding:7px 0;border-radius:10px;border:1px solid #ffffff15;background:var(--card2);color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;transition:.15s;text-align:center}
+.mode-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+#search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none;margin-bottom:8px}
+#search::placeholder{color:var(--dim)}
+#search:focus{border-color:var(--purple)}
+.spoiler-row{margin-top:12px}
+.hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;display:inline-block}
+.steps-btn{color:var(--green)}
+.hint-text{margin-top:8px;color:var(--orange);font-size:14px;font-weight:600}
+.steps-text{margin-top:8px;color:var(--green);font-size:13px;line-height:1.7;white-space:pre-wrap}
+.hl{color:var(--orange);font-weight:600;background:rgba(245,158,11,0.15);padding:1px 4px;border-radius:4px}
+.filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
+.filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
+pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
+.code-wrap{position:relative;margin-top:10px}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(124,58,237,0.2);border:none;color:#a78bfa;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;z-index:1;transition:.2s;box-shadow:0 0 10px rgba(124,58,237,0.2)}
+.copy-btn:hover{background:rgba(124,58,237,0.35);box-shadow:0 0 14px rgba(124,58,237,0.4)}
+.copy-btn:active{background:var(--purple);color:#fff;transform:scale(0.95)}
+.copy-btn.copied{background:rgba(34,197,94,0.25);color:#4ade80;box-shadow:0 0 10px rgba(34,197,94,0.3)}
+.enter-btn-inline{position:absolute;top:34px;right:8px;background:var(--card);border:1px solid #ffffff20;color:var(--dim);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;z-index:1;transition:.2s}
+.enter-btn-inline:active{background:var(--purple);color:#fff}
+.enter-btn-inline{min-width:72px;text-align:center;line-height:1}
+.enter-btn-inline.active{box-shadow:0 0 0 2px rgba(124,58,237,.25)}
+.mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.fly-overlay{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
+.peek-cat{position:fixed;z-index:400;pointer-events:none;transition:transform .8s cubic-bezier(.34,1.56,.64,1);font-size:40px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.peek-cat.from-right{right:-50px;bottom:15%;transform:translateX(0)}
+.peek-cat.from-right.visible{transform:translateX(-45px)}
+.peek-cat.from-left{left:-50px;bottom:25%;transform:translateX(0) scaleX(-1)}
+.peek-cat.from-left.visible{transform:translateX(45px) scaleX(-1)}
+.peek-cat.from-bottom{bottom:-45px;right:20%;transform:translateY(0)}
+.peek-cat.from-bottom.visible{transform:translateY(-40px)}
+.peek-cat-face{display:block;line-height:1}
+.peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
+.fish{position:fixed;pointer-events:none;z-index:50;font-size:var(--fish-size,28px);opacity:0;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2))}
+@keyframes fishSwimLR{0%{opacity:0;transform:translateX(0) translateY(0) scaleX(1)}8%{opacity:1}50%{transform:translateX(var(--swim-x,40vw)) translateY(var(--swim-y,0px)) scaleX(1)}100%{opacity:0;transform:translateX(var(--swim-x2,80vw)) translateY(var(--swim-y2,20px)) scaleX(1)}}
+@keyframes fishSwimRL{0%{opacity:0;transform:translateX(0) translateY(0) scaleX(-1)}8%{opacity:1}50%{transform:translateX(var(--swim-x,-40vw)) translateY(var(--swim-y,0px)) scaleX(-1)}100%{opacity:0;transform:translateX(var(--swim-x2,-80vw)) translateY(var(--swim-y2,20px)) scaleX(-1)}}
+@keyframes fishBob{0%,100%{margin-top:0}50%{margin-top:var(--bob,6px)}}
+.mascot{position:absolute;will-change:transform,opacity;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));user-select:none;font-size:30px;opacity:.95}
+.mascot-bird{animation:mascotBird 2.8s ease-in-out both}
+.mascot-butterfly{animation:mascotButterfly 3.2s linear both}
+.mascot-cat{animation:mascotCat 3.6s ease-in-out both}
+
+@keyframes mascotBird{
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75) rotate(-8deg)}
+  10%{opacity:1}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1.15) rotate(10deg)}
+}
+@keyframes mascotButterfly{
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.70) rotate(0deg)}
+  10%{opacity:1}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx)),calc(var(--y) + var(--dy))) scale(1.20) rotate(12deg)}
+}
+@keyframes mascotCat{
+  0%{opacity:0;transform:translate(var(--x),var(--y)) scale(.75)}
+  12%{opacity:1}
+  30%{transform:translate(calc(var(--x) + var(--dx)),var(--y)) scale(1.25)}
+  60%{transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(1.05)}
+  100%{opacity:0;transform:translate(calc(var(--x) + var(--dx2)),var(--y)) scale(.95)}
+}
+
+/* Интерактив 5: "пузырьки" во время ввода решения */
+.typing-bubble{
+  position:absolute;
+  left:0;
+  top:0;
+  pointer-events:none;
+  user-select:none;
+  will-change:transform,opacity;
+  opacity:.95;
+  font-size:18px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+  animation:bubbleRise 1200ms ease-out both;
+}
+@keyframes bubbleRise{
+  0%{opacity:0;transform:translate(0,0) scale(.8)}
+  12%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}
+}
+
+/* Интерактив 6: "вылетающие" эмодзи при переключении карточки */
+.fly-marker{
+  position:absolute;
+  left:0;
+  top:0;
+  pointer-events:none;
+  user-select:none;
+  will-change:transform,opacity;
+  opacity:0;
+  font-size:22px;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
+  animation:flyMarker 850ms ease-out both;
+}
+@keyframes flyMarker{
+  0%{opacity:0;transform:translate(0,0) scale(.75) rotate(0deg)}
+  12%{opacity:1}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(var(--rot))}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .typing-bubble,.fly-marker{display:none !important}
+}
+.solution-editor{position:relative;border-radius:10px;overflow:hidden}
+.code-wrap:has(.solution-editor),.code-wrap:has(.solution-pre){animation:codeBreathe 6s ease-in-out infinite}
+@keyframes codeBreathe{0%,100%{box-shadow:0 0 15px rgba(124,58,237,0.2)}50%{box-shadow:0 0 25px rgba(124,58,237,0.4),0 0 40px rgba(236,72,153,0.2)}}
+.solution-pre{margin:0}
+.solution-pre code{display:block;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;white-space:pre}
+.solution-pre code.solution-bg{background:var(--card2);color:var(--dim);user-select:none}
+.solution-pre code.no-hljs{background:var(--card2);color:var(--dim);user-select:none}
+.solution-input{position:absolute;inset:0;width:100%;height:100%;padding:12px;border:0;outline:none;background:transparent;color:var(--text);font-family:monospace;font-size:11px;line-height:1.5;resize:none;overflow:auto;caret-color:var(--purple)}
+.solution-enter-btn{margin-top:12px;width:100%;background:var(--card2);border:1px solid #ffffff20;color:var(--dim);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.solution-enter-btn:active{transform:scale(.99);background:var(--purple);color:#fff;border-color:var(--purple)}
+.edit-toggle{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid #ffffff20;color:var(--dim);width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:.2s}
+.edit-toggle.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.mark-btn{position:absolute;top:10px;right:10px;background:none;border:none;font-size:20px;cursor:pointer;opacity:.35;transition:opacity .15s,transform .15s;line-height:1;padding:4px;z-index:5}
+.mark-btn:active{transform:scale(.85)}
+.mark-btn.marked{opacity:1}
+.filter-btn.marked-filter{border-color:rgba(250,204,21,0.5);background:rgba(250,204,21,0.12);color:#facc15}
+.edit-field{width:100%;background:var(--card2);color:var(--text);border:1px solid #ffffff20;border-radius:8px;padding:8px;font-size:13px;font-family:monospace;resize:vertical;line-height:1.5;margin-top:6px}
+.edit-field:focus{border-color:var(--purple);outline:none}
+.edit-label{font-size:11px;color:var(--dim);margin-top:10px;text-transform:uppercase;letter-spacing:.5px}
+.edit-save{background:var(--green);color:#000;border:none;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;width:100%}
+.edit-save:disabled{opacity:.5;cursor:not-allowed}
+.edit-status{text-align:center;font-size:12px;margin-top:8px;min-height:18px}
+.token-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+.token-box{background:var(--card);border-radius:16px;padding:24px;max-width:360px;width:100%}
+.token-box h3{margin-bottom:12px;font-size:16px}
+.token-box p{font-size:13px;color:var(--dim);margin-bottom:12px;line-height:1.5}
+.token-box input{width:100%;padding:10px;border-radius:8px;border:1px solid #ffffff20;background:var(--card2);color:var(--text);font-size:14px;font-family:monospace}
+.token-box input:focus{border-color:var(--purple);outline:none}
+.token-btns{display:flex;gap:8px;margin-top:14px}
+.token-btns button{flex:1;padding:10px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.token-ok{background:var(--purple);color:#fff}
+.token-cancel{background:var(--card2);color:var(--dim)}
+.solve-tracker{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 10px;flex-wrap:wrap;-webkit-user-select:none;user-select:none}
+.solve-tracker .solve-label{color:var(--dim);font-size:13px}
+.solve-btn{width:42px;height:42px;border-radius:12px;border:1px solid #ffffff20;background:var(--card2);color:var(--text);font-size:22px;line-height:1;cursor:pointer;transition:transform .1s,background .15s}
+.solve-btn:active{transform:scale(.92);background:var(--purple);color:#fff}
+.solve-num{min-width:32px;text-align:center;font-weight:700;font-size:17px;color:var(--green)}
+.lc-similar{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff15}
+.lc-similar-title{font-size:12px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.lc-similar-links{display:flex;flex-wrap:wrap;gap:8px 14px}
+.lc-similar-subtitle{font-size:11px;color:var(--dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.45px}
+.lc-similar-subtitle:first-of-type{margin-top:0}
+.lc-similar-link{color:var(--purple);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.lc-similar-link:active{opacity:.85}
+.repo-similar-link{
+  display:inline-block;
+  margin:0;
+  padding:6px 12px;
+  border-radius:10px;
+  border:1px solid rgba(34,197,94,0.35);
+  background:rgba(34,197,94,0.1);
+  color:var(--green);
+  font-size:13px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  text-align:left;
+  transition:background .15s,border-color .15s,transform .1s;
+}
+.repo-similar-link:hover{background:rgba(34,197,94,0.18);border-color:rgba(34,197,94,0.55)}
+.repo-similar-link:active{transform:scale(.98);opacity:.95}
+
+/* ===== DIAGRAM STYLES (сказочный блок — отдельный фон) ===== */
+.diagram-wrap{
+  margin-top:18px;
+  padding:22px 20px 20px;
+  position:relative;
+  border-radius:20px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  border:1px solid rgba(251,191,36,0.35);
+  box-shadow:
+    0 0 0 1px rgba(167,139,250,0.25) inset,
+    0 4px 24px rgba(91,33,182,0.45),
+    0 12px 48px rgba(236,72,153,0.18),
+    0 0 80px rgba(251,191,36,0.08);
+  background:
+    linear-gradient(155deg,
+      #1a0a2e 0%,
+      #2d1b4e 22%,
+      #4c1d95 48%,
+      #1e3a5f 78%,
+      #0f172a 100%);
+}
+/* северное сияние + тёплый блик */
+.diagram-wrap::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:0;
+  opacity:.95;
+  background:
+    radial-gradient(ellipse 140% 70% at 50% -30%, rgba(192,132,252,0.45), transparent 55%),
+    radial-gradient(ellipse 90% 50% at 100% 80%, rgba(244,114,182,0.28), transparent 50%),
+    radial-gradient(ellipse 70% 45% at 0% 90%, rgba(52,211,153,0.12), transparent 45%),
+    radial-gradient(ellipse 60% 40% at 85% 15%, rgba(251,191,36,0.2), transparent 40%);
+  animation:diagramAurora 14s ease-in-out infinite alternate;
+}
+/* мелкие «звёзды» */
+.diagram-wrap::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  z-index:0;
+  opacity:.55;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,0.95) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 88% 12%, rgba(255,255,255,0.85) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 72% 42%, rgba(255,255,255,0.7) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 25% 55%, rgba(253,224,71,0.9) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 45% 28%, rgba(255,255,255,0.65) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 92% 68%, rgba(255,255,255,0.55) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 8% 82%, rgba(255,255,255,0.5) 0.5px, transparent 0.6px),
+    radial-gradient(circle at 55% 88%, rgba(196,181,253,0.9) 0.5px, transparent 0.6px);
+  animation:diagramTwinkle 5s ease-in-out infinite;
+}
+@keyframes diagramAurora{
+  0%{opacity:.88;filter:hue-rotate(-8deg)}
+  100%{opacity:1;filter:hue-rotate(12deg)}
+}
+@keyframes diagramTwinkle{
+  0%,100%{opacity:.45}
+  50%{opacity:.72}
+}
+.diagram-wrap > *{position:relative;z-index:1}
+
+.diagram-title{
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:14px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:linear-gradient(90deg,#fde68a,#fbbf24,#f472b6,#c4b5fd);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.diagram-title::before{
+  content:'✨';
+  font-size:16px;
+  filter:none;
+  -webkit-background-clip:unset;
+  background-clip:unset;
+  color:#fde68a;
+  text-shadow:0 0 12px rgba(251,191,36,.8);
+}
+
+/* Array visualization */
+.arr-vis{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.arr-cell{min-width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--card);border:2px solid #ffffff20;border-radius:8px;font-size:14px;font-weight:600;transition:all .3s ease;position:relative}
+.diagram-wrap .arr-cell{background:rgba(15,23,42,0.55);border-color:rgba(226,232,240,0.28);color:#f1f5f9;border-radius:10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.arr-cell.active{border-color:var(--purple);background:rgba(124,58,237,0.2);transform:scale(1.1)}
+.arr-cell.left-ptr{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,0.3)}
+.arr-cell.right-ptr{border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,158,11,0.3)}
+.arr-cell.mid-ptr{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,0.3)}
+.arr-cell.window{background:rgba(34,197,94,0.15);border-color:var(--green)}
+.arr-cell.found{background:rgba(34,197,94,0.3);border-color:var(--green);animation:pulse .5s ease}
+.arr-cell.discarded{opacity:.3;transform:scale(.9)}
+.arr-cell .ptr-label{position:absolute;top:-20px;font-size:10px;font-weight:700;white-space:nowrap}
+.arr-cell .ptr-label.l{color:var(--green)}
+.arr-cell .ptr-label.r{color:var(--orange)}
+.arr-cell .ptr-label.m{color:var(--purple)}
+
+/* Stack visualization */
+.stack-vis{display:flex;flex-direction:column-reverse;gap:4px;align-items:center;min-height:120px;margin:12px 0}
+.stack-cell{min-width:80px;padding:8px 16px;background:var(--card);border:2px solid #ffffff20;border-radius:8px;font-size:14px;font-weight:600;text-align:center;transition:all .3s ease}
+.stack-cell.push{animation:stackPush .4s ease}
+.stack-cell.pop{animation:stackPop .4s ease}
+.stack-cell.top{border-color:var(--purple);background:rgba(124,58,237,0.2)}
+.stack-base{width:100px;height:4px;background:var(--dim);border-radius:2px;margin-top:8px}
+
+/* Tree visualization */
+.tree-vis{display:flex;flex-direction:column;align-items:center;gap:8px;margin:12px 0}
+.tree-row{display:flex;gap:16px;justify-content:center}
+.tree-node{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--card);border:2px solid #ffffff20;border-radius:50%;font-size:13px;font-weight:600;transition:all .3s ease;position:relative}
+.tree-node.active{border-color:var(--purple);background:rgba(124,58,237,0.2);transform:scale(1.15)}
+.tree-node.visited{border-color:var(--green);background:rgba(34,197,94,0.2)}
+.tree-node.null{opacity:.3;font-size:10px}
+.tree-edge{position:absolute;width:2px;background:#ffffff30;transform-origin:top center}
+
+/* Controls */
+.diagram-controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:16px;flex-wrap:wrap}
+.diagram-btn{
+  background:linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.06));
+  border:1px solid rgba(251,191,36,0.45);
+  color:#fef3c7;
+  padding:8px 16px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .2s,border-color .2s;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  box-shadow:0 2px 12px rgba(91,33,182,0.35),0 0 20px rgba(251,191,36,0.08);
+}
+.diagram-btn:hover{
+  border-color:rgba(253,224,71,0.85);
+  box-shadow:0 4px 20px rgba(124,58,237,0.45),0 0 28px rgba(251,191,36,0.15);
+  color:#fff;
+}
+.diagram-btn:active{transform:scale(.96)}
+.diagram-btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.diagram-step{font-size:12px;color:rgba(254,243,199,0.85);padding:6px 12px;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+
+/* Step description */
+.diagram-desc{
+  font-size:13px;
+  color:#e2e8f0;
+  text-align:center;
+  margin-top:12px;
+  min-height:40px;
+  line-height:1.55;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(15,23,42,0.35);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  text-shadow:0 1px 12px rgba(0,0,0,.5);
+}
+.diagram-desc .hl{
+  color:#fde68a;
+  font-weight:700;
+  text-shadow:0 0 16px rgba(251,191,36,.45);
+}
+.diagram-wrap .stack-cell,
+.diagram-wrap .tree-node,
+.diagram-wrap .struct-block,
+.diagram-wrap .vars-panel,
+.diagram-wrap .cart-box,
+.diagram-wrap .cart-val,
+.diagram-wrap .ll-val,
+.diagram-wrap .deque-item{
+  background:rgba(15,23,42,0.5);
+  border-color:rgba(226,232,240,0.22);
+  color:#f1f5f9;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+.diagram-wrap .stack-base{background:linear-gradient(90deg,transparent,rgba(253,224,71,0.5),transparent)}
+.diagram-wrap .struct-item,
+.diagram-wrap .vars-arr-item,
+.diagram-wrap .cart-chip,
+.diagram-wrap .cart-result{background:rgba(30,27,75,0.55);border-color:rgba(255,255,255,0.12)}
+.diagram-wrap .cart-input-title,
+.diagram-wrap .cart-box-title,
+.diagram-wrap .cart-input-label,
+.diagram-wrap .struct-label,
+.diagram-wrap .deque-label{color:rgba(254,243,199,0.75)}
+.diagram-wrap .vars-name{color:#c4b5fd}
+.diagram-wrap .vars-eq,.diagram-wrap .struct-arrow,.diagram-wrap .ll-arrow{color:rgba(226,232,240,0.5)}
+
+@media (prefers-reduced-motion:reduce){
+  .diagram-wrap::before,.diagram-wrap::after{animation:none}
+}
+
+/* Variables panel (debugger-style) */
+.vars-panel{background:var(--card);border-radius:10px;padding:12px;margin:10px 0;font-family:monospace;font-size:12px}
+.vars-row{display:flex;align-items:flex-start;margin:6px 0;gap:8px}
+.vars-name{color:var(--purple);min-width:70px;font-weight:600}
+.vars-eq{color:var(--dim)}
+.vars-val{color:var(--text);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.vars-val.highlight{color:var(--green);font-weight:600}
+.vars-arr{display:flex;gap:2px;flex-wrap:wrap}
+.vars-arr-item{background:var(--card2);padding:3px 8px;border-radius:4px;border:1px solid #ffffff15}
+.vars-arr-item.new{border-color:var(--green);background:rgba(34,197,94,0.15);animation:fadeIn .3s}
+.vars-arr-item.current{border-color:var(--purple);background:rgba(124,58,237,0.2)}
+.vars-map{display:flex;flex-direction:column;gap:4px}
+.vars-map-entry{display:flex;gap:6px;background:var(--card2);padding:4px 8px;border-radius:4px}
+.vars-map-key{color:var(--orange)}
+.vars-map-arrow{color:var(--dim)}
+.vars-map-val{color:var(--text)}
+.vars-str{color:var(--green)}
+.vars-num{color:var(--orange)}
+
+/* Linked list visualization */
+.ll-vis{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:12px 0}
+.ll-node{display:flex;align-items:center;gap:2px}
+.ll-val{background:var(--card);border:2px solid #ffffff20;padding:6px 12px;border-radius:8px;font-weight:600;transition:all .3s}
+.ll-val.current{border-color:var(--purple);background:rgba(124,58,237,0.2)}
+.ll-val.slow{border-color:var(--green);box-shadow:0 0 0 2px rgba(34,197,94,0.3)}
+.ll-val.fast{border-color:var(--orange);box-shadow:0 0 0 2px rgba(245,158,11,0.3)}
+.ll-val.remove{opacity:.4;text-decoration:line-through}
+.ll-arrow{color:var(--dim);font-size:16px}
+.ll-null{color:var(--dim);font-style:italic;font-size:12px}
+
+/* Deque visualization */
+.deque-vis{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.deque-label{font-size:11px;color:var(--dim);text-transform:uppercase}
+.deque-items{display:flex;gap:4px;min-height:36px;align-items:center}
+.deque-item{background:var(--card);border:2px solid #ffffff20;padding:6px 10px;border-radius:6px;font-size:13px;font-weight:600}
+.deque-item.front{border-color:var(--green)}
+.deque-item.back{border-color:var(--orange)}
+
+/* Multi-structure layout */
+.multi-vis{display:flex;flex-direction:column;gap:14px}
+.struct-block{background:var(--card);border-radius:10px;padding:10px 12px}
+.struct-label{font-size:11px;color:var(--dim);margin-bottom:6px;font-family:monospace}
+.struct-label .type{color:var(--purple)}
+.struct-row{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.struct-item{background:var(--card2);padding:4px 10px;border-radius:6px;font-size:13px;font-family:monospace;border:1px solid #ffffff15}
+.struct-item.hl{border-color:var(--green);background:rgba(34,197,94,0.15)}
+.struct-item.active{border-color:var(--purple);background:rgba(124,58,237,0.2)}
+.struct-kv{display:flex;gap:4px}
+.struct-key{color:var(--orange)}
+.struct-arrow{color:var(--dim)}
+.struct-val{color:var(--text)}
+
+/* Cartesian product visualization */
+.cart-vis{display:flex;flex-direction:column;gap:10px}
+.cart-input-title{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px}
+.cart-input-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cart-input-label{font-family:monospace;color:var(--purple);min-width:72px;font-size:12px}
+.cart-arr{display:flex;gap:4px;flex-wrap:wrap}
+.cart-val{background:var(--card);border:1px solid #ffffff20;padding:5px 10px;border-radius:6px;font-family:monospace;font-size:13px}
+.cart-val.active{border-color:var(--green);background:rgba(34,197,94,0.18)}
+.cart-state{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cart-box{background:var(--card);border-radius:8px;padding:8px 10px}
+.cart-box-title{font-size:11px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.cart-chip-row{display:flex;gap:4px;flex-wrap:wrap}
+.cart-chip{background:var(--card2);border:1px solid #ffffff20;padding:4px 8px;border-radius:6px;font-family:monospace;font-size:12px}
+.cart-chip.idx{color:var(--orange)}
+.cart-results{display:flex;flex-direction:column;gap:4px;max-height:130px;overflow:auto}
+.cart-result{font-family:monospace;font-size:12px;color:var(--text);background:var(--card2);border:1px solid #ffffff15;border-radius:6px;padding:4px 8px}
+@media (max-width:560px){
+  .cart-state{grid-template-columns:1fr}
+}
+
+/* Animations */
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes stackPush{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes stackPop{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-20px)}}
+@keyframes slideIn{0%{opacity:0;transform:translateX(-10px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+
+/* Responsive */
+@media (max-width:400px){
+  .arr-cell{min-width:28px;height:28px;font-size:12px}
+  .tree-node{width:28px;height:28px;font-size:11px}
+  .diagram-wrap{padding:16px 14px 14px}
+}
+
+/* Theory modal */
+.theory-modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:250;padding:16px;backdrop-filter:blur(4px)}
+.theory-box{background:var(--card);border-radius:20px;padding:24px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto;position:relative;border:1px solid #ffffff15}
+.theory-close{position:absolute;top:12px;right:12px;background:var(--card2);border:none;color:var(--dim);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
+.theory-close:hover{color:var(--text)}
+.theory-edit-toggle{position:absolute;top:12px;right:52px;background:var(--card2);border:none;color:var(--dim);width:32px;height:32px;border-radius:50%;font-size:14px;cursor:pointer;transition:.2s}
+.theory-edit-toggle:hover{color:var(--text);background:var(--purple)}
+.theory-title{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.theory-title .icon{font-size:24px}
+.theory-subtitle{color:var(--dim);font-size:13px;margin-bottom:16px}
+.theory-section{margin-bottom:16px}
+.theory-section-title{font-size:12px;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600}
+.theory-text{font-size:14px;line-height:1.6;color:var(--text)}
+.theory-code{background:var(--card2);border-radius:10px;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;overflow-x:auto;margin-top:8px}
+.theory-code .comment{color:var(--dim)}
+.theory-code .keyword{color:var(--purple)}
+.theory-code .hl{color:var(--green);font-weight:600}
+.theory-when{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.theory-when-item{background:rgba(124,58,237,0.15);color:var(--purple);padding:4px 10px;border-radius:6px;font-size:12px}
+.tag.clickable{cursor:pointer;transition:.2s}
+.tag.clickable:hover{filter:brightness(1.2);transform:scale(1.05)}
 </style>
 </head>
 <body>
 
-<div id="patterns" class="screen active">
-  <h1>AlgoCards</h1>
-  <div class="grid" id="patternsGrid"></div>
+<h1>AlgoCards</h1>
+<div id="flyOverlay" class="fly-overlay" aria-hidden="true"></div>
+<div id="peekCat" class="peek-cat from-right" aria-hidden="true">
+  <span class="peek-cat-face">🐱</span>
+  <span class="peek-cat-paws">🐾</span>
 </div>
-
-<div id="patternDetail" class="screen">
-  <button class="back-btn" onclick="showScreen('patterns')">← Назад</button>
-  <h1 id="pdTitle"></h1>
-  <div id="pdList"></div>
+<div class="subtitle" id="info"></div>
+<input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
+<div class="mode-toggle">
+  <button class="mode-btn active" id="modeMixed" onclick="setDailyMode('mixed')">🔀 10 разных тем</button>
+  <button class="mode-btn" id="modeTopic" onclick="setDailyMode('topic')">📚 10 одной темы</button>
 </div>
+<div class="filter-row" id="filters"></div>
+<div id="cardsArea"></div>
+<button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
+<div id="tokenModal" class="token-modal" style="display:none"></div>
+<div id="theoryModal" class="theory-modal" style="display:none"></div>
 
-<div id="problemDetail" class="screen">
-  <button class="back-btn" id="pdBack">← Назад</button>
-  <h1 id="probTitle" style="font-size:20px"></h1>
-  <div id="probContent"></div>
-</div>
-
-<div id="quiz" class="screen">
-  <h1>Квиз</h1>
-  <div id="quizArea"></div>
-</div>
-
-<div id="cards" class="screen">
-  <h1>Карточки</h1>
-  <div id="cardsArea"></div>
-</div>
-
-<nav class="tabs">
-  <div class="tab active" onclick="showScreen('patterns')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Паттерны</div>
-  <div class="tab" onclick="showScreen('quiz')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 115.12 2.13c-.73.58-1.12 1.3-1.12 2.12V14"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>Квиз</div>
-  <div class="tab" onclick="showScreen('cards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="4" y="2" width="16" height="16" rx="2" opacity=".4"/></svg>Карточки</div>
-</nav>
-
+<script charset="UTF-8">
+(function(){
+  var v=typeof localStorage!=='undefined'?localStorage.getItem('algocards_pq'):'';
+  document.write('<script src="problems.js'+(v?'?v='+encodeURIComponent(v):'')+'" charset="UTF-8"><\/script>');
+})();
+</script>
+<script src="theory.js" charset="UTF-8"></script>
 <script>
-const P=[
-{id:"bt1",t:"Generate Parentheses",p:"Backtracking",d:"средне",desc:"Дано n. Сгенерировать все правильные скобочные последовательности длины 2n.\n\nВвод: n=3\nВывод: [\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]",hint:"Два счётчика: open и close. open<n → ставим '(', close<open → ставим ')'",code:"void gen(int o,int c,int n,StringBuilder sb,List<String> r){\n  if(sb.length()==2*n){r.add(sb.toString());return;}\n  if(o<n){sb.append('(');gen(o+1,c,n,sb,r);sb.deleteCharAt(sb.length()-1);}\n  if(c<o){sb.append(')');gen(o,c+1,n,sb,r);sb.deleteCharAt(sb.length()-1);}\n}",expl:"Backtracking с двумя счётчиками. close никогда не превышает open."},
-{id:"bs1",t:"Поиск в повернутом массиве",p:"Binary Search",d:"средне",desc:"Отсортированный массив повёрнут ([4,5,6,7,0,1,2]). Найти target за O(log n).\n\nВвод: nums=[4,5,6,7,0,1,2], target=0\nВывод: 4",hint:"Определи какая половина отсортирована, проверь попадает ли target в неё",code:"int search(int[] a,int t){\n  int lo=0,hi=a.length-1;\n  while(lo<=hi){\n    int m=lo+(hi-lo)/2;\n    if(a[m]==t)return m;\n    if(a[lo]<=a[m]){\n      if(t>=a[lo]&&t<a[m])hi=m-1; else lo=m+1;\n    }else{\n      if(t>a[m]&&t<=a[hi])lo=m+1; else hi=m-1;\n    }\n  }return -1;\n}",expl:"Одна из половин всегда отсортирована. Определяем какая и сужаем поиск."},
-{id:"gop1",t:"Best Time to Buy and Sell Stock II",p:"Greedy",d:"легко",desc:"Цены акций по дням. Сколько угодно сделок. Макс прибыль.\n\nВвод: [7,1,5,3,6,4]\nВывод: 7",hint:"Собираем все подъёмы: если prices[i]>prices[i-1] — добавляем разницу",code:"int maxProfit(int[] p){\n  int r=0;\n  for(int i=1;i<p.length;i++)\n    if(p[i]>p[i-1]) r+=p[i]-p[i-1];\n  return r;\n}",expl:"Greedy: сумма всех положительных разностей = максимальная прибыль."},
-{id:"hf1",t:"Группировка анаграмм",p:"HashMap",d:"средне",desc:"Дан массив строк. Сгруппируйте анаграммы.\n\nВвод: [\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]\nВывод: [[\"bat\"],[\"nat\",\"tan\"],[\"ate\",\"eat\",\"tea\"]]",hint:"Ключ = отсортированная строка. HashMap<ключ, список>",code:"Map<String,List<String>> m=new HashMap<>();\nfor(String s:strs){\n  char[] a=s.toCharArray();\n  Arrays.sort(a);\n  m.computeIfAbsent(new String(a),k->new ArrayList<>()).add(s);\n}",expl:"Все анаграммы дают одинаковый ключ при сортировке символов."},
-{id:"hpq1",t:"K частых элементов",p:"Heap / PQ",d:"средне",desc:"Дан массив и k. Вернуть k самых частых элементов.\n\nВвод: nums=[1,1,1,2,2,3], k=2\nВывод: [1,2]",hint:"Частоты через HashMap, затем min-heap размера k",code:"PriorityQueue<Integer> heap=new PriorityQueue<>(\n  (a,b)->freq.get(a)-freq.get(b));\nfor(int key:freq.keySet()){\n  heap.add(key);\n  if(heap.size()>k)heap.poll();\n}",expl:"Min-heap размера k: добавляем, если >k — удаляем минимум."},
-{id:"iss1",t:"Merge Intervals",p:"Intervals Sweep",d:"средне",desc:"Слить перекрывающиеся интервалы.\n\nВвод: [[1,3],[2,6],[8,10],[15,18]]\nВывод: [[1,6],[8,10],[15,18]]",hint:"Сортируй по началу. Расширяй текущий или начинай новый.",code:"Arrays.sort(intervals,(a,b)->a[0]-b[0]);\nList<int[]> r=new ArrayList<>();\nint[] cur=intervals[0];\nfor(int i=1;i<intervals.length;i++){\n  if(intervals[i][0]<=cur[1]) cur[1]=Math.max(cur[1],intervals[i][1]);\n  else{r.add(cur);cur=intervals[i];}\n}\nr.add(cur);",expl:"Сортировка + sweep: начало ≤ конец текущего — расширяем, иначе новый."},
-{id:"ll1",t:"Reverse Linked List",p:"Linked List",d:"легко",desc:"Развернуть односвязный список.\n\nВвод: 1→2→3→4→5\nВывод: 5→4→3→2→1",hint:"Три указателя: prev, curr, next. Перенаправляем curr.next на prev.",code:"ListNode prev=null,curr=head;\nwhile(curr!=null){\n  ListNode next=curr.next;\n  curr.next=prev;\n  prev=curr;\n  curr=next;\n}\nreturn prev;",expl:"Итеративный разворот. O(n) время, O(1) память."},
-{id:"ps1",t:"Subarray Sum Equals K",p:"Prefix Sum",d:"средне",desc:"Количество подмассивов с суммой k.\n\nВвод: nums=[1,1,1], k=2\nВывод: 2",hint:"Prefix sum + HashMap: ищем prefixSum-k в мапе",code:"Map<Integer,Integer> m=new HashMap<>();\nm.put(0,1); int sum=0,cnt=0;\nfor(int x:nums){\n  sum+=x;\n  cnt+=m.getOrDefault(sum-k,0);\n  m.merge(sum,1,Integer::sum);\n}",expl:"prefixSum[j]-prefixSum[i]=k → subarray [i+1..j] имеет сумму k."},
-{id:"sw1",t:"Minimum Window Substring",p:"Sliding Window",d:"сложно",desc:"Минимальная подстрока s, содержащая все символы t.\n\nВвод: s=\"ADOBECODEBANC\", t=\"ABC\"\nВывод: \"BANC\"",hint:"Расширяем правую границу пока не покроем t, затем сжимаем левую",code:"int[] need=new int[128];\nfor(char c:t.toCharArray())need[c]++;\nint miss=t.length(),l=0,start=0,min=Integer.MAX_VALUE;\nfor(int r=0;r<s.length();r++){\n  if(need[s.charAt(r)]-->0)miss--;\n  while(miss==0){\n    if(r-l+1<min){min=r-l+1;start=l;}\n    if(++need[s.charAt(l++)]>0)miss++;\n  }\n}",expl:"Два указателя: правый расширяет, левый сжимает для минимума."},
-{id:"st1",t:"Valid Parentheses",p:"Stack",d:"легко",desc:"Проверить валидность скобочной последовательности (){}[].\n\nВвод: \"([{}])\"\nВывод: true",hint:"Открывающую — в стек, закрывающую — сверяем с вершиной",code:"Stack<Character> s=new Stack<>();\nfor(char c:str.toCharArray()){\n  if(c=='(')s.push(')');\n  else if(c=='{')s.push('}');\n  else if(c=='[')s.push(']');\n  else if(s.isEmpty()||s.pop()!=c)return false;\n}\nreturn s.isEmpty();",expl:"Стек: кладём ожидаемую закрывающую. При закрывающей — сверяем."},
-{id:"tr1",t:"Number of Islands",p:"Trees / DFS",d:"средне",desc:"2D-сетка из '1' и '0'. Посчитать количество островов.\n\nВвод: [[1,1,0],[1,0,0],[0,0,1]]\nВывод: 2",hint:"При нахождении '1' запускаем DFS, затапливаем весь остров",code:"int count=0;\nfor(int i=0;i<g.length;i++)\n for(int j=0;j<g[0].length;j++)\n  if(g[i][j]=='1'){dfs(g,i,j);count++;}\n// dfs меняет '1'->'0' и идёт в 4 стороны",expl:"DFS flood fill: затапливаем остров при нахождении, +1 к счётчику."},
-{id:"tp1",t:"Container With Most Water",p:"Two Pointers",d:"средне",desc:"Массив высот. Найти контейнер с максимумом воды.\n\nВвод: [1,8,6,2,5,4,8,3,7]\nВывод: 49",hint:"Два указателя. Двигаем тот, чья высота меньше.",code:"int l=0,r=h.length-1,max=0;\nwhile(l<r){\n  max=Math.max(max,Math.min(h[l],h[r])*(r-l));\n  if(h[l]<h[r])l++; else r--;\n}",expl:"Двигаем меньший указатель: сдвиг большего точно не увеличит площадь."},
-{id:"uf1",t:"Количество компонент связности",p:"Union-Find",d:"средне",desc:"Дан граф рёбрами. Количество компонент связности.\n\nВвод: n=5, edges=[[0,1],[1,2],[3,4]]\nВывод: 2",hint:"Union-Find: объединяй вершины, считай уникальные корни",code:"int[] p=new int[n];\nfor(int i=0;i<n;i++)p[i]=i;\nint comp=n;\nfor(int[] e:edges){\n  int a=find(p,e[0]),b=find(p,e[1]);\n  if(a!=b){p[a]=b;comp--;}\n}",expl:"Union-Find с path compression: объединяем, считаем корни."},
-{id:"dp1",t:"Longest Palindromic Substring",p:"Dynamic Prog.",d:"средне",desc:"Найти самую длинную подстроку-палиндром.\n\nВвод: \"babad\"\nВывод: \"bab\"",hint:"Expand around center: расширяйся влево-вправо пока совпадает",code:"for(int i=0;i<s.length();i++){\n  int l1=expand(s,i,i);\n  int l2=expand(s,i,i+1);\n  // обновляем max\n}\nint expand(String s,int l,int r){\n  while(l>=0&&r<s.length()&&s.charAt(l)==s.charAt(r)){l--;r++;}\n  return r-l-1;\n}",expl:"O(n²). Для каждого центра расширяемся пока совпадает."}
-];
-
-const patterns={};
-P.forEach(p=>{if(!patterns[p.p])patterns[p.p]=[];patterns[p.p].push(p)});
-const patNames=Object.keys(patterns);
-let curPat=null,curScreen='patterns';
-
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active',['patterns','quiz','cards'][i]===id);
-  });
-  curScreen=id;
-  if(id==='quiz')initQuiz();
-  if(id==='cards')initCards();
-}
-
-// PATTERNS
-function renderPatterns(){
-  const g=document.getElementById('patternsGrid');
-  g.innerHTML=patNames.map(name=>`
-    <div class="pcard" onclick="openPattern('${name}')">
-      <div class="name">${name}</div>
-      <div class="desc">${patterns[name].length} задач</div>
-    </div>`).join('');
-}
-function openPattern(name){
-  curPat=name;
-  document.getElementById('pdTitle').textContent=name;
-  document.getElementById('pdList').innerHTML=patterns[name].map(p=>`
-    <div class="problem-card" onclick="openProblem('${p.id}','patternDetail')">
-      <div class="title">${p.d==='легко'?'🟢':p.d==='средне'?'🟡':'🔴'} ${p.t}</div>
-      <div class="diff">${p.d}</div>
-    </div>`).join('');
-  showScreen('patternDetail');
-}
-function openProblem(id,from){
-  const p=P.find(x=>x.id===id);
-  document.getElementById('pdBack').onclick=()=>showScreen(from);
-  document.getElementById('probTitle').textContent=p.t;
-  document.getElementById('probContent').innerHTML=`
-    <span class="tag" style="background:${p.d==='легко'?'#22c55e30;color:#22c55e':p.d==='средне'?'#f59e0b30;color:#f59e0b':'#ef444430;color:#ef4444'}">${p.d}</span>
-    <span class="tag" style="background:#7c3aed30;color:#7c3aed;margin-left:4px">${p.p}</span>
-    <div class="detail-section"><h3>📝 Условие</h3><div style="white-space:pre-wrap">${esc(p.desc)}</div></div>
-    <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">💡 Показать подсказку</button>
-    <div class="detail-section" style="display:none"><h3>💡 Подсказка</h3>${esc(p.hint)}</div>
-    <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">👨‍💻 Показать решение</button>
-    <div class="detail-section" style="display:none"><h3>👨‍💻 Код</h3><pre>${esc(p.code)}</pre></div>
-    <button class="spoiler-btn" onclick="this.nextElementSibling.style.display='block';this.style.display='none'">🧠 Показать объяснение</button>
-    <div class="detail-section" style="display:none"><h3>🧠 Объяснение</h3>${esc(p.expl)}</div>`;
-  showScreen('problemDetail');
-}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-
-// QUIZ
-let qIdx=0,qList=[],qAnswered=false,qScore=0,qTotal=5;
-function initQuiz(){
-  qIdx=0;qScore=0;qList=shuffle([...P]).slice(0,qTotal);
-  document.getElementById('quizArea').innerHTML=`
-    <p style="color:var(--dim);margin-bottom:12px">Прочитай условие — угадай паттерн</p>
-    <button class="big-btn" onclick="nextQ()">Начать</button>`;
-}
-function nextQ(){
-  if(qIdx>=qTotal){
-    document.getElementById('quizArea').innerHTML=`
-      <div style="text-align:center;margin-top:40px">
-        <div style="font-size:48px">${qScore>=4?'⭐':'🔄'}</div>
-        <h2 style="margin:12px 0">${qScore} из ${qTotal}</h2>
-        <button class="big-btn" onclick="initQuiz()">Ещё раз</button>
-      </div>`;
-    return;
-  }
-  qAnswered=false;
-  const p=qList[qIdx];
-  const correct=p.p;
-  let opts=patNames.filter(n=>n!==correct);
-  opts=shuffle(opts).slice(0,3);
-  opts.push(correct);
-  opts=shuffle(opts);
-  const area=document.getElementById('quizArea');
-  area.innerHTML=`
-    <div class="counter">${qIdx+1} / ${qTotal}</div>
-    <div class="progress-bar"><div class="fill" style="width:${qIdx/qTotal*100}%"></div></div>
-    <div class="detail-section"><strong>${p.t}</strong><div style="white-space:pre-wrap;margin-top:8px;font-size:14px">${esc(p.desc)}</div></div>
-    <p style="font-weight:600;margin:8px 0">Какой паттерн?</p>
-    ${opts.map(o=>`<div class="quiz-option" data-v="${o}" onclick="pickAnswer(this,'${esc2(correct)}')">${o}</div>`).join('')}`;
-}
-function pickAnswer(el,correct){
-  if(qAnswered)return;
-  qAnswered=true;
-  const v=el.dataset.v;
-  document.querySelectorAll('.quiz-option').forEach(o=>{
-    if(o.dataset.v===correct)o.classList.add('correct');
-    else if(o===el)o.classList.add('wrong');
-    else o.classList.add('reveal');
-  });
-  if(v===correct)qScore++;
-  qIdx++;
-  setTimeout(nextQ,1200);
-}
-function esc2(s){return s.replace(/'/g,"\\'")}
-
-// FLASHCARDS
-let fcIdx=0,fcFlipped=false,fcList=[];
-function initCards(){
-  fcList=shuffle([...P]);fcIdx=0;fcFlipped=false;
-  renderCard();
-}
-function renderCard(){
-  const p=fcList[fcIdx];
-  const area=document.getElementById('cardsArea');
-  area.innerHTML=`
-    <div class="counter">${fcIdx+1} / ${fcList.length}</div>
-    <div class="flashcard${fcFlipped?' flipped':''}" onclick="flipCard()">
-      <div class="fc-face">
-        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.d}</span>
-        <h3 style="margin:12px 0">${p.t}</h3>
-        <div style="white-space:pre-wrap;font-size:14px">${esc(p.desc)}</div>
-        <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть</div>
-      </div>
-      <div class="fc-face fc-back">
-        <span class="tag" style="background:#7c3aed30;color:#7c3aed">${p.p}</span>
-        <div style="margin:10px 0;color:var(--orange);font-size:14px">${esc(p.hint)}</div>
-        <pre style="font-size:11px;background:var(--card2);padding:10px;border-radius:10px;overflow-x:auto">${esc(p.code)}</pre>
-        <div style="margin-top:8px;font-size:13px;color:var(--dim)">${esc(p.expl)}</div>
-      </div>
-    </div>
-    <div class="fc-nav">
-      <button onclick="fcPrev()">←</button>
-      <button onclick="fcShuffle()">🔀</button>
-      <button onclick="fcNext()">→</button>
-    </div>`;
-}
-function flipCard(){fcFlipped=!fcFlipped;renderCard()}
-function fcNext(){fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
-function fcPrev(){fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
-function fcShuffle(){fcFlipped=false;fcList=shuffle([...P]);fcIdx=0;renderCard()}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
+function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 
-renderPatterns();
+// Очень простой stripper для Java/С-стиля комментариев.
+// Удаляет //... до конца строки и /* ... */ блоки, сохраняя переносы строк.
+function stripCodeComments(src){
+  if(!src)return '';
+  let out=String(src);
+  // Блок-комментарии
+  out=out.replace(/\/\*[\s\S]*?\*\//g,'');
+  // Однострочные комментарии
+  out=out.replace(/(^|[^:])\/\/.*$/gm,'$1');
+  return out;
+}
+
+// THEORY загружается из theory.js
+
+let currentTheoryPattern = null;
+let theoryEditMode = false;
+
+function showTheory(pattern, forceEdit) {
+  const t = THEORY[pattern];
+  if (!t) return;
+  currentTheoryPattern = pattern;
+  if (forceEdit !== undefined) theoryEditMode = forceEdit;
+
+  const m = document.getElementById('theoryModal');
+  m.style.display = 'flex';
+
+  if (theoryEditMode) {
+    m.innerHTML = `
+      <div class="theory-box theory-edit-mode">
+        <button class="theory-close" onclick="closeTheory()">×</button>
+        <button class="theory-edit-toggle" onclick="toggleTheoryEdit()" title="Отменить редактирование">✕</button>
+        <div class="theory-subtitle">${pattern}</div>
+
+        <div class="edit-label">Иконка</div>
+        <input type="text" class="edit-field theory-edit-field" data-key="icon" value="${t.icon||''}" style="width:60px;text-align:center;font-size:24px">
+
+        <div class="edit-label">Название</div>
+        <input type="text" class="edit-field theory-edit-field" data-key="title" value="${escCode(t.title||'')}">
+
+        <div class="edit-label">Описание</div>
+        <textarea class="edit-field theory-edit-field" data-key="desc" rows="3">${t.desc||''}</textarea>
+
+        <div class="edit-label">Шаблон кода</div>
+        <textarea class="edit-field theory-edit-field" data-key="code" rows="15" style="font-family:monospace;font-size:12px">${t.code||''}</textarea>
+
+        <button class="edit-save" id="saveTheoryBtn" onclick="saveTheory()">💾 Сохранить и запушить</button>
+        <div class="edit-status" id="theoryEditStatus"></div>
+      </div>
+    `;
+  } else {
+    m.innerHTML = `
+      <div class="theory-box">
+        <button class="theory-close" onclick="closeTheory()">×</button>
+        <button class="theory-edit-toggle" onclick="toggleTheoryEdit()" title="Редактировать">✏️</button>
+        <div class="theory-title"><span class="icon">${t.icon}</span> ${t.title}</div>
+        <div class="theory-subtitle">${pattern}</div>
+
+        <div class="theory-section">
+          <div class="theory-section-title">Описание</div>
+          <div class="theory-text">${t.desc}</div>
+        </div>
+
+        <div class="theory-section">
+          <div class="theory-section-title">Шаблон кода</div>
+          <pre class="theory-code"><code class="language-java">${escCode(t.code)}</code></pre>
+        </div>
+      </div>
+    `;
+    // Подсветка синтаксиса
+    m.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+  }
+}
+
+function toggleTheoryEdit() {
+  const token = getToken();
+  if (!theoryEditMode && !token) {
+    showTokenModal();
+    return;
+  }
+  theoryEditMode = !theoryEditMode;
+  showTheory(currentTheoryPattern);
+}
+
+function closeTheory() {
+  theoryEditMode = false;
+  document.getElementById('theoryModal').style.display = 'none';
+}
+
+// Закрытие модала при клике на фон
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('theoryModal');
+  if (e.target === modal) closeTheory();
+});
+
+// --- «10 задач на сегодня» (без поиска) ---
+// Из текущего набора (все задачи или выбранный паттерн) каждый календарный день показываем не больше DAILY_LIMIT карточек.
+// Состав и порядок детерминированы от строки seed (дата + фильтр), чтобы за день список не менялся между перезагрузками.
+// Поиск не ограничиваем — при непустой строке поиска показываются все совпадения из getFiltered().
+
+const DAILY_LIMIT=10;
+/** Дата (YYYY-MM-DD), для которой уже собран fcList; если наступил новый день — пересобираем список в renderCard */
+let dailyListDateKey='';
+
+/** Локальная календарная дата устройства — ключ «какой сегодня день» для дневной выборки */
+function todayLocalDateKey(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+/** FNV-1a: превращаем строку seed в стартовое число для PRNG */
+function hashString(s){
+  let h=2166136261>>>0;
+  for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}
+  return h>>>0;
+}
+
+/** Детерминированный генератор [0,1) — нужен для воспроизводимого «перемешивания» по дню */
+function mulberry32(seed){
+  return function(){
+    let t=(seed+=0x6D2B79F5)>>>0;
+    t=Math.imul(t^t>>>15,t|1);
+    t^=t+Math.imul(t^t>>>7,t|61);
+    return ((t^t>>>14)>>>0)/4294967296;
+  };
+}
+
+/**
+ * Берёт из list до maxN задач: Fisher–Yates с PRNG от seedStr.
+ * seedStr обычно «дата|all» или «дата|Two Pointers» — отдельная выборка на каждый паттерн в тот же день.
+ */
+function pickDailyProblems(list,seedStr,maxN){
+  if(!list.length)return[];
+  const n=Math.min(maxN,list.length);
+  const rand=mulberry32(hashString(seedStr));
+  const idx=[...Array(list.length).keys()];
+  for(let i=idx.length-1;i>0;i--){
+    const j=Math.floor(rand()*(i+1));
+    const t=idx[i];idx[i]=idx[j];idx[j]=t;
+  }
+  return idx.slice(0,n).map(i=>list[i]);
+}
+
+/** Заполняет fcList дневной порцией. Имеет смысл только при пустом поиске. */
+function rebuildDailyList(){
+  const k=todayLocalDateKey();
+  dailyListDateKey=k;
+  let pool=getFiltered();
+  // Режим «одна тема»: если фильтр не выбран — берём случайную тему дня
+  if(dailyMode==='topic'&&!activeFilter){
+    const rand=mulberry32(hashString(k+'|topic'));
+    const idx=Math.floor(rand()*allPatterns.length);
+    const pat=allPatterns[idx];
+    pool=P.filter(p=>p.p===pat);
+  }
+  if(activeFilter){
+    fcList=pool;
+  }else{
+    fcList=pickDailyProblems(pool,k+'|'+dailyMode,DAILY_LIMIT);
+  }
+}
+
+function setDailyMode(mode){
+  dailyMode=mode;
+  localStorage.setItem('dailyMode',mode);
+  document.getElementById('modeMixed').classList.toggle('active',mode==='mixed');
+  document.getElementById('modeTopic').classList.toggle('active',mode==='topic');
+  if(!searchQuery){rebuildDailyList();fcIdx=0;fcFlipped=false;renderCard();}
+}
+
+function isInTodaysDailyBatch(p){
+  if(searchQuery)return false;
+  if(activeFilter)return getFiltered().some(x=>x.id===p.id);
+  const list=getFiltered();
+  const k=todayLocalDateKey()+'|all';
+  const daily=pickDailyProblems(list,k,DAILY_LIMIT);
+  return daily.some(x=>x.id===p.id);
+}
+
+/** Переход к карточке из этой репы (полный список по паттерну цели; поиск сбрасывается). */
+function openRepoSimilarCard(targetId){
+  const target=P.find(x=>String(x.id)===String(targetId));
+  if(!target)return;
+  setMascotTyping(false);
+  fcFlipped=false;
+  searchQuery='';
+  const se=document.getElementById('search');
+  if(se)se.value='';
+  if(activeFilter!=null&&activeFilter!==target.p){
+    activeFilter=target.p;
+    renderFilters();
+  }
+  let list=getFiltered();
+  let idx=list.findIndex(x=>String(x.id)===String(targetId));
+  if(idx<0){
+    activeFilter=null;
+    renderFilters();
+    list=getFiltered();
+    idx=list.findIndex(x=>String(x.id)===String(targetId));
+  }
+  if(idx<0)return;
+  fcList=list;
+  fcIdx=idx;
+  renderCard();
+}
+
+function similarProblemsHtml(p){
+  if(!isInTodaysDailyBatch(p))return '';
+  let lcBlock='';
+  if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length){
+    const items=p.lcSimilar.map(x=>{
+      const h=(x.h||'').replace(/[^a-z0-9-]/gi,'');
+      if(!h)return '';
+      const href='https://leetcode.com/problems/'+h+'/';
+      const label=(x.n?x.n+'. ':'')+esc(x.t||h);
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="lc-similar-link">${label}</a>`;
+    }).filter(Boolean).join('');
+    if(items) lcBlock=`<div class="lc-similar-subtitle">LeetCode</div><div class="lc-similar-links">${items}</div>`;
+  }
+  let repoBlock='';
+  if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length){
+    const repoItems=p.repoSimilar.map(entry=>{
+      const rid=typeof entry==='string'?entry:(entry&&entry.id);
+      if(!rid)return '';
+      const other=P.find(x=>String(x.id)===String(rid));
+      if(!other||String(other.id)===String(p.id))return '';
+      const label=(typeof entry==='object'&&entry.t)?entry.t:other.t;
+      const num=P.indexOf(other)+1;
+      // id в одинарных кавычках — иначе JSON.stringify даёт "id" и ломает onclick="...openRepoSimilarCard("
+      const safeId=String(rid).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const titleAttr=String(label).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      return `<button type="button" class="repo-similar-link" title="${titleAttr}" onclick="event.stopPropagation();openRepoSimilarCard('${safeId}')">#${num} ${esc(label)}</button>`;
+    }).filter(Boolean).join('');
+    if(repoItems) repoBlock=`<div class="lc-similar-subtitle">В этой коллекции</div><div class="lc-similar-links">${repoItems}</div>`;
+  }
+  if(!lcBlock&&!repoBlock)return '';
+  return `<div class="lc-similar" onclick="event.stopPropagation()">
+    <div class="lc-similar-title">Похожие задачи</div>
+    ${lcBlock}
+    ${repoBlock}
+  </div>`;
+}
+
+// ===== DIAGRAM SYSTEM =====
+let diagramState = {}; // {problemId: currentStep}
+
+function getDiagramStep(pid) {
+  return diagramState[pid] || 0;
+}
+
+function setDiagramStep(pid, step) {
+  diagramState[pid] = step;
+  renderCard();
+}
+
+function diagramHtml(p) {
+  if (!p.diagram) return '';
+  const d = p.diagram;
+  const step = getDiagramStep(p.id);
+  const maxStep = (d.steps?.length || 1) - 1;
+  const currentStep = d.steps?.[step] || d.steps?.[0];
+
+  let content = '';
+
+  if (d.type === 'array') {
+    content = renderArrayDiagram(d, currentStep);
+  } else if (d.type === 'twoptr') {
+    content = renderTwoPtrDiagram(d, currentStep);
+  } else if (d.type === 'window') {
+    content = renderWindowDiagram(d, currentStep);
+  } else if (d.type === 'stack') {
+    content = renderStackDiagram(d, currentStep);
+  } else if (d.type === 'tree') {
+    content = renderTreeDiagram(d, currentStep);
+  } else if (d.type === 'bsearch') {
+    content = renderBSearchDiagram(d, currentStep);
+  } else if (d.type === 'multi') {
+    content = renderMultiDiagram(d, currentStep);
+  } else if (d.type === 'cartesian') {
+    content = renderCartesianDiagram(d, currentStep);
+  }
+
+  const controls = d.steps && d.steps.length > 1 ? `
+    <div class="diagram-controls" onclick="event.stopPropagation()">
+      <button class="diagram-btn" onclick="setDiagramStep('${p.id}', ${Math.max(0, step-1)})" ${step===0?'disabled':''}>← Назад</button>
+      <span class="diagram-step">${step+1} / ${d.steps.length}</span>
+      <button class="diagram-btn" onclick="setDiagramStep('${p.id}', ${Math.min(maxStep, step+1)})" ${step===maxStep?'disabled':''}>Далее →</button>
+    </div>
+  ` : '';
+
+  const desc = currentStep?.desc ? `<div class="diagram-desc">${esc(currentStep.desc).replace(/\*\*([^*]+)\*\*/g,'<span class="hl">$1</span>')}</div>` : '';
+
+  return `
+    <div class="diagram-wrap" onclick="event.stopPropagation()">
+      <div class="diagram-title">Визуализация алгоритма</div>
+      ${content}
+      ${desc}
+      ${controls}
+    </div>
+  `;
+}
+
+function renderArrayDiagram(d, step) {
+  const arr = d.data || [];
+  const active = step?.active || [];
+  const labels = step?.labels || {};
+
+  const cells = arr.map((v, i) => {
+    let cls = 'arr-cell';
+    if (active.includes(i)) cls += ' active';
+    let label = '';
+    for (const [k, idx] of Object.entries(labels)) {
+      if (idx === i) label = `<span class="ptr-label">${k}</span>`;
+    }
+    return `<div class="${cls}">${label}${v}</div>`;
+  }).join('');
+
+  return `<div class="arr-vis">${cells}</div>`;
+}
+
+function renderTwoPtrDiagram(d, step) {
+  const arr = d.data || [];
+  const l = step?.l ?? 0;
+  const r = step?.r ?? arr.length - 1;
+  const found = step?.found || [];
+
+  const cells = arr.map((v, i) => {
+    let cls = 'arr-cell';
+    let label = '';
+    if (i === l) { cls += ' left-ptr'; label = '<span class="ptr-label l">L</span>'; }
+    if (i === r) { cls += ' right-ptr'; label += '<span class="ptr-label r">R</span>'; }
+    if (found.includes(i)) cls += ' found';
+    return `<div class="${cls}">${label}${v}</div>`;
+  }).join('');
+
+  return `<div class="arr-vis">${cells}</div>`;
+}
+
+function renderWindowDiagram(d, step) {
+  const arr = d.data || [];
+  const wl = step?.wl ?? 0;
+  const wr = step?.wr ?? 0;
+
+  const cells = arr.map((v, i) => {
+    let cls = 'arr-cell';
+    let label = '';
+    if (i >= wl && i <= wr) cls += ' window';
+    if (i === wl) label = '<span class="ptr-label l">L</span>';
+    if (i === wr) label += '<span class="ptr-label r">R</span>';
+    return `<div class="${cls}">${label}${v}</div>`;
+  }).join('');
+
+  return `<div class="arr-vis">${cells}</div>`;
+}
+
+function renderBSearchDiagram(d, step) {
+  const arr = d.data || [];
+  const l = step?.l ?? 0;
+  const r = step?.r ?? arr.length - 1;
+  const m = step?.m ?? Math.floor((l + r) / 2);
+  const found = step?.found;
+
+  const cells = arr.map((v, i) => {
+    let cls = 'arr-cell';
+    let label = '';
+    if (i < l || i > r) cls += ' discarded';
+    if (i === l) label = '<span class="ptr-label l">L</span>';
+    if (i === r) label += '<span class="ptr-label r">R</span>';
+    if (i === m) { cls += ' mid-ptr'; label += '<span class="ptr-label m">M</span>'; }
+    if (found === i) cls += ' found';
+    return `<div class="${cls}">${label}${v}</div>`;
+  }).join('');
+
+  return `<div class="arr-vis">${cells}</div>`;
+}
+
+function renderStackDiagram(d, step) {
+  const stack = step?.stack || [];
+  const top = step?.top;
+
+  const cells = stack.map((v, i) => {
+    let cls = 'stack-cell';
+    if (i === stack.length - 1) cls += ' top';
+    return `<div class="${cls}">${v}</div>`;
+  }).join('');
+
+  return `<div class="stack-vis">${cells}<div class="stack-base"></div></div>`;
+}
+
+function renderTreeDiagram(d, step) {
+  const nodes = d.data || [];
+  const active = step?.active || [];
+  const visited = step?.visited || [];
+
+  // Simple binary tree layout (levels)
+  let html = '<div class="tree-vis">';
+  let idx = 0;
+  let level = 1;
+  while (idx < nodes.length) {
+    const count = Math.min(level, nodes.length - idx);
+    html += '<div class="tree-row">';
+    for (let i = 0; i < count && idx < nodes.length; i++, idx++) {
+      const v = nodes[idx];
+      let cls = 'tree-node';
+      if (v === null) cls += ' null';
+      if (active.includes(idx)) cls += ' active';
+      if (visited.includes(idx)) cls += ' visited';
+      html += `<div class="${cls}">${v === null ? '∅' : v}</div>`;
+    }
+    html += '</div>';
+    level *= 2;
+  }
+  html += '</div>';
+  return html;
+}
+
+function renderMultiDiagram(d, step) {
+  const structs = step?.structs || [];
+  let html = '<div class="multi-vis">';
+
+  for (const s of structs) {
+    html += `<div class="struct-block">`;
+    html += `<div class="struct-label"><span class="type">${s.type || ''}</span> ${s.name || ''}</div>`;
+    html += `<div class="struct-row">`;
+
+    if (Array.isArray(s.data)) {
+      for (let i = 0; i < s.data.length; i++) {
+        const v = s.data[i];
+        let cls = 'struct-item';
+        if (s.hl?.includes(i)) cls += ' hl';
+        if (s.active?.includes(i)) cls += ' active';
+        html += `<div class="${cls}">${v}</div>`;
+      }
+    } else if (typeof s.data === 'object') {
+      // key-value map
+      for (const [k, v] of Object.entries(s.data)) {
+        html += `<div class="struct-item struct-kv"><span class="struct-key">${k}</span><span class="struct-arrow">→</span><span class="struct-val">${v}</span></div>`;
+      }
+    } else {
+      html += `<div class="struct-item">${s.data}</div>`;
+    }
+
+    html += `</div></div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderCartesianDiagram(d, step){
+  const input=Array.isArray(d.input)?d.input:[];
+  const activeArr=step?.activeArr ?? -1;
+  const activeVal=step?.activeVal ?? -1;
+  const idx=step?.idx ?? 0;
+  const current=Array.isArray(step?.current)?step.current:[];
+  const result=Array.isArray(step?.result)?step.result:[];
+
+  const inputHtml=input.map((arr,arrIdx)=>{
+    const vals=(Array.isArray(arr)?arr:[]).map((v,valIdx)=>{
+      const cls='cart-val'+((arrIdx===activeArr && valIdx===activeVal)?' active':'');
+      return `<span class="${cls}">${esc(String(v))}</span>`;
+    }).join('');
+    return `<div class="cart-input-row">
+      <span class="cart-input-label">arrays[${arrIdx}] =</span>
+      <div class="cart-arr">${vals}</div>
+    </div>`;
+  }).join('');
+
+  const currentHtml=current.length
+    ? current.map(v=>`<span class="cart-chip">${esc(String(v))}</span>`).join('')
+    : '<span class="cart-chip">[]</span>';
+
+  const resultHtml=result.length
+    ? result.map(r=>`<div class="cart-result">[${(Array.isArray(r)?r:[]).map(x=>esc(String(x))).join(', ')}]</div>`).join('')
+    : '<div class="cart-result">пока пусто</div>';
+
+  return `<div class="cart-vis">
+    <div class="cart-input-title">Вход: массив массивов</div>
+    ${inputHtml}
+    <div class="cart-state">
+      <div class="cart-box">
+        <div class="cart-box-title">Текущее состояние рекурсии</div>
+        <div class="cart-chip-row">
+          <span class="cart-chip idx">idx=${idx}</span>
+          ${currentHtml}
+        </div>
+      </div>
+      <div class="cart-box">
+        <div class="cart-box-title">Уже собранные комбинации</div>
+        <div class="cart-results">${resultHtml}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const REPO='tantarin/algocards';
+const FILE_PATH='problems.js';
+const THEORY_FILE_PATH='theory.js';
+const allPatterns=[...new Set(P.map(p=>p.p))].sort();
+let activeFilter=null;
+let searchQuery='';
+let fcIdx=0,fcFlipped=false,fcList=[];
+let dailyMode=localStorage.getItem('dailyMode')||'mixed'; // 'mixed' | 'topic'
+let editMode=false;
+const markedIds=new Set(); // метки живут только в памяти — сбрасываются при обновлении
+let showMarkedOnly=false;
+let solutionInputOpen={}; // { [problemId]: {1:boolean,2:boolean} }
+let mascotTimer=null;
+let mascotTyping=false;
+let mascotProfile=null;
+let lastSwipeAt=0;
+let peekCatTimer=null;
+
+// Рыжий кот выглядывает из-за края экрана
+function initPeekCat(){
+  const cat=document.getElementById('peekCat');
+  if(!cat)return;
+  const positions=['from-right','from-left','from-bottom'];
+  function peekOnce(){
+    const pos=positions[Math.floor(Math.random()*positions.length)];
+    cat.className='peek-cat '+pos;
+    setTimeout(()=>cat.classList.add('visible'),50);
+    setTimeout(()=>cat.classList.remove('visible'),2500);
+  }
+  // Первое появление через 3-6 сек, потом каждые 10-20 сек
+  setTimeout(()=>{
+    peekOnce();
+    peekCatTimer=setInterval(peekOnce,10000+Math.random()*10000);
+  },3000+Math.random()*3000);
+}
+initPeekCat();
+
+// Плавающие рыбки по всему экрану
+const FISH_EMOJIS=['🐠','🐟','🐡','🦈','🐙','🦑','🐬','🐳','🦐','🦞'];
+
+function spawnFish(){
+  const el=document.createElement('div');
+  el.className='fish';
+  el.textContent=FISH_EMOJIS[Math.floor(Math.random()*FISH_EMOJIS.length)];
+  const size=20+Math.floor(Math.random()*22);
+  const top=5+Math.random()*88;
+  const dur=(7+Math.random()*7).toFixed(1);
+  const bob=(4+Math.random()*8).toFixed(0);
+  const dy1=((Math.random()-0.5)*60).toFixed(0);
+  const dy2=((Math.random()-0.5)*80).toFixed(0);
+  const goRight=Math.random()<0.5;
+  if(goRight){
+    const startLeft=-(size+10);
+    el.style.cssText=`--fish-size:${size}px;--swim-x:45vw;--swim-y:${dy1}px;--swim-x2:105vw;--swim-y2:${dy2}px;--bob:${bob}px;left:${startLeft}px;top:${top}%;animation:fishSwimLR ${dur}s ease-in-out forwards,fishBob ${(2+Math.random()*1.5).toFixed(1)}s ease-in-out infinite`;
+  } else {
+    const startRight=-(size+10);
+    el.style.cssText=`--fish-size:${size}px;--swim-x:-45vw;--swim-y:${dy1}px;--swim-x2:-105vw;--swim-y2:${dy2}px;--bob:${bob}px;right:${startRight}px;top:${top}%;animation:fishSwimRL ${dur}s ease-in-out forwards,fishBob ${(2+Math.random()*1.5).toFixed(1)}s ease-in-out infinite`;
+  }
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),(parseFloat(dur)+0.5)*1000);
+}
+
+function initFish(){
+  setTimeout(()=>{
+    spawnFish();
+    setInterval(()=>{
+      const count=1+Math.floor(Math.random()*2);
+      for(let i=0;i<count;i++) setTimeout(spawnFish,i*800+Math.random()*600);
+    },6000+Math.random()*6000);
+  },1500+Math.random()*2000);
+}
+initFish();
+
+function setupSwipeNav(){
+  if(editMode)return;
+  const card=document.querySelector('#cardsArea .flashcard');
+  if(!card)return;
+
+  // на каждый render навешиваем заново, но чтобы не размножать — очищаем обработчики через замену слушателя не делаем,
+  // т.к. рендер создаёт новый DOM и старые коллбеки теряются.
+
+  let startX=0, startY=0, startT=0;
+  const SWIPE_PX=70;
+  const DY_RATIO=1.25;
+  const MAX_DT=700;
+  // Тайтовые пороги для touch часто не проходят (палец мягче двигается и датчики скорости другие).
+  const SWIPE_PX_TOUCH=45;
+  const DY_RATIO_TOUCH=1.05;
+  const MAX_DT_TOUCH=1050;
+
+  function shouldIgnoreTarget(target){
+    if(!target)return true;
+    if(document.querySelector('#cardsArea textarea.solution-input'))return true;
+    if(target.closest && target.closest('textarea.solution-input'))return true;
+    if(target.closest && target.closest('button, a'))return true;
+    if(target.closest && target.closest('.code-wrap, pre, code, .solution-pre, .solution-editor'))return true;
+    return false;
+  }
+
+  card.addEventListener('pointerdown',(e)=>{
+    if(e.pointerType==='mouse' && e.button!==0)return;
+    if(shouldIgnoreTarget(e.target))return;
+    startX=e.clientX;startY=e.clientY;startT=Date.now();
+  },{passive:true});
+
+  card.addEventListener('pointerup',(e)=>{
+    if(!startT)return;
+    const dx=e.clientX-startX;
+    const dy=e.clientY-startY;
+    const dt=Date.now()-startT;
+    startT=0;
+
+    if(Math.abs(dx)>=SWIPE_PX && Math.abs(dx)>(Math.abs(dy)*DY_RATIO) && dt<=MAX_DT){
+      lastSwipeAt=Date.now();
+      if(dx<0){
+        spawnFlyMarker('right', card);
+        fcNext();
+      } else {
+        spawnFlyMarker('left', card);
+        fcPrev();
+      }
+    }
+  },{passive:true});
+
+  // Touch-обработка (iOS/некоторые Android иногда хуже отрабатывают pointer events).
+  card.addEventListener('touchstart',(e)=>{
+    if(shouldIgnoreTarget(e.target))return;
+    if(!e.touches || !e.touches.length)return;
+    const t=e.touches[0];
+    startX=t.clientX; startY=t.clientY; startT=Date.now();
+  },{passive:true});
+
+  card.addEventListener('touchend',(e)=>{
+    if(!startT)return;
+    // На touchend используем startY/startX, текущие координаты не обязательны — dx/dy считаем по последней дельте.
+    // Если touchcancel/scroll сорвёт жест — startT сбросится по touchcancel ниже.
+    const dt=Date.now()-startT;
+    startT=0;
+    // touchend часто не даёт clientX/clientY в end-объекте так, как pointerup, поэтому берём last touch координату из changedTouches.
+    const c = e.changedTouches && e.changedTouches.length ? e.changedTouches[0] : null;
+    if(!c)return;
+    const dx=c.clientX-startX;
+    const dy=c.clientY-startY;
+
+    if(Math.abs(dx)>=SWIPE_PX_TOUCH && Math.abs(dx)>(Math.abs(dy)*DY_RATIO_TOUCH) && dt<=MAX_DT_TOUCH){
+      lastSwipeAt=Date.now();
+      if(dx<0){
+        spawnFlyMarker('right', card);
+        fcNext();
+      } else {
+        spawnFlyMarker('left', card);
+        fcPrev();
+      }
+    }
+  },{passive:true});
+
+  card.addEventListener('touchcancel',()=>{
+    startT=0;
+  },{passive:true});
+
+  card.addEventListener('click',(e)=>{
+    if(Date.now()-lastSwipeAt<450)return;
+    // не переворачивать при клике по ссылкам/кнопкам и блоку похожих задач
+    const t=e.target;
+    if(t&&t.closest&&(t.closest('button,a,.lc-similar')||t.closest('textarea')))return;
+    flipCard();
+  });
+}
+
+const CARD_ACCENTS=[
+  {a:'#7c3aed',s:'rgba(124,58,237,0.25)'}, // purple
+  {a:'#3b82f6',s:'rgba(59,130,246,0.25)'}, // blue
+  {a:'#22c55e',s:'rgba(34,197,94,0.25)'}, // green
+  {a:'#f59e0b',s:'rgba(245,158,11,0.25)'}, // orange
+  {a:'#ef4444',s:'rgba(239,68,68,0.25)'}, // red
+  {a:'#06b6d4',s:'rgba(6,182,212,0.25)'}, // cyan
+  {a:'#ec4899',s:'rgba(236,72,153,0.25)'}, // pink
+  {a:'#a3e635',s:'rgba(163,230,53,0.25)'} // lime
+];
+
+function applyCardAccent(p){
+  if(!p)return;
+  const el=document.querySelector('#cardsArea .flashcard');
+  if(!el)return;
+  const idx=hashString(p.id)%CARD_ACCENTS.length;
+  const acc=CARD_ACCENTS[idx];
+  el.style.setProperty('--accent', acc.a);
+  el.style.setProperty('--accent-soft', acc.s);
+}
+
+function mascotProfileFor(problemId){
+  const h=hashString(String(problemId));
+  // разные карты = разные профили поведения питомцев
+  const inputInterval=450 + (h%550); // 450..999
+  const readInterval=1100 + (h%900); // 1100..1999
+  const extraSpawnProb=0.12 + ((h>>3)%20)/100; // 0.12..0.31
+  const catBias=((h>>7)&1)?1:-1;
+
+  const catW=0.25 + ((h>>2)%35)/100; // 0.25..0.60
+  const birdW=0.20 + ((h>>4)%25)/100; // 0.20..0.45
+  const buttW=0.20 + ((h>>6)%25)/100; // 0.20..0.45
+
+  // длительности анимаций тоже разные, чтобы визуально отличалось
+  const durBird=2.2 + (h%80)/100; // 2.2..3.0
+  const durButterfly=2.5 + ((h>>1)%90)/100; // 2.5..3.4
+  const durCat=2.8 + ((h>>5)%120)/100; // 2.8..4.0
+
+  return {
+    inputInterval,
+    readInterval,
+    extraSpawnProb,
+    catBias,
+    catW,
+    birdW,
+    buttW,
+    durBird,
+    durButterfly,
+    durCat,
+    sizeJitter:0.85 + ((h>>9)%40)/100 // 0.85..1.25
+  };
+}
+
+function setMascotProfile(p){
+  mascotProfile=mascotProfileFor(p.id);
+}
+
+function setMascotTyping(v){
+  mascotTyping=!!v;
+  setupMascots();
+}
+
+function stopMascots(){
+  if(mascotTimer)clearInterval(mascotTimer);
+  mascotTimer=null;
+}
+
+function spawnMascot(){
+  const layer=document.getElementById('mascotLayer');
+  if(!layer)return;
+  const existing=layer.querySelectorAll('.mascot');
+  if(existing.length>=12)return;
+  const p=fcList[fcIdx];
+  if(!p)return;
+  if(!mascotProfile)setMascotProfile(p);
+  const prof=mascotProfile||mascotProfileFor(p.id);
+  const hashVal=hashString(String(p.id));
+
+  // Разные эмодзи, но с разной “профильной” вероятностью по карточке.
+  const butterflyEmojis=[
+    {t:'🦋',cls:'mascot-butterfly'},
+    {t:'🪲',cls:'mascot-butterfly'}
+  ];
+  const birdEmojis=[
+    {t:'🐦',cls:'mascot-bird'},
+    {t:'🐧',cls:'mascot-bird'},
+    {t:'🦅',cls:'mascot-bird'}
+  ];
+  const catEmojis=[
+    {t:'🐱',cls:'mascot-cat'},
+    {t:'🐈',cls:'mascot-cat'},
+    {t:'🐅',cls:'mascot-cat'}
+  ];
+
+  // Вес внутри карточки зависит от problemId, а не только от рандома.
+  const hMix=(hashVal%1000)/1000;
+  let pickType;
+  if(mascotTyping){
+    // при вводе чаще котики
+    const wCat=0.55 + prof.catW*0.35;
+    const wBird=0.30 + prof.birdW*0.20;
+    const wBf=1 - wCat - wBird;
+    const r=Math.random();
+    pickType = r < wCat ? 'cat' : (r < wCat+wBird ? 'bird' : 'butterfly');
+  } else if(fcFlipped){
+    // на обороте (но без ввода) чаще птички/жучки
+    const wBird=0.45 + prof.birdW*0.25;
+    const wBf=0.40 + prof.buttW*0.20;
+    const wCat=1 - wBird - wBf;
+    const r=Math.random();
+    pickType = r < wBird ? 'bird' : (r < wBird+wBf ? 'butterfly' : 'cat');
+  } else {
+    // на фронте (читаешь условие) чаще бабочки
+    const wBf=0.55 + prof.buttW*0.25;
+    const wBird=0.35 + prof.birdW*0.15;
+    const wCat=1 - wBf - wBird;
+    const r=Math.random();
+    pickType = r < wBf ? 'butterfly' : (r < wBf+wBird ? 'bird' : 'cat');
+  }
+
+  let pickList=butterflyEmojis;
+  let animDur=prof.durButterfly;
+  if(pickType==='bird'){
+    pickList=birdEmojis;
+    animDur=prof.durBird;
+  } else if(pickType==='cat'){
+    pickList=catEmojis;
+    animDur=prof.durCat;
+  }
+
+  const variantIdx=(hashVal + existing.length + Math.floor(hMix*10))%pickList.length;
+  const pick=pickList[variantIdx];
+
+  const el=document.createElement('span');
+  el.className='mascot '+pick.cls;
+  el.textContent=pick.t;
+  el.style.animationDuration=animDur+'s';
+  const fontScale=prof.sizeJitter;
+  el.style.fontSize=(30*fontScale)+'px';
+
+  const rect=layer.getBoundingClientRect();
+  const w=rect.width||300;
+  const height=rect.height||220;
+  // стартовые точки и траектория тоже меняются по карточке
+  const x=Math.floor((0.05 + (hashVal%20)/100)*w + Math.random()*(w*0.20));
+  const y=Math.floor((0.08 + ((hashVal>>3)%20)/100)*height + Math.random()*(height*0.22));
+
+  const sign = (pickType==='cat'?prof.catBias:1) * (Math.random()<0.5?1:-1);
+  const dxAmp = w * (0.12 + (pickType==='bird'?prof.birdW:pickType==='butterfly'?prof.buttW:prof.catW)*0.25);
+  const dyAmp = height * (0.15 + (pickType==='bird'?prof.birdW:pickType==='butterfly'?prof.buttW:prof.catW)*0.25);
+
+  const dx=Math.floor(sign*Math.random()*dxAmp);
+  const dy=Math.floor((Math.random()*2-1)*dyAmp);
+  const dx2=dx + Math.floor(sign*Math.random()*w*(0.08 + prof.catW*0.10));
+
+  el.style.setProperty('--x', x+'px');
+  el.style.setProperty('--y', y+'px');
+  el.style.setProperty('--dx', dx+'px');
+  el.style.setProperty('--dy', dy+'px');
+  el.style.setProperty('--dx2', dx2+'px');
+
+  layer.appendChild(el);
+  el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
+}
+
+// Интерактив 5: маленькие "мыслительные" пузырьки во время ввода.
+function spawnTypingBubbles(){
+  const layer=document.getElementById('mascotLayer');
+  if(!layer)return;
+  if(!mascotTyping)return;
+  const ta=document.querySelector('#cardsArea textarea.solution-input');
+  if(!ta)return;
+
+  const existing=layer.querySelectorAll('.typing-bubble').length;
+  if(existing>=10)return;
+
+  const bubbleEmojis=['💭','🤔','🧠','📝','✨','🎯'];
+  const lr=layer.getBoundingClientRect();
+  const r=ta.getBoundingClientRect();
+
+  const x=(r.left-lr.left)+r.width*(0.15+Math.random()*0.7);
+  const y=(r.top-lr.top)+r.height*(0.18+Math.random()*0.64);
+
+  const el=document.createElement('span');
+  el.className='typing-bubble';
+  el.textContent=bubbleEmojis[Math.floor(Math.random()*bubbleEmojis.length)];
+
+  const dx=(Math.random()*2-1)*30;
+  const dy=-(50+Math.random()*85);
+  const dur=0.9+Math.random()*0.7;
+  const z=0.8+Math.random()*0.35;
+
+  el.style.left=Math.floor(x)+'px';
+  el.style.top=Math.floor(y)+'px';
+  el.style.animationDuration=dur+'s';
+  el.style.opacity=String(z);
+  el.style.setProperty('--dx', dx+'px');
+  el.style.setProperty('--dy', dy+'px');
+
+  layer.appendChild(el);
+  el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
+}
+
+// Интерактив 6: "летящие" эмодзи при навигации по карточкам.
+function spawnFlyMarker(dir, anchorEl){
+  const overlay=document.getElementById('flyOverlay');
+  if(!overlay)return;
+  if(editMode)return;
+
+  const existing=overlay.querySelectorAll('.fly-marker').length;
+  if(existing>=8)return;
+
+  const emojis=dir==='right'
+    ? ['🚀','✨','⚡️','🧩']
+    : ['🔙','⏪','🌪️','✨'];
+
+  // overlay фиксированный к viewport, значит r.left/r.top уже подходят как координаты для left/top
+  let baseX=window.innerWidth*0.5;
+  let baseY=window.innerHeight*0.22;
+
+  if(anchorEl && anchorEl.getBoundingClientRect){
+    const r=anchorEl.getBoundingClientRect();
+    baseX=r.left + r.width/2;
+    baseY=r.top + r.height/2;
+  }
+
+  const count=3;
+  for(let i=0;i<count;i++){
+    const el=document.createElement('span');
+    el.className='fly-marker';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+
+    const x=baseX + (Math.random()*40-20);
+    const y=baseY + (Math.random()*20-10);
+    const dx=(dir==='right'?1:-1)*(70+Math.random()*140);
+    const dy=-(45+Math.random()*95);
+    const rot=(Math.random()*70-35)*(dir==='right'?1:-1);
+    const dur=0.7+Math.random()*0.35;
+
+    el.style.left=Math.floor(x)+'px';
+    el.style.top=Math.floor(y)+'px';
+    el.style.animationDuration=dur+'s';
+    el.style.setProperty('--dx', dx+'px');
+    el.style.setProperty('--dy', dy+'px');
+    el.style.setProperty('--rot', rot+'deg');
+
+    overlay.appendChild(el);
+    el.addEventListener('animationend',()=>{ try{el.remove();}catch(e){} },{once:true});
+  }
+}
+
+function setupMascots(){
+  if(editMode){stopMascots();return;}
+  const layer=document.getElementById('mascotLayer');
+  if(!layer){stopMascots();return;}
+  stopMascots();
+
+  // Если пишет — чаще, если читаешь — реже
+  let interval=1400;
+  const prof=mascotProfile||{};
+  if(mascotTyping)interval=prof.inputInterval||650;
+  else interval=fcFlipped?(prof.readInterval?Math.floor(prof.readInterval*0.92):1050):(prof.readInterval||1500);
+
+  mascotTimer=setInterval(()=>{
+    if(mascotTyping && Math.random()<0.65)spawnTypingBubbles();
+    // Иногда подкидываем по 2 “питомца”, чтобы было веселее
+    spawnMascot();
+    if(!mascotTyping && Math.random()<(prof.extraSpawnProb||0.2))spawnMascot();
+  }, interval);
+}
+
+function solutionInputKey(problemId, which){
+  return 'algocards_solution_input_'+problemId+'_'+which;
+}
+function loadSolutionInput(problemId, which){
+  try{
+    const raw=localStorage.getItem(solutionInputKey(problemId, which));
+    return typeof raw==='string'?raw:'';
+  }catch(e){
+    return '';
+  }
+}
+function saveSolutionDraft(textarea){
+  const pid=textarea.dataset.problemId;
+  const which=textarea.dataset.which;
+  if(!pid||!which)return;
+  try{localStorage.setItem(solutionInputKey(pid, which), textarea.value);}catch(e){}
+}
+function isSolutionInputOpen(problemId, which){
+  return !!(solutionInputOpen[problemId] && solutionInputOpen[problemId][which]);
+}
+function openSolutionInput(which){
+  const p=fcList[fcIdx];
+  if(!p)return;
+  if(isSolutionInputOpen(p.id, which)){
+    solutionInputOpen[p.id][which]=false;
+    renderCard();
+    setMascotTyping(false);
+    return;
+  }
+  if(!solutionInputOpen[p.id])solutionInputOpen[p.id]={};
+  solutionInputOpen[p.id][which]=true;
+  renderCard();
+  setTimeout(()=>{
+    const el=document.getElementById('solutionInput_'+p.id+'_'+which);
+    if(!el)return;
+    el.focus();
+    const v=el.value||'';
+    try{el.setSelectionRange(v.length, v.length);}catch(e){}
+    setMascotTyping(true);
+  },0);
+}
+
+function getToken(){return localStorage.getItem('gh_token')}
+function setToken(t){localStorage.setItem('gh_token',t)}
+
+function toggleEdit(){
+  if(!editMode){
+    const token=getToken();
+    if(!token){showTokenModal();return}
+    editMode=true;
+    document.getElementById('editToggle').classList.add('active');
+    renderCard();
+  } else {
+    editMode=false;
+    document.getElementById('editToggle').classList.remove('active');
+    renderCard();
+  }
+}
+
+function showTokenModal(){
+  const m=document.getElementById('tokenModal');
+  m.style.display='flex';
+  m.innerHTML=`<div class="token-box">
+    <h3>🔑 GitHub Token</h3>
+    <p>Нужен Personal Access Token с правом <b>repo</b> для пуша изменений.<br>
+    <a href="https://github.com/settings/tokens/new?scopes=repo&description=AlgoCards" target="_blank" style="color:var(--purple)">Создать токен →</a></p>
+    <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx">
+    <div class="token-btns">
+      <button class="token-cancel" onclick="closeTokenModal()">Отмена</button>
+      <button class="token-ok" onclick="saveToken()">Сохранить</button>
+    </div>
+  </div>`;
+  setTimeout(()=>document.getElementById('tokenInput').focus(),100);
+}
+
+function closeTokenModal(){document.getElementById('tokenModal').style.display='none'}
+
+function saveToken(){
+  const v=document.getElementById('tokenInput').value.trim();
+  if(!v)return;
+  setToken(v);
+  closeTokenModal();
+  editMode=true;
+  document.getElementById('editToggle').classList.add('active');
+  renderCard();
+}
+
+function toggleMark(id,btn){
+  if(markedIds.has(id)){markedIds.delete(id);if(btn){btn.classList.remove('marked');btn.title='Отметить';}}
+  else{markedIds.add(id);if(btn){btn.classList.add('marked');btn.title='Снять метку';}}
+  // если мы в режиме «только отмеченные» и только что сняли метку — убрать карточку из списка
+  if(showMarkedOnly){
+    fcList=fcList.filter(p=>markedIds.has(p.id));
+    if(fcIdx>=fcList.length)fcIdx=Math.max(0,fcList.length-1);
+    renderFilters();
+    renderCard();
+  }
+}
+
+function setShowMarked(val){
+  showMarkedOnly=val;
+  renderFilters();
+  if(showMarkedOnly){
+    fcList=P.filter(p=>markedIds.has(p.id));
+  }else{
+    if(searchQuery)fcList=getFiltered();
+    else rebuildDailyList();
+  }
+  fcIdx=0;fcFlipped=false;renderCard();
+}
+
+function getFiltered(){
+  let list=activeFilter?P.filter(p=>p.p===activeFilter):[...P];
+  if(showMarkedOnly)list=list.filter(p=>markedIds.has(p.id));
+  if(searchQuery){
+    const q=searchQuery.toLowerCase().trim();
+    const lcNumMatch=q.match(/^(?:lc\s*)?(\d{2,5})$/);
+    if(lcNumMatch){
+      const num=parseInt(lcNumMatch[1]);
+      list=list.filter(p=>
+        (p.t&&p.t.includes('LC '+num+'.'))||
+        (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
+      );
+    }else{
+      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p).toLowerCase().includes(q));
+    }
+  }
+  return list;
+}
+
+function applySearch(){
+  searchQuery=document.getElementById('search').value.trim();
+  // С поиском — полный список совпадений; без поиска — снова лимит «на сегодня»
+  if(searchQuery)fcList=getFiltered();
+  else rebuildDailyList();
+  fcIdx=0;fcFlipped=false;
+  renderCard();
+}
+
+function renderFilters(){
+  const markedCount=markedIds.size;
+  const markedBtn=markedCount>0
+    ?`<div class="filter-btn marked-filter${showMarkedOnly?' active':''}" onclick="setShowMarked(${!showMarkedOnly})">⭐ Отмеченные${markedCount>0?' ('+markedCount+')':''}</div>`
+    :'';
+  document.getElementById('filters').innerHTML=
+    markedBtn+
+    `<div class="filter-btn${!activeFilter&&!showMarkedOnly?' active':''}" onclick="setShowMarked(false);setFilter(null)">Все</div>`+
+    allPatterns.map(p=>`<div class="filter-btn${activeFilter===p&&!showMarkedOnly?' active':''}" onclick="setShowMarked(false);setFilter('${p}')">${p}</div>`).join('');
+}
+
+function setFilter(pat){
+  activeFilter=pat;
+  renderFilters();
+  // При активном поиске фильтр только сужает выдачу поиска; иначе — новая дневная 10 из выбранного паттерна
+  if(searchQuery)fcList=getFiltered();
+  else rebuildDailyList();
+  fcIdx=0;fcFlipped=false;
+  renderCard();
+}
+
+const EDIT_FIELDS=[
+  {key:'t',label:'Название'},
+  {key:'desc',label:'Условие',rows:8},
+  {key:'hint',label:'Подсказка',rows:2},
+  {key:'steps',label:'Схема решения',rows:4},
+  {key:'code',label:'Код (Java)',rows:12},
+  {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
+  {key:'complexity',label:'Сложность',rows:1},
+  {key:'complexityExpl',label:'Объяснение сложности',rows:2},
+  {key:'expl',label:'Объяснение алгоритма',rows:3},
+  {key:'p2',label:'Доп. тег (паттерн, опционально)',rows:1}
+];
+
+function lcSimilarToText(arr){
+  if(!Array.isArray(arr)||!arr.length)return '';
+  return arr.map(x=>(x.n?x.n+' ':'')+x.t).join('\n');
+}
+
+function textToLcSimilar(text){
+  return text.split('\n').map(line=>{
+    line=line.trim();
+    if(!line)return null;
+    const m=line.match(/^(\d+)\s+(.+)$/);
+    let n,t;
+    if(m){n=parseInt(m[1]);t=m[2].trim();}else{t=line;}
+    const h=t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    return n?{n,t,h}:{t,h};
+  }).filter(Boolean);
+}
+
+function renderEditCard(){
+  const p=fcList[fcIdx];
+  let fields=EDIT_FIELDS.map(f=>`
+    <div class="edit-label">${f.label}</div>
+    <textarea class="edit-field" data-key="${f.key}" rows="${f.rows||3}">${p[f.key]||''}</textarea>
+  `).join('');
+  fields+=`
+    <div class="edit-label">LeetCode похожие (одна строка = «532 Two Sum II»)</div>
+    <textarea class="edit-field" data-key="lcSimilar" rows="4">${lcSimilarToText(p.lcSimilar)}</textarea>
+  `;
+
+  document.getElementById('cardsArea').innerHTML=`
+    <div class="counter-row">
+      <div class="counter">${fcIdx+1} / ${fcList.length}${!searchQuery?' • на сегодня':''}</div>
+      <div class="counter-nav-cluster">
+        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+        <button type="button" class="shuffle-mini" title="Перемешать" onclick="event.stopPropagation();fcShuffle()">🔀</button>
+        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
+      </div>
+    </div>
+    <div class="flashcard" style="cursor:default">
+      <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
+      <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:4px">${esc(p.d)}</span>
+      ${fields}
+      <button class="edit-save" id="saveBtn" onclick="saveCard()">💾 Сохранить и запушить</button>
+      <div class="edit-status" id="editStatus"></div>
+    </div>
+    `;
+}
+
+function renderCard(){
+  // Вкладка открыта через полночь: обновляем дневной набор (только в обычном режиме, не в поиске)
+  if(!searchQuery){
+    const k=todayLocalDateKey();
+    if(dailyListDateKey!==k){
+      rebuildDailyList();
+      fcIdx=0;fcFlipped=false;
+    }
+  }
+  const totalFiltered=getFiltered().length;
+  let infoText=fcList.length+' задач';
+  // Подсказка под заголовком: «на сегодня» только когда реально действует лимит DAILY_LIMIT
+  if(!searchQuery&&!activeFilter&&totalFiltered>DAILY_LIMIT)infoText+=' на сегодня';
+  else if(searchQuery)infoText+=' по поиску';
+  document.getElementById('info').textContent=infoText;
+  if(!fcList.length){document.getElementById('cardsArea').innerHTML='<p style="text-align:center;color:var(--dim)">Нет задач</p>';return;}
+  if(editMode){renderEditCard();return}
+  const p=fcList[fcIdx];
+  setMascotProfile(p);
+  document.getElementById('cardsArea').innerHTML=`
+    <div class="counter-row">
+      <div class="counter">${fcIdx+1} / ${fcList.length}</div>
+      <div class="counter-nav-cluster">
+        <button type="button" class="shuffle-mini" title="Предыдущая задача" onclick="event.stopPropagation();spawnFlyMarker('left', this);fcPrev()">←</button>
+        <button type="button" class="shuffle-mini" title="Перемешать" onclick="event.stopPropagation();fcShuffle()">🔀</button>
+        <button type="button" class="shuffle-mini" title="Следующая задача" onclick="event.stopPropagation();spawnFlyMarker('right', this);fcNext()">→</button>
+      </div>
+    </div>
+    <div class="flashcard">
+      <button class="mark-btn${markedIds.has(p.id)?' marked':''}" onclick="event.stopPropagation();toggleMark('${p.id}',this)" title="${markedIds.has(p.id)?'Снять метку':'Отметить'}">⭐</button>
+      <div class="mascot-layer" id="mascotLayer"></div>
+      <div class="fc-face${!fcFlipped?' visible':''}">
+        <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
+        ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
+        <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
+        <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
+        <div class="code-wrap" style="margin-top:4px">
+          <button class="copy-btn" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <div class="desc-copy-body" style="white-space:pre-wrap;font-size:14px;line-height:1.6;padding-top:32px">${esc(p.desc)}</div>
+        </div>
+        <div class="spoiler-row">
+          <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
+          <div class="hint-text" style="display:none">${esc(p.hint)}</div>
+        </div>
+        ${p.steps?`<div class="spoiler-row">
+          <button class="hint-btn steps-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">🔢 Схема решения</button>
+          <div class="steps-text" style="display:none">${esc(p.steps)}</div>
+        </div>`:''}
+        ${similarProblemsHtml(p)}
+        <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
+      </div>
+      <div class="fc-face${fcFlipped?' visible':''}">
+        <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
+        ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
+        <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
+        <div class="code-wrap" style="margin-top:10px">
+          <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
+        </div>
+
+        ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
+        <div class="code-wrap" style="margin-top:10px">
+          <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
+        </div>
+        `:''}
+        ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
+          <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
+          ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
+        </div>`:''}
+        ${diagramHtml(p)}
+      </div>
+    </div>
+    `;
+  applyCardAccent(p);
+  document.querySelectorAll('pre code:not(.no-hljs)').forEach(el=>hljs.highlightElement(el));
+  setupMascots();
+  setupSwipeNav();
+}
+
+function copyProblemBundle(btn){
+  const p=fcList[fcIdx];
+  if(!p)return;
+  const sel=window.getSelection?window.getSelection().toString().trim():'';
+  if(sel){
+    navigator.clipboard.writeText(sel).then(()=>{
+      btn.textContent='Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+    }).catch(()=>{btn.textContent='Error'});
+    return;
+  }
+  if(btn.classList.contains('solution-copy')){
+    const codeEl=btn.closest('.code-wrap').querySelector('pre code');
+    const text=codeEl?codeEl.textContent:'';
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+    }).catch(()=>{btn.textContent='Error'});
+    return;
+  }
+  const num=P.indexOf(p)+1;
+  const parts=['#'+num+' '+p.t,'','Условие:',p.desc||'','','Решение:',p.code||''];
+  if(p.code2){
+    parts.push('','Решение 2 (HashMap, O(n)):');
+    parts.push(p.code2);
+  }
+  const text=parts.join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='Copied ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+  }).catch(()=>{btn.textContent='Error'});
+}
+
+function flipCard(){setMascotTyping(false);fcFlipped=!fcFlipped;renderCard()}
+function fcNext(){setMascotTyping(false);fcFlipped=false;fcIdx=(fcIdx+1)%fcList.length;renderCard()}
+function fcPrev(){setMascotTyping(false);fcFlipped=false;fcIdx=(fcIdx-1+fcList.length)%fcList.length;renderCard()}
+function fcShuffle(){
+  setMascotTyping(false);
+  fcFlipped=false;
+  // Поиск — перемешиваем всю выдачу; иначе всегда заново «на сегодня» (14), даже после перехода по repoSimilar с полным списком
+  if(searchQuery)fcList=shuffle(getFiltered());
+  else{
+    rebuildDailyList();
+    fcList=shuffle(fcList.slice());
+  }
+  fcIdx=0;renderCard();
+}
+
+function buildProblemsJs(){
+  const escVal=s=>{
+    if(s==null)return '';
+    return s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  };
+  let out='const P = [\n';
+  let prevPat='';
+  P.forEach((p,i)=>{
+    if(p.p!==prevPat){
+      out+='// ===== '+p.p.toUpperCase()+' =====\n';
+      prevPat=p.p;
+    }
+    out+='{id:"'+p.id+'",t:"'+p.t.replace(/"/g,'\\"')+'",p:"'+p.p.replace(/"/g,'\\"')+'",d:"'+p.d.replace(/"/g,'\\"')+'",\n';
+    out+='desc:`'+escVal(p.desc)+'`,\n';
+    out+='hint:`'+escVal(p.hint)+'`,\n';
+    out+='code:`'+escVal(p.code)+'`,\n';
+    if(p.code2)out+='code2:`'+escVal(p.code2)+'`,\n';
+    out+='steps:`'+escVal(p.steps)+'`,\n';
+    out+='complexity:`'+escVal(p.complexity)+'`,\n';
+    out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
+    out+='expl:`'+escVal(p.expl)+'`';
+    if(p.p2)out+=',\np2:"'+p.p2.replace(/"/g,'\\"')+'"';
+    if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length)out+=',\nlcSimilar:'+JSON.stringify(p.lcSimilar);
+    if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length)out+=',\nrepoSimilar:'+JSON.stringify(p.repoSimilar);
+    // Иначе при пуше из редактора пропадают все diagram:{...} в problems.js
+    if(p.diagram!=null&&typeof p.diagram==='object')out+=',\ndiagram:'+JSON.stringify(p.diagram);
+    out+='}';
+    if(i<P.length-1)out+=',';
+    out+='\n\n';
+  });
+  out+='];\n';
+  return out;
+}
+
+async function purgeProblemsJsFromCaches(){
+  if(!('caches'in window))return;
+  const names=await caches.keys();
+  await Promise.all(names.map(async name=>{
+    const c=await caches.open(name);
+    const reqs=await c.keys();
+    await Promise.all(reqs.map(r=>{
+      if((r.url||'').includes('problems.js'))return c.delete(r);
+    }));
+  }));
+}
+
+async function saveCard(){
+  const p=fcList[fcIdx];
+  const btn=document.getElementById('saveBtn');
+  const status=document.getElementById('editStatus');
+  
+  document.querySelectorAll('.edit-field').forEach(el=>{
+    if(el.dataset.key==='lcSimilar'){
+      p.lcSimilar=textToLcSimilar(el.value);
+    }else{
+      p[el.dataset.key]=el.value;
+    }
+  });
+
+  btn.disabled=true;
+  status.style.color='var(--dim)';
+  status.textContent='Генерация файла...';
+
+  const content=buildProblemsJs();
+  const encoded=btoa(unescape(encodeURIComponent(content)));
+  
+  status.textContent='Получение SHA текущего файла...';
+  const token=getToken();
+  
+  try{
+    const meta=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,{
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!meta.ok){
+      if(meta.status===401){
+        status.style.color='var(--red)';
+        status.textContent='Неверный токен. Нажмите ✏️ чтобы обновить.';
+        localStorage.removeItem('gh_token');
+        editMode=false;
+        const editToggle=document.getElementById('editToggle');
+        if(editToggle) editToggle.classList.remove('active');
+        renderCard(); // выходим из режима редактирования
+        btn.disabled=false;
+        return;
+      }
+      throw new Error('GitHub API: '+meta.status);
+    }
+    const metaJson=await meta.json();
+    const sha=metaJson.sha;
+
+    status.textContent='Пушим в GitHub...';
+    const put=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:'Update '+p.id+': '+p.t,
+        content:encoded,
+        sha:sha
+      })
+    });
+    
+    if(!put.ok){
+      const err=await put.json();
+      throw new Error(err.message||'PUT failed: '+put.status);
+    }
+
+    localStorage.setItem('algocards_pq',String(Date.now()));
+    await purgeProblemsJsFromCaches();
+
+    status.style.color='var(--green)';
+    status.textContent='✅ Запушено!';
+    btn.disabled=false;
+
+    // После успешного пуша выходим из режима редактирования
+    editMode=false;
+    const editToggle=document.getElementById('editToggle');
+    if(editToggle) editToggle.classList.remove('active');
+    renderCard();
+  }catch(e){
+    status.style.color='var(--red)';
+    status.textContent='❌ '+e.message;
+    btn.disabled=false;
+  }
+}
+
+function buildTheoryJs(){
+  const escVal=s=>{
+    if(s==null)return '';
+    return s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  };
+  let out='const THEORY = {\n';
+  const keys=Object.keys(THEORY);
+  keys.forEach((k,i)=>{
+    const t=THEORY[k];
+    out+=`  '${k}': {\n`;
+    out+=`    icon: '${t.icon||''}',\n`;
+    out+=`    title: '${(t.title||'').replace(/'/g,"\\'")}',\n`;
+    out+=`    desc: '${(t.desc||'').replace(/'/g,"\\'")}',\n`;
+    out+=`    code: \`${escVal(t.code)}\`\n`;
+    out+='  }';
+    if(i<keys.length-1)out+=',';
+    out+='\n';
+  });
+  out+='};\n';
+  return out;
+}
+
+async function purgeTheoryJsFromCaches(){
+  if(!('caches'in window))return;
+  const names=await caches.keys();
+  await Promise.all(names.map(async name=>{
+    const c=await caches.open(name);
+    const reqs=await c.keys();
+    await Promise.all(reqs.map(r=>{
+      if((r.url||'').includes('theory.js'))return c.delete(r);
+    }));
+  }));
+}
+
+async function saveTheory(){
+  const pattern=currentTheoryPattern;
+  if(!pattern||!THEORY[pattern])return;
+  const t=THEORY[pattern];
+  const btn=document.getElementById('saveTheoryBtn');
+  const status=document.getElementById('theoryEditStatus');
+
+  document.querySelectorAll('.theory-edit-field').forEach(el=>{
+    t[el.dataset.key]=el.value;
+  });
+
+  btn.disabled=true;
+  status.style.color='var(--dim)';
+  status.textContent='Генерация файла...';
+
+  const content=buildTheoryJs();
+  const encoded=btoa(unescape(encodeURIComponent(content)));
+
+  status.textContent='Получение SHA текущего файла...';
+  const token=getToken();
+
+  try{
+    const meta=await fetch(`https://api.github.com/repos/${REPO}/contents/${THEORY_FILE_PATH}`,{
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
+    });
+    if(!meta.ok){
+      if(meta.status===401){
+        status.style.color='var(--red)';
+        status.textContent='Неверный токен. Нажмите ✏️ чтобы обновить.';
+        localStorage.removeItem('gh_token');
+        editMode=false;
+        const editToggle=document.getElementById('editToggle');
+        if(editToggle) editToggle.classList.remove('active');
+        theoryEditMode=false;
+        renderCard();
+        showTheory(pattern);
+        btn.disabled=false;
+        return;
+      }
+      throw new Error('GitHub API: '+meta.status);
+    }
+    const metaJson=await meta.json();
+    const sha=metaJson.sha;
+
+    status.textContent='Пушим в GitHub...';
+    const put=await fetch(`https://api.github.com/repos/${REPO}/contents/${THEORY_FILE_PATH}`,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:'Update theory: '+pattern,
+        content:encoded,
+        sha:sha
+      })
+    });
+
+    if(!put.ok){
+      const err=await put.json();
+      throw new Error(err.message||'PUT failed: '+put.status);
+    }
+
+    await purgeTheoryJsFromCaches();
+
+    status.style.color='var(--green)';
+    status.textContent='✅ Запушено!';
+    btn.disabled=false;
+
+    // После успешного пуша выходим из режима редактирования теории
+    theoryEditMode=false;
+    showTheory(pattern);
+  }catch(e){
+    status.style.color='var(--red)';
+    status.textContent='❌ '+e.message;
+    btn.disabled=false;
+  }
+}
+
+renderFilters();
+// Восстанавливаем состояние кнопок режима из localStorage
+document.getElementById('modeMixed').classList.toggle('active',dailyMode==='mixed');
+document.getElementById('modeTopic').classList.toggle('active',dailyMode==='topic');
+rebuildDailyList(); // старт: fcList = до 10 задач на сегодня (или все, если в наборе меньше)
+renderCard();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script>
 </body>

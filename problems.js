@@ -6176,7 +6176,7 @@ complexityExpl:`Один проход — O(n). In-place три указател
 expl:`Dutch National Flag: low..mid-1 — нули, mid..high — единицы (необработанные), high+1..n-1 — двойки. Один проход. O(n) время, O(1) память.`,
 lcSimilar:[{"n":148,"t":"Sort List","h":"sort-list"}]},
 
-{id:"tp44",t:"Linked List Cycle II",p:"Two Pointers",d:"средне",
+{id:"tp44",t:"LeetCode 142. Linked List Cycle II",p:"Two Pointers",d:"средне",
 desc:`Дан связный список. Найти ==узел, где начинается цикл==. Если цикла нет — вернуть null.
 
 Пример:

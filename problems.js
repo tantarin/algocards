@@ -973,21 +973,18 @@ desc:`Найти самый длинный ==строго монотонный==
 Ввод: [2, 7, 5, 4, 4, 3]
 Вывод: [1, 3] (подотрезок [7, 5, 4] — строго убывающий, длина 3)`,
 hint:`Отслеживать длину возрастающей и убывающей подпоследовательности. Сбрасывать при смене направления или равных элементах.`,
-code:`class Solution {
-    public int[] longestMonotone(int[] arr) {
-        if (arr.length <= 1)
-            return new int[]{0, arr.length - 1};
+code:`import java.util.*;
 
-        int incLen = 1, decLen = 1;
-        int maxLen = 1;
-        int bestEnd = 0;
-        boolean bestIsInc = true;
+class Solution {
+    public static List<Integer> searchMonoton(List<Integer> nums) {
+        int maxLen = 1, incLen = 1, decLen = 1;
+        List<Integer> result = Arrays.asList(0, 0);
 
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] > arr[i - 1]) {
+        for (int idx = 1; idx < nums.size(); idx++) {
+            if (nums.get(idx - 1) < nums.get(idx)) {
                 incLen++;
                 decLen = 1;
-            } else if (arr[i] < arr[i - 1]) {
+            } else if (nums.get(idx - 1) > nums.get(idx)) {
                 decLen++;
                 incLen = 1;
             } else {
@@ -995,19 +992,14 @@ code:`class Solution {
                 decLen = 1;
             }
 
-            if (incLen > maxLen) {
-                maxLen = incLen;
-                bestEnd = i;
-                bestIsInc = true;
-            }
-            if (decLen > maxLen) {
-                maxLen = decLen;
-                bestEnd = i;
-                bestIsInc = false;
+            int currLen = Math.max(incLen, decLen);
+            if (currLen > maxLen) {
+                result = Arrays.asList(idx - currLen + 1, idx);
+                maxLen = currLen;
             }
         }
 
-        return new int[]{bestEnd - maxLen + 1, bestEnd};
+        return result;
     }
 }`,
 complexity:`Время: O(n), Память: O(1)`,

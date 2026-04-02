@@ -2505,25 +2505,25 @@ hint:`Нам надо отслеживать состояние, а именно
 Отслеживаем prev (единицы до последнего нуля) и curr (единицы после). Ответ = prev + curr.`,
 code:`class Solution {
     public int longestSubarray(int[] nums) {
-        int prev = 0;
-        int curr = 0;
-        int result = 0;
-        boolean hasZero = false;
-
-        for (int num : nums) {
-            if (num == 1) {
-                curr++;
-            } else {
-                hasZero = true;
-                result = Math.max(result, prev + curr);
-                prev = curr;
-                curr = 0;
+        int left = 0;
+        int zeroCount = 0;
+        int maxLen = 0;
+        
+        for (int right = 0; right < nums.length; right++) {
+            // Добавляем правый элемент
+            if (nums[right] == 0) zeroCount++;
+            
+            // Если нулей больше 1, убираем слева
+            while (zeroCount > 1) {
+                if (nums[left] == 0) zeroCount--;
+                left++;
             }
+            
+            // Длина подмассива после удаления одного элемента
+            maxLen = Math.max(maxLen, right - left);
         }
-
-        result = Math.max(result, prev + curr);
-
-        return hasZero ? result : nums.length - 1;
+        
+        return maxLen;
     }
 }`,
 steps:``,

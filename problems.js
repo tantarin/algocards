@@ -6064,7 +6064,9 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n²), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n) + two pointers O(n²). O(1) доп. памяти.`,
-expl:`Аналог 3Sum, но вместо == 0 отслеживаем минимальное отклонение от target. При точном совпадении — возвращаем сразу. O(n²).`,
+expl:`Для этой задачи не существует алгоритма лучше, чем O(n²).
+Для каждого фиксированного i:
+left и right проходят вместе по всем элементам от i+1 до n-1`,
 lcSimilar:[{"t":"LeetCode 16. 3Sum Closest","h":"leetcode-16-3sum-closest"}]},
 
 {id:"tp42",t:"4Sum",p:"Two Pointers",d:"средне",

@@ -712,7 +712,7 @@ function rebuildDailyList(){
     const rand=mulberry32(hashString(k+'|topic'));
     const idx=Math.floor(rand()*allPatterns.length);
     const pat=allPatterns[idx];
-    pool=P.filter(p=>p.p===pat||p.p2===pat);
+    pool=P.filter(p=>(p.p===pat||p.p2===pat)&&(!diffFilter||p.d===diffFilter));
   }
   if(activeFilter||diffFilter){
     fcList=pool;

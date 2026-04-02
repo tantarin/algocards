@@ -521,11 +521,11 @@ function stripHighlightMarkers(s){
   if(s==null||s==='')return '';
   return String(s).replace(/==([^=]+)==/g,'$1');
 }
-/** Текст объяснения перед копируемым кодом: построчные // комментарии Java. */
-function explAsJavaLineComments(expl){
+/** Текст объяснения перед копируемым кодом: без == и без //, просто текст и пустая строка. */
+function explTextBeforeCode(expl){
   const t=stripHighlightMarkers((expl||'').trim());
   if(!t)return '';
-  return t.split(/\r?\n/).map(line=>'// '+line).join('\n')+'\n\n';
+  return t+'\n\n';
 }
 /** Делит desc на условие и блок примеров (строка «Пример…:» / «Примеры:»). */
 function splitProblemDesc(desc){
@@ -1677,7 +1677,7 @@ function copyProblemBundle(btn){
   if(btn.classList.contains('solution-copy')){
     const codeEl=btn.closest('.code-wrap').querySelector('pre code');
     let text=codeEl?codeEl.textContent:'';
-    const prefix=explAsJavaLineComments(p.expl);
+    const prefix=explTextBeforeCode(p.expl);
     if(prefix)text=prefix+text;
     navigator.clipboard.writeText(text).then(()=>{
       btn.textContent='Copied ✓';
@@ -1699,7 +1699,7 @@ function copyProblemBundle(btn){
     return;
   }
   const num=P.indexOf(p)+1;
-  const parts=['#'+num+' '+p.t,'','Условие:',stripHighlightMarkers(p.desc||''),'','Решение:',explAsJavaLineComments(p.expl)+(p.code||'')];
+  const parts=['#'+num+' '+p.t,'','Условие:',stripHighlightMarkers(p.desc||''),'','Решение:',explTextBeforeCode(p.expl)+(p.code||'')];
   if(p.code2){
     parts.push('','Решение 2 (HashMap, O(n)):');
     parts.push(p.code2);

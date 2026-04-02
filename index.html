@@ -150,6 +150,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .solve-num{min-width:32px;text-align:center;font-weight:700;font-size:17px;color:var(--green)}
 .lc-similar{margin-top:14px;padding-top:12px;border-top:1px solid #ffffff15}
 .lc-similar-title{font-size:12px;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.lc-similar-empty{font-size:13px;color:var(--dim);opacity:.92;margin-top:2px}
 .lc-similar-links{display:flex;flex-wrap:wrap;gap:8px 14px}
 .lc-similar-subtitle{font-size:11px;color:var(--dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:.45px}
 .lc-similar-subtitle:first-of-type{margin-top:0}
@@ -728,15 +729,6 @@ function setDailyMode(mode){
   if(!searchQuery){rebuildDailyList();fcIdx=0;fcFlipped=false;renderCard();}
 }
 
-function isInTodaysDailyBatch(p){
-  if(searchQuery)return false;
-  if(activeFilter)return getFiltered().some(x=>x.id===p.id);
-  const list=getFiltered();
-  const k=todayLocalDateKey()+'|all';
-  const daily=pickDailyProblems(list,k,DAILY_LIMIT);
-  return daily.some(x=>x.id===p.id);
-}
-
 /** Переход к карточке из этой репы (полный список по паттерну цели; поиск сбрасывается). */
 function openRepoSimilarCard(targetId){
   const target=P.find(x=>String(x.id)===String(targetId));
@@ -765,7 +757,6 @@ function openRepoSimilarCard(targetId){
 }
 
 function similarProblemsHtml(p){
-  if(!isInTodaysDailyBatch(p))return '';
   let lcBlock='';
   if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length){
     const items=p.lcSimilar.map(x=>{
@@ -793,11 +784,12 @@ function similarProblemsHtml(p){
     }).filter(Boolean).join('');
     if(repoItems) repoBlock=`<div class="lc-similar-subtitle">В этой коллекции</div><div class="lc-similar-links">${repoItems}</div>`;
   }
-  if(!lcBlock&&!repoBlock)return '';
+  const emptyNote=(!lcBlock&&!repoBlock)?'<div class="lc-similar-empty">Пока без подборки</div>':'';
   return `<div class="lc-similar" onclick="event.stopPropagation()">
     <div class="lc-similar-title">Похожие задачи</div>
     ${lcBlock}
     ${repoBlock}
+    ${emptyNote}
   </div>`;
 }
 

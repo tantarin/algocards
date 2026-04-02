@@ -50,6 +50,7 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px}
 pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .desc-display{padding-top:32px}
+.expl-display{padding-top:32px}
 .problem-desc-stack{display:flex;flex-direction:column;gap:16px}
 .problem-desc-condition{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
 .problem-desc-condition--solo{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
@@ -1629,7 +1630,10 @@ function renderCard(){
       <div class="fc-face${fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
-        <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap">${esc(p.expl)}</div>
+        <div class="code-wrap" style="margin-top:10px">
+          <button type="button" class="copy-btn copy-problem-expl" title="Копировать объяснение" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <div class="expl-display" style="font-size:13px;color:var(--dim);white-space:pre-wrap;line-height:1.65">${esc(p.expl||'')}</div>
+        </div>
         <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
@@ -1683,6 +1687,15 @@ function copyProblemBundle(btn){
     const titleLine='#'+num+' '+(p.t||'').trim();
     const body=stripHighlightMarkers((p.desc||'').trim());
     const text=body?titleLine+'\n\n'+body:titleLine;
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},1500);
+    }).catch(()=>{btn.textContent='Error'});
+    return;
+  }
+  if(btn.classList.contains('copy-problem-expl')){
+    const text=stripHighlightMarkers((p.expl||'').trim());
     navigator.clipboard.writeText(text).then(()=>{
       btn.textContent='Copied ✓';
       btn.classList.add('copied');

@@ -714,7 +714,7 @@ function rebuildDailyList(){
     const pat=allPatterns[idx];
     pool=P.filter(p=>p.p===pat||p.p2===pat);
   }
-  if(activeFilter){
+  if(activeFilter||diffFilter){
     fcList=pool;
   }else{
     fcList=pickDailyProblems(pool,k+'|'+dailyMode,DAILY_LIMIT);
@@ -1056,6 +1056,7 @@ let dailyMode=localStorage.getItem('dailyMode')||'mixed'; // 'mixed' | 'topic'
 let editMode=false;
 const markedIds=new Set(); // метки живут только в памяти — сбрасываются при обновлении
 let showMarkedOnly=false;
+let diffFilter=null; // null | 'легко' | 'средне' | 'сложно'
 let solutionInputOpen={}; // { [problemId]: {1:boolean,2:boolean} }
 let mascotTimer=null;
 let mascotTyping=false;
@@ -1410,6 +1411,7 @@ function setShowMarked(val){
 
 function getFiltered(){
   let list=activeFilter?P.filter(p=>p.p===activeFilter||p.p2===activeFilter):[...P];
+  if(diffFilter)list=list.filter(p=>p.d===diffFilter);
   if(showMarkedOnly)list=list.filter(p=>markedIds.has(p.id));
   if(searchQuery){
     const q=searchQuery.toLowerCase().trim();
@@ -1467,7 +1469,7 @@ function applyProblemIdFromUrlParams(){
   const se=document.getElementById('search');
   if(se)se.value='';
   if(showMarkedOnly)showMarkedOnly=false;
-  activeFilter=null;
+  activeFilter=null;diffFilter=null;
   renderFilters();
   rebuildDailyList();
   let idx=fcList.findIndex(x=>String(x.id)===String(urlId));
@@ -1487,13 +1489,39 @@ function applySearch(){
 
 function renderFilters(){
   const markedCount=markedIds.size;
+  const noFilters=!activeFilter&&!showMarkedOnly&&!diffFilter;
   const markedBtn=markedCount>0
-    ?`<div class="filter-btn marked-filter${showMarkedOnly?' active':''}" onclick="setShowMarked(${!showMarkedOnly})">⭐ Отмеченные${markedCount>0?' ('+markedCount+')':''}</div>`
+    ?`<div class="filter-btn marked-filter${showMarkedOnly?' active':''}" onclick="setShowMarked(${!showMarkedOnly})">⭐ Отмеченные (${markedCount})</div>`
     :'';
+  const diffBtns=[
+    {v:'легко',   label:'Лёгкие',  color:'#22c55e'},
+    {v:'средне',  label:'Средние', color:'#f59e0b'},
+    {v:'сложно',  label:'Сложные', color:'#ef4444'},
+  ].map(({v,label,color})=>{
+    const active=diffFilter===v;
+    return `<div class="filter-btn diff-filter${active?' active':''}" style="${active?`border-color:${color};background:${color}18;color:${color}`:''}" onclick="setDiffFilter('${v}')">${label}</div>`;
+  }).join('');
   document.getElementById('filters').innerHTML=
     markedBtn+
-    `<div class="filter-btn${!activeFilter&&!showMarkedOnly?' active':''}" onclick="setShowMarked(false);setFilter(null)">Все</div>`+
+    `<div class="filter-btn${noFilters?' active':''}" onclick="clearAllFilters()">Все</div>`+
+    diffBtns+
     allPatterns.map(p=>`<div class="filter-btn${activeFilter===p&&!showMarkedOnly?' active':''}" onclick="setShowMarked(false);setFilter('${p}')">${p}</div>`).join('');
+}
+
+function setDiffFilter(val){
+  diffFilter=diffFilter===val?null:val;
+  renderFilters();
+  if(searchQuery)fcList=getFiltered();
+  else rebuildDailyList();
+  fcIdx=0;fcFlipped=false;renderCard();
+}
+
+function clearAllFilters(){
+  activeFilter=null;diffFilter=null;showMarkedOnly=false;
+  renderFilters();
+  if(searchQuery)fcList=getFiltered();
+  else rebuildDailyList();
+  fcIdx=0;fcFlipped=false;renderCard();
 }
 
 function setFilter(pat){

@@ -516,6 +516,11 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 <script src="theory.js" charset="UTF-8"></script>
 <script>
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/==([^=]+)==/g,'<span class="hl">$1</span>')}
+/** Для буфера обмена: убрать маркеры ==текст==, оставить только содержимое (как на экране без разметки). */
+function stripHighlightMarkers(s){
+  if(s==null||s==='')return '';
+  return String(s).replace(/==([^=]+)==/g,'$1');
+}
 /** Делит desc на условие и блок примеров (строка «Пример…:» / «Примеры:»). */
 function splitProblemDesc(desc){
   if(desc==null||desc==='')return{condition:'',examples:null};
@@ -1676,7 +1681,7 @@ function copyProblemBundle(btn){
   if(btn.classList.contains('copy-problem-desc')){
     const num=P.indexOf(p)+1;
     const titleLine='#'+num+' '+(p.t||'').trim();
-    const body=(p.desc||'').trim();
+    const body=stripHighlightMarkers((p.desc||'').trim());
     const text=body?titleLine+'\n\n'+body:titleLine;
     navigator.clipboard.writeText(text).then(()=>{
       btn.textContent='Copied ✓';
@@ -1686,7 +1691,7 @@ function copyProblemBundle(btn){
     return;
   }
   const num=P.indexOf(p)+1;
-  const parts=['#'+num+' '+p.t,'','Условие:',p.desc||'','','Решение:',p.code||''];
+  const parts=['#'+num+' '+p.t,'','Условие:',stripHighlightMarkers(p.desc||''),'','Решение:',p.code||''];
   if(p.code2){
     parts.push('','Решение 2 (HashMap, O(n)):');
     parts.push(p.code2);

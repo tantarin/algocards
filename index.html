@@ -40,9 +40,7 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 #search:focus{border-color:var(--purple)}
 .spoiler-row{margin-top:12px}
 .hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;display:inline-block}
-.steps-btn{color:var(--green)}
 .hint-text{margin-top:8px;color:var(--orange);font-size:14px;font-weight:600}
-.steps-text{margin-top:8px;color:var(--green);font-size:13px;line-height:1.7;white-space:pre-wrap}
 .hl{color:var(--orange);font-weight:600;background:rgba(245,158,11,0.15);padding:1px 4px;border-radius:4px}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
@@ -1520,7 +1518,6 @@ const EDIT_FIELDS=[
   {key:'t',label:'Название'},
   {key:'desc',label:'Условие',rows:8},
   {key:'hint',label:'Подсказка',rows:2},
-  {key:'steps',label:'Схема решения',rows:4},
   {key:'code',label:'Код (Java)',rows:12},
   {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
   {key:'complexity',label:'Сложность',rows:1},
@@ -1625,10 +1622,6 @@ function renderCard(){
           <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
           <div class="hint-text" style="display:none">${esc(p.hint)}</div>
         </div>
-        ${p.steps?`<div class="spoiler-row">
-          <button class="hint-btn steps-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">🔢 Схема решения</button>
-          <div class="steps-text" style="display:none">${esc(p.steps)}</div>
-        </div>`:''}
         ${similarProblemsHtml(p)}
         <div style="text-align:center;color:var(--dim);margin-top:16px;font-size:13px">нажми чтобы перевернуть →</div>
       </div>
@@ -1744,7 +1737,6 @@ function buildProblemsJs(){
     out+='hint:`'+escVal(p.hint)+'`,\n';
     out+='code:`'+escVal(p.code)+'`,\n';
     if(p.code2)out+='code2:`'+escVal(p.code2)+'`,\n';
-    out+='steps:`'+escVal(p.steps)+'`,\n';
     out+='complexity:`'+escVal(p.complexity)+'`,\n';
     out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
     out+='expl:`'+escVal(p.expl)+'`';

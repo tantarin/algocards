@@ -6037,7 +6037,7 @@ complexityExpl:`Сортировка O(n log n) + двойной проход O(
 expl:`Сортируем, фиксируем i. Для остатка — классические two pointers: sum < 0 → left++, sum > 0 → right--. Пропуск дубликатов гарантирует уникальность. O(n²).`,
 lcSimilar:[{"n":167,"t":"Two Sum II","h":"two-sum-ii-input-array-is-sorted"},{"n":16,"t":"3Sum Closest","h":"3sum-closest"},{"n":18,"t":"4Sum","h":"4sum"}]},
 
-{id:"tp41",t:"3Sum Closest",p:"Two Pointers",d:"средне",
+{id:"tp41",t:"LeetCode 16. 3Sum Closest",p:"Two Pointers",d:"средне",
 desc:`Дан массив nums и target. Найти тройку с суммой, ==ближайшей к target==. Вернуть эту сумму.
 
 Пример:
@@ -6065,7 +6065,7 @@ code:`class Solution {
 complexity:`Время: O(n²), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n) + two pointers O(n²). O(1) доп. памяти.`,
 expl:`Аналог 3Sum, но вместо == 0 отслеживаем минимальное отклонение от target. При точном совпадении — возвращаем сразу. O(n²).`,
-lcSimilar:[{"n":15,"t":"3Sum","h":"3sum"}]},
+lcSimilar:[{"t":"LeetCode 16. 3Sum Closest","h":"leetcode-16-3sum-closest"}]},
 
 {id:"tp42",t:"4Sum",p:"Two Pointers",d:"средне",
 desc:`Дан массив nums и target. Найти все уникальные четвёрки с суммой ==target==.

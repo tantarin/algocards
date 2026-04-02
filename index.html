@@ -712,7 +712,7 @@ function rebuildDailyList(){
     const rand=mulberry32(hashString(k+'|topic'));
     const idx=Math.floor(rand()*allPatterns.length);
     const pat=allPatterns[idx];
-    pool=P.filter(p=>p.p===pat);
+    pool=P.filter(p=>p.p===pat||p.p2===pat);
   }
   if(activeFilter){
     fcList=pool;
@@ -1048,7 +1048,7 @@ function renderCartesianDiagram(d, step){
 const REPO='tantarin/algocards';
 const FILE_PATH='problems.js';
 const THEORY_FILE_PATH='theory.js';
-const allPatterns=[...new Set(P.map(p=>p.p))].sort();
+const allPatterns=[...new Set(P.flatMap(p=>[p.p,p.p2].filter(Boolean)))].sort();
 let activeFilter=null;
 let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
@@ -1409,7 +1409,7 @@ function setShowMarked(val){
 }
 
 function getFiltered(){
-  let list=activeFilter?P.filter(p=>p.p===activeFilter):[...P];
+  let list=activeFilter?P.filter(p=>p.p===activeFilter||p.p2===activeFilter):[...P];
   if(showMarkedOnly)list=list.filter(p=>markedIds.has(p.id));
   if(searchQuery){
     const q=searchQuery.toLowerCase().trim();
@@ -1421,7 +1421,7 @@ function getFiltered(){
         (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
       );
     }else{
-      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p).toLowerCase().includes(q));
+      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p+(p.p2?' '+p.p2:'')).toLowerCase().includes(q));
     }
   }
   return list;

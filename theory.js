@@ -300,5 +300,28 @@ for (int[] interval : intervals) {
         end = interval[1];
     }
 }`
+  },
+  'Read / Write': {
+    icon: '✍️',
+    title: 'Указатели read / write',
+    desc: 'Один индекс читает массив (или проходит «быстрее»), второй указывает, куда писать следующий нужный элемент — всё in-place в одном буфере. Часто называют fast/slow или read/write. Обычно O(n) время и O(1) дополнительной памяти.',
+    code: `// Уникальные в отсортированном массиве (fast/slow)
+int slow = 0;
+for (int fast = 1; fast < nums.length; fast++) {
+    if (nums[fast] != nums[slow]) {
+        slow++;
+        nums[slow] = nums[fast];
+    }
+}
+return slow + 1;
+
+// Явные read / write при фильтрации символов
+int write = 0;
+for (int read = 0; read < n; read++) {
+    if (keep(arr[read])) {
+        arr[write++] = arr[read];
+    }
+}
+return write;`
   }
 };

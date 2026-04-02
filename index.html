@@ -708,7 +708,7 @@ function rebuildDailyList(){
   dailyListDateKey=k;
   let pool=getFiltered();
   // Режим «одна тема»: если фильтр не выбран — берём случайную тему дня
-  if(dailyMode==='topic'&&!activeFilter){
+  if(dailyMode==='topic'&&!activeFilter&&!diffFilter){
     const rand=mulberry32(hashString(k+'|topic'));
     const idx=Math.floor(rand()*allPatterns.length);
     const pat=allPatterns[idx];

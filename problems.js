@@ -5836,7 +5836,7 @@ complexityExpl:`n/2 свапов — O(n). In-place — O(1).`,
 expl:`Классика двух указателей с концов: меняем местами элементы, идём к центру. O(n) время, O(1) память.`,
 lcSimilar:[{"n":541,"t":"Reverse String II","h":"reverse-string-ii"}]},
 
-{id:"tp34",t:"Remove Duplicates from Sorted Array",p:"Two Pointers",d:"легко",
+{id:"tp34",t:"LeetCode 26. Remove Duplicates from Sorted Array",p:"Two Pointers",d:"легко",
 desc:`Дан ==отсортированный== массив nums. Удалить дубликаты ==in-place==, вернуть количество уникальных элементов k.
 
 Пример:
@@ -5861,7 +5861,7 @@ code:`class Solution {
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). In-place — O(1).`,
 expl:`slow отстаёт от fast: slow фиксирует позицию последнего уникального. Новый уникальный элемент — записываем в slow+1. O(n) время, O(1) память.`,
-lcSimilar:[{"n":27,"t":"Remove Element","h":"remove-element"},{"n":80,"t":"Remove Duplicates II","h":"remove-duplicates-from-sorted-array-ii"}]},
+lcSimilar:[{"n":27,"t":"Remove Element","h":"remove-element"},{"n":80,"t":"Remove Duplicates II","h":"remove-duplicates-ii"}]},
 
 {id:"tp35",t:"Remove Element",p:"Two Pointers",d:"легко",
 desc:`Дан массив nums и число val. Удалить ==in-place== все вхождения val, вернуть количество оставшихся элементов.

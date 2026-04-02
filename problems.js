@@ -3556,45 +3556,51 @@ complexity:`Время: O(n + m), Память: O(min(n, m))`,
 complexityExpl:`Указатели по двум массивам, каждый элемент один раз — O(n+m). Список совпадений — O(min(n,m)) памяти.`,
 expl:`Merge-подобная техника на отсортированных массивах. При совпадении — добавляем и двигаем оба указателя. Иначе — двигаем указатель на меньший элемент. O(n+m).`},
 
-{id:"tp8",t:"LC 228. Summary Ranges",p:"Two Pointers",d:"средне",
-desc:`Отсортировать числа и свернуть ==последовательные в диапазоны== "x-y".
+{id:"tp8",t:"LC 228. Свертка в диапазоны (Summary Ranges)",p:"Two Pointers",d:"средне",
+desc:`средне
+# яндекс
 
-Пример:
-Ввод: [1, 4, 5, 2, 3, 9, 8, 11, 0]
+Дан список неотрицательных целых чисел nums, ==повторов нет==. Нужно преобразовать его в строку, сворачивая соседние по числовому ряду числа в диапазоны (сначала список удобно ==отсортировать==).
+
+Если числа идут подряд (разница 1), записать как =="x-y"==. Иначе одно число ==("x")==. Диапазоны через ==запятую==.
+
+Пример 1:
+Ввод: nums = [1,4,5,2,3,9,8,11,0]
 Вывод: "0-5,8-9,11"`,
-hint:`Сортируем. Два указателя для расширения диапазона последовательных чисел.`,
-code:`class Solution {
-    public String toRanges(int[] nums) {
-        Arrays.sort(nums);
-        StringBuilder sb = new StringBuilder();
+hint:`После сортировки — два индекса l и r: расширяйте r, пока nums[r+1] == nums[r] + 1. Фиксируйте сегмент и переходите к следующему.`,
+code:`import java.util.*;
 
-        int i = 0;
-        while (i < nums.length) {
-            int start = nums[i];
-            while (i + 1 < nums.length
-                && nums[i + 1] == nums[i] + 1) {
-                i++;
-            }
-            int end = nums[i];
+class Solution {
+    public String counterRanges(List<Integer> nums) {
+        Collections.sort(nums);
+        List<String> result = new ArrayList<>();
+        int n = nums.size();
 
-            if (sb.length() > 0) sb.append(",");
-            if (start == end) {
-                sb.append(start);
-            } else {
-                sb.append(start).append("-").append(end);
+        for (int l = 0; l < n; l++) {
+            int r = l;
+            while (r + 1 < n
+                    && nums.get(r + 1) == nums.get(r) + 1) {
+                r++;
             }
-            i++;
+            int start = nums.get(l);
+            int end = nums.get(r);
+            result.add(start == end
+                ? String.valueOf(start)
+                : start + "-" + end);
+            l = r;
         }
 
-        return sb.toString();
+        return String.join(",", result);
     }
 }`,
-steps:`1. Сортируем массив.
-2. Группируем подряд числа с шагом 1.
-3. Выводим как «start» или «start-end».`,
-complexity:`Время: O(n log n), Память: O(1)`,
-complexityExpl:`Сортировка O(n log n), затем группировка за O(n). StringBuilder — O(1) доп. памяти.`,
-expl:`Сортируем массив O(n log n). Затем группируем последовательные числа. Одиночные — как число, диапазоны — как "start-end".`},
+steps:`1. Collections.sort(nums).
+2. Для каждого l тянем r, пока следующий элемент = текущий + 1.
+3. Добавляем "start" или "start-end"; l = r, цикл for увеличит l до следующего блока.`,
+complexity:`Время: O(n log n), Память: O(n)`,
+complexityExpl:`Сортировка O(n log n), один проход группировки O(n). Список строк результата — O(n) памяти.`,
+expl:`После сортировки последовательные участки идут подряд. Проход с окном [l..r] и String.join — как LeetCode 228 Summary Ranges.`,
+lcSimilar:[{"n":228,"t":"Summary Ranges","h":"summary-ranges"}],
+repoSimilar:["iss7"]},
 
 {id:"tp9",t:"Удаление смайликов",p:"Two Pointers",d:"легко",
 desc:`Удалить из массива символов все вхождения смайликов ==:-)== и ==:-(==. После двоеточия, дефиса и первой скобки (')' или '(') нужно выкинуть и все ==подряд идущие такие же скобки== того же типа (например ":-)))" целиком, не только три символа).
@@ -7032,7 +7038,8 @@ steps:`1. Для начала непрерывного отрезка берём
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Указатель с расширением непрерывных отрезков — O(n). Список строк — O(1) доп. памяти.`,
 expl:`Группируем последовательные числа (nums[i+1] == nums[i] + 1). Одиночные — как число, диапазоны — как "start->end". O(n) время, O(1) доп. память.`,
-lcSimilar:[{"t":"Summary Ranges","h":"summary-ranges"},{"t":"Missing Ranges","h":"missing-ranges"}]},
+lcSimilar:[{"t":"Summary Ranges","h":"summary-ranges"},{"t":"Missing Ranges","h":"missing-ranges"}],
+repoSimilar:["tp8"]},
 
 {id:"iss8",t:"Interval List Intersections",p:"Intervals Sweep",d:"средне",
 desc:`Даны два списка ==непересекающихся отсортированных интервалов==. Найти их ==пересечения==.

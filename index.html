@@ -1674,7 +1674,10 @@ function copyProblemBundle(btn){
     return;
   }
   if(btn.classList.contains('copy-problem-desc')){
-    const text=(p.desc||'').trim();
+    const num=P.indexOf(p)+1;
+    const titleLine='#'+num+' '+(p.t||'').trim();
+    const body=(p.desc||'').trim();
+    const text=body?titleLine+'\n\n'+body:titleLine;
     navigator.clipboard.writeText(text).then(()=>{
       btn.textContent='Copied ✓';
       btn.classList.add('copied');

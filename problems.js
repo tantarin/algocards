@@ -3015,7 +3015,7 @@ complexityExpl:`Рекурсия isMirror посещает каждый узел
 expl:`Рекурсивное зеркальное сравнение: left.left ↔ right.right и left.right ↔ right.left. O(n) время, O(h) стек рекурсии.`,
 lcSimilar:[{"t":"LC 101 · Symmetric Tree","h":"lc-101-symmetric-tree"}]},
 
-{id:"tr3",t:"Правильное дерево поиска",p:"Trees / DFS",d:"легко",
+{id:"tr3",t:"LC 98 · Validate Binary Search Tree",p:"Trees / DFS",d:"легко",
 desc:`Дан корень ==бинарного дерева==. Проверить, является ли оно ==валидным деревом поиска (BST)==.
 
 Свойство BST: все значения в левом поддереве строго меньше текущего узла, все значения в правом поддереве строго больше.
@@ -3059,7 +3059,8 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`isValid обходит каждый узел один раз с границами — O(n). Глубина рекурсии — O(h) памяти.`,
-expl:`Рекурсия с границами: для левого поддерева max = node.val, для правого min = node.val. Используем long для обработки граничных значений Integer. O(n).`},
+expl:`Рекурсия с границами: для левого поддерева max = node.val, для правого min = node.val. Используем long для обработки граничных значений Integer. O(n).`,
+lcSimilar:[{"t":"LC 98 · Validate Binary Search Tree","h":"lc-98-validate-binary-search-tree"}]},
 
 {id:"tr4",t:"Поиск k-ого наименьшего",p:"Trees / DFS",d:"средне",
 desc:`средне

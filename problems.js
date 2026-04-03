@@ -2377,8 +2377,7 @@ code:`class Solution {
         for (int i = 1; i < arr.length; i++) {
             if (arr[i] > arr[i - 1]) {
                 currLength++;
-                maxLength = Math.max(maxLength,
-                    currLength);
+                maxLength = Math.max(maxLength, currLength);
             } else {
                 currLength = 1;
             }

@@ -2127,7 +2127,7 @@ lcSimilar:[{"t":"Subarray Sum Equals K","h":"subarray-sum-equals-k"}],
 repoSimilar:["ps1","ps2"]},
 
 // ===== PREFIX SUM EXT. =====
-{id:"pse1",t:"Произведение кроме себя",p:"Prefix Sum Ext.",d:"легко",
+{id:"pse1",t:"LC 238 · Product of Array Except Self",p:"Prefix Sum Ext.",d:"легко",
 desc:`Дан массив nums. Вернуть массив, где каждый элемент — ==произведение всех кроме текущего==. Без деления.
 
 Пример:
@@ -2155,7 +2155,8 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n), Память: O(1) доп.`,
 complexityExpl:`Два прохода: слева префиксные произведения, справа суффикс в переменной — O(n). Кроме массива ответа — O(1) доп. памяти.`,
-expl:`O(n) время, O(1) дополнительная память (кроме ответа). Первый проход: prefix product слева. Второй проход: suffix product справа, умножаем на prefix.`},
+expl:`O(n) время, O(1) дополнительная память (кроме ответа). Первый проход: prefix product слева. Второй проход: suffix product справа, умножаем на prefix.`,
+lcSimilar:[{"t":"LC 238 · Product of Array Except Self","h":"lc-238-product-of-array-except-self"}]},
 
 {id:"pse2",t:"Индекс равных сумм",p:"Prefix Sum Ext.",d:"средне",
 desc:`Найти индекс, где ==сумма слева равна сумме справа==.

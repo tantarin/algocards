@@ -4074,23 +4074,30 @@ desc:`Дан массив целых чисел arr (не отсортирова
 hint:`Отсортировать уникальные значения, назначить ранги. Или пройти один раз, увеличивая ранг при смене значения.`,
 code:`class Solution {
     public int[] arrayRankTransform(int[] arr) {
-        int n = arr.length;
-        int[] sorted = arr.clone();
+        // копируем массив чтобы не испортить оригинал при сортировке
+        int[] sorted = new int[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            sorted[i] = arr[i];
+        }
+
+        // сортируем копию — теперь можем определить порядок значений
         Arrays.sort(sorted);
 
+        // назначаем ранги уникальным значениям по порядку
         Map<Integer, Integer> rank = new HashMap<>();
         int nextRank = 1;
-        for (int val : sorted) {
-            if (!rank.containsKey(val)) {
-                rank.put(val, nextRank++);
+        for (int i = 0; i < arr.length; i++) {
+            if (!rank.containsKey(sorted[i])) {
+                rank.put(sorted[i], nextRank++);
             }
         }
 
-        int[] result = new int[n];
-        for (int i = 0; i < n; i++) {
-            result[i] = rank.get(arr[i]);
+        // заменяем каждый элемент его рангом
+        for (int j = 0; j < arr.length; j++) {
+            arr[j] = rank.get(arr[j]);
         }
-        return result;
+
+        return arr;
     }
 }`,
 complexity:`Время: O(n log n), Память: O(n)`,

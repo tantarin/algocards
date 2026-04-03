@@ -2706,21 +2706,27 @@ desc:`Дана строка s, содержащая только символы 
 hint:`Стек (ArrayDeque). Открывающую кладём, при закрывающей — сверяем с вершиной стека.`,
 code:`class Solution {
     public boolean isValid(String s) {
+        // стек хранит незакрытые открывающие скобки
         Deque<Character> stack = new ArrayDeque<>();
 
         for (char c : s.toCharArray()) {
             if (c == '(' || c == '{' || c == '[') {
+                // открывающая — кладём на стек, ждём пару
                 stack.push(c);
-            }
-            else if (stack.isEmpty() || !isMatchingPair(stack.pop(), c)) {
+            } else if (stack.isEmpty() || !isMatchingPair(stack.pop(), c)) {
+                // закрывающая, но стек пуст — нет пары
+                // или вершина стека не совпадает с текущей закрывающей
                 return false;
             }
         }
 
+        // если стек пуст — все открывающие закрыты
+        // если нет — остались незакрытые скобки
         return stack.isEmpty();
     }
 
     private boolean isMatchingPair(char open, char close) {
+        // проверяем что открывающая и закрывающая — одного типа
         return (open == '(' && close == ')')
             || (open == '{' && close == '}')
             || (open == '[' && close == ']');

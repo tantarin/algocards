@@ -1871,25 +1871,22 @@ hint:`Сложение справа налево с переносом в сис
 code:`class Solution {
     public String addHex(String a, String b) {
         StringBuilder result = new StringBuilder();
-        int i = a.length() - 1;
-        int j = b.length() - 1;
+        int p1 = a.length() - 1;
+        int p2 = b.length() - 1;
         int carry = 0;
-        while (i >= 0 || j >= 0 || carry > 0) {
+        while (p1 >= 0 || p2 >= 0 || carry > 0) {
             int sum = carry;
-            if (i >= 0) sum += hexToInt(a.charAt(i--));
-            if (j >= 0) sum += hexToInt(b.charAt(j--));
+            if (p1 >= 0) sum += hexToInt(a.charAt(p1--));
+            if (p2 >= 0) sum += hexToInt(b.charAt(p2--));
             result.append(intToHex(sum % 16));
             carry = sum / 16;
         }
-
         return result.reverse().toString();
     }
-
     private int hexToInt(char c) {
         if (c >= '0' && c <= '9') return c - '0';
         return c - 'a' + 10;
     }
-
     private char intToHex(int n) {
         if (n < 10) return (char) ('0' + n);
         return (char) ('a' + n - 10);

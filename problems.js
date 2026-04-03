@@ -4332,29 +4332,13 @@ hint:`Кладём все числа в HashSet. Для k == 0 считаем д
 code:`class Solution {
     public int findPairs(int[] nums, int k) {
         if (k < 0) return 0;
-
-        Set<Integer> set = new HashSet<>();
-        Set<Integer> counted = new HashSet<>();
+        Map<Integer, Integer> freq = new HashMap<>();
         int count = 0;
-
         for (int num : nums) {
-            if (k == 0) {
-                if (set.contains(num) && !counted.contains(num)) {
-                    count++;
-                    counted.add(num);
-                }
-            }
-            set.add(num);
+            // сколько раз num-k уже встречался — столько новых пар
+            count += freq.getOrDefault(num - k, 0);
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
         }
-
-        if (k > 0) {
-            for (int num : set) {
-                if (set.contains(num + k)) {
-                    count++;
-                }
-            }
-        }
-
         return count;
     }
 }`,

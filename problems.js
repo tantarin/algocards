@@ -1750,7 +1750,7 @@ complexityExpl:`Сортировка двух массивов starts/ends — O
 expl:`Сортируем starts и ends отдельно. Если очередной start < end — начинаем новую встречу (rooms++). Иначе — освобождаем комнату (rooms--). O(n log n).`},
 
 // ===== LINKED LIST =====
-{id:"ll1",t:"Reverse Linked List",p:"Linked List",d:"легко",
+{id:"ll1",t:"LC 206 · Reverse Linked List",p:"Linked List",d:"легко",
 desc:`Дан head ==односвязного списка==. ==Перевернуть список== и вернуть его новый head.
 
 Пример 1:

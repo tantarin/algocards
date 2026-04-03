@@ -312,21 +312,23 @@ desc:`Дан отсортированный (по возрастанию) мас
 Вывод: 3`,
 hint:`Классический подход lo/hi/mid. Сравниваем mid с target и сдвигаем границы.`,
 code:`class Solution {
-    public int binarySearch(int[] nums, int target) {
-        int lo = 0;
-        int hi = nums.length - 1;
-
-        while (lo <= hi) {
-            int mid = lo + (hi - lo) / 2;
+    public int search(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
+        
+        while (left <= right) {
+            int mid = left + (right - left) / 2;  // защита от переполнения
+            
             if (nums[mid] == target) {
                 return mid;
             } else if (nums[mid] < target) {
-                lo = mid + 1;
+                left = mid + 1;   // ищем в правой половине
             } else {
-                hi = mid - 1;
+                right = mid - 1;  // ищем в левой половине
             }
         }
-        return -1;
+        
+        return -1;  // не найдено
     }
 }`,
 complexity:`Время: O(log n), Память: O(1)`,

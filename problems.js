@@ -2673,10 +2673,7 @@ expl:`O(n). Отслеживаем нули отдельно (zeroCount). Для
 
 // ===== STACK =====
 {id:"st1",t:"Valid Parentheses",p:"Stack",d:"легко",
-desc:`легко
-# Amazon, Meta, Google, Bloomberg
-
-Дана строка s, содержащая только символы '(', ')', '{', '}', '[', ']'. Определить, является ли строка допустимой.
+desc:`Дана строка s, содержащая только символы '(', ')', '{', '}', '[', ']'. Определить, является ли строка допустимой.
 
 Строка допустима если:
 - Каждая открывающая ==скобка== закрыта соответствующей закрывающей
@@ -2715,8 +2712,7 @@ code:`class Solution {
             if (c == '(' || c == '{' || c == '[') {
                 stack.push(c);
             }
-            else if (stack.isEmpty()
-                || !isMatchingPair(stack.pop(), c)) {
+            else if (stack.isEmpty() || !isMatchingPair(stack.pop(), c)) {
                 return false;
             }
         }

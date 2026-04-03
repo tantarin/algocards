@@ -4073,16 +4073,16 @@ desc:`Дан массив целых чисел arr (не отсортирова
 [100, 100, 100]  → [1, 1, 1]`,
 hint:`Отсортировать уникальные значения, назначить ранги. Или пройти один раз, увеличивая ранг при смене значения.`,
 code:`class Solution {
-    public int[] compress(int[] arr) {
+    public int[] arrayRankTransform(int[] arr) {
         int n = arr.length;
         int[] sorted = arr.clone();
         Arrays.sort(sorted);
 
         Map<Integer, Integer> rank = new HashMap<>();
-        int r = 1;
-        for (int i = 0; i < n; i++) {
-            if (!rank.containsKey(sorted[i])) {
-                rank.put(sorted[i], r++);
+        int nextRank = 1;
+        for (int val : sorted) {
+            if (!rank.containsKey(val)) {
+                rank.put(val, nextRank++);
             }
         }
 
@@ -4090,7 +4090,6 @@ code:`class Solution {
         for (int i = 0; i < n; i++) {
             result[i] = rank.get(arr[i]);
         }
-
         return result;
     }
 }`,

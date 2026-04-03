@@ -2360,7 +2360,7 @@ repoSimilar:["sw1","sw8","sw9"],
 diagram:{"type":"multi","data":["c","b","a","e","b","a","b","a","c","d"],"steps":[{"structs":[{"type":"String","name":"s","data":["c","b","a","e","b","a","b","a","c","d"],"active":[0,1,2]},{"type":"int[]","name":"freq","data":{"a":1,"b":1,"c":1}},{"type":"int","name":"needCount","data":"0 ✓"}],"desc":"Окно [c,b,a] — freq покрыт, needCount=0"},{"structs":[{"type":"String","name":"s","data":["c","b","a","e","b","a","b","a","c","d"],"active":[1,2,3]},{"type":"int[]","name":"freq","data":{"a":1,"b":1,"c":0,"e":-1}},{"type":"int","name":"needCount","data":"1"}],"desc":"Окно [b,a,e] — e лишняя, needCount=1"},{"structs":[{"type":"String","name":"s","data":["c","b","a","e","b","a","b","a","c","d"],"active":[6,7,8]},{"type":"int[]","name":"freq","data":{"a":1,"b":1,"c":1}},{"type":"int","name":"needCount","data":"0 ✓"}],"desc":"Окно [b,a,c] — анаграмма найдена!"}]}},
 
 // ===== ONE PASS WITH STATE =====
-{id:"sw4",t:"Возрастающая подпоследовательность",p:"One Pass with State",d:"легко",
+{id:"sw4",t:"LC 674 Longest Continuous Increasing Subsequence",p:"One Pass with State",d:"легко",
 desc:`Найти длину самого длинного ==непрерывного строго возрастающего подмассива==.
 
 Пример:
@@ -2389,7 +2389,8 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл от 1 до n−1, сравнение соседей — O(n). Несколько счётчиков — O(1) памяти.`,
-expl:`Один проход O(n). Если текущий элемент > предыдущего — увеличиваем длину. Иначе — сбрасываем до 1. Запоминаем максимум.`},
+expl:`Один проход O(n). Если текущий элемент > предыдущего — увеличиваем длину. Иначе — сбрасываем до 1. Запоминаем максимум.`,
+lcSimilar:[{"t":"LC 674 · Longest Continuous Increasing Subsequence","h":"lc-674-longest-continuous-increasing-subsequence"}]},
 
 // ===== SLIDING WINDOW =====
 {id:"sw5",t:"Наглый подставной отчет",p:"Sliding Window",d:"средне",

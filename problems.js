@@ -3016,10 +3016,7 @@ expl:`Рекурсивное зеркальное сравнение: left.left 
 lcSimilar:[{"t":"LC 101 · Symmetric Tree","h":"lc-101-symmetric-tree"}]},
 
 {id:"tr3",t:"Правильное дерево поиска",p:"Trees / DFS",d:"легко",
-desc:`легко
-# Яндекс, Amazon
-
-Дан корень ==бинарного дерева==. Проверить, является ли оно ==валидным деревом поиска (BST)==.
+desc:`Дан корень ==бинарного дерева==. Проверить, является ли оно ==валидным деревом поиска (BST)==.
 
 Свойство BST: все значения в левом поддереве строго меньше текущего узла, все значения в правом поддереве строго больше.
 
@@ -3047,20 +3044,17 @@ desc:`легко
 hint:`Передавать min/max границы в рекурсию. Значение должно быть строго между low и high.`,
 code:`class Solution {
     public boolean isValidBST(TreeNode root) {
-        return isValid(root, Long.MIN_VALUE,
-                       Long.MAX_VALUE);
+        return isValid(root, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
-    private boolean isValid(TreeNode node,
-                            long low, long high) {
+    private boolean isValid(TreeNode node, long low, long high) {
         if (node == null) return true;
 
         if (node.val <= low || node.val >= high) {
             return false;
         }
 
-        return isValid(node.left, low, node.val)
-            && isValid(node.right, node.val, high);
+        return isValid(node.left, low, node.val) && isValid(node.right, node.val, high);
     }
 }`,
 complexity:`Время: O(n), Память: O(h)`,

@@ -708,13 +708,13 @@ function rebuildDailyList(){
   dailyListDateKey=k;
   let pool=getFiltered();
   // Режим «одна тема»: если фильтр не выбран — берём случайную тему дня
-  if(dailyMode==='topic'&&!activeFilter&&!diffFilter){
+  if(dailyMode==='topic'&&!activeFilter&&!diffFilter&&!yaFilter){
     const rand=mulberry32(hashString(k+'|topic'));
     const idx=Math.floor(rand()*allPatterns.length);
     const pat=allPatterns[idx];
     pool=P.filter(p=>(p.p===pat||p.p2===pat)&&(!diffFilter||p.d===diffFilter));
   }
-  if(activeFilter||diffFilter){
+  if(activeFilter||diffFilter||yaFilter){
     fcList=pool;
   }else{
     fcList=pickDailyProblems(pool,k+'|'+dailyMode,DAILY_LIMIT);
@@ -1049,7 +1049,9 @@ const REPO='tantarin/algocards';
 const FILE_PATH='problems.js';
 const THEORY_FILE_PATH='theory.js';
 const allPatterns=[...new Set(P.flatMap(p=>[p.p,p.p2].filter(Boolean)))].sort();
+const YANDEX_IDS=new Set(['tp11','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','tp19','tp52','sw8','gh2','sw3','pse5','pse3','pse4','ps2','ms2','ms1','uf1','tp13','iss5','gop5','gop4','gop6','tr15','swd1','tp54','ya1','ya2']);
 let activeFilter=null;
+let yaFilter=false;
 let searchQuery='';
 let fcIdx=0,fcFlipped=false,fcList=[];
 let dailyMode=localStorage.getItem('dailyMode')||'mixed'; // 'mixed' | 'topic'
@@ -1410,7 +1412,8 @@ function setShowMarked(val){
 }
 
 function getFiltered(){
-  let list=activeFilter?P.filter(p=>p.p===activeFilter||p.p2===activeFilter):[...P];
+  let list=yaFilter?P.filter(p=>YANDEX_IDS.has(p.id)):[...P];
+  if(activeFilter)list=list.filter(p=>p.p===activeFilter||p.p2===activeFilter);
   if(diffFilter)list=list.filter(p=>p.d===diffFilter);
   if(showMarkedOnly)list=list.filter(p=>markedIds.has(p.id));
   if(searchQuery){
@@ -1489,10 +1492,11 @@ function applySearch(){
 
 function renderFilters(){
   const markedCount=markedIds.size;
-  const noFilters=!activeFilter&&!showMarkedOnly&&!diffFilter;
+  const noFilters=!activeFilter&&!showMarkedOnly&&!diffFilter&&!yaFilter;
   const markedBtn=markedCount>0
     ?`<div class="filter-btn marked-filter${showMarkedOnly?' active':''}" onclick="setShowMarked(${!showMarkedOnly})">⭐ Отмеченные (${markedCount})</div>`
     :'';
+  const yaBtn=`<div class="filter-btn${yaFilter?' active':''}" style="${yaFilter?'border-color:#fc3f1d;background:#fc3f1d22;color:#fc3f1d':'border-color:#fc3f1d44;color:#fc9d8d'}" onclick="toggleYaFilter()">🦊 Яндекс (32)</div>`;
   const diffBtns=[
     {v:'легко',   label:'Лёгкие',  color:'#22c55e'},
     {v:'средне',  label:'Средние', color:'#f59e0b'},
@@ -1504,8 +1508,9 @@ function renderFilters(){
   document.getElementById('filters').innerHTML=
     markedBtn+
     `<div class="filter-btn${noFilters?' active':''}" onclick="clearAllFilters()">Все</div>`+
+    yaBtn+
     diffBtns+
-    allPatterns.map(p=>`<div class="filter-btn${activeFilter===p&&!showMarkedOnly?' active':''}" onclick="setShowMarked(false);setFilter('${p}')">${p}</div>`).join('');
+    allPatterns.map(p=>`<div class="filter-btn${activeFilter===p&&!showMarkedOnly&&!yaFilter?' active':''}" onclick="setShowMarked(false);setFilter('${p}')">${p}</div>`).join('');
 }
 
 function setDiffFilter(val){
@@ -1517,7 +1522,16 @@ function setDiffFilter(val){
 }
 
 function clearAllFilters(){
-  activeFilter=null;diffFilter=null;showMarkedOnly=false;
+  activeFilter=null;diffFilter=null;showMarkedOnly=false;yaFilter=false;
+  renderFilters();
+  if(searchQuery)fcList=getFiltered();
+  else rebuildDailyList();
+  fcIdx=0;fcFlipped=false;renderCard();
+}
+
+function toggleYaFilter(){
+  yaFilter=!yaFilter;
+  if(yaFilter){activeFilter=null;showMarkedOnly=false;}
   renderFilters();
   if(searchQuery)fcList=getFiltered();
   else rebuildDailyList();
@@ -1525,7 +1539,7 @@ function clearAllFilters(){
 }
 
 function setFilter(pat){
-  activeFilter=pat;
+  activeFilter=pat;yaFilter=false;
   renderFilters();
   // При активном поиске фильтр только сужает выдачу поиска; иначе — новая дневная 10 из выбранного паттерна
   if(searchQuery)fcList=getFiltered();

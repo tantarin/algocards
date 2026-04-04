@@ -1813,8 +1813,7 @@ desc:`Число хранится как ==массив цифр в обратн
 Вывод: [5, 8, 2] (число 285)`,
 hint:`Поцифровое умножение с переносом (carry). Как умножение столбиком.`,
 code:`class Solution {
-    public List<Integer> multiplyByDigit(
-            List<Integer> num, int n) {
+    public List<Integer> multiplyByDigit(List<Integer> num, int n) {
         List<Integer> result = new ArrayList<>();
         int carry = 0;
 

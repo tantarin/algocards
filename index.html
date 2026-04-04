@@ -1050,6 +1050,7 @@ const FILE_PATH='problems.js';
 const THEORY_FILE_PATH='theory.js';
 const allPatterns=[...new Set(P.flatMap(p=>[p.p,p.p2].filter(Boolean)))].sort();
 const YANDEX_IDS=new Set(['tp11','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','tp19','tp52','sw8','gh2','sw3','pse5','pse3','pse4','ps2','ms2','ms1','uf1','tp13','iss5','gop5','gop4','gop6','tr15','swd1','tp54','ya1','ya2']);
+function isYandexProblem(p){return YANDEX_IDS.has(p.id)||p.ya===true;}
 let activeFilter=null;
 let yaFilter=false;
 let searchQuery='';
@@ -1412,7 +1413,7 @@ function setShowMarked(val){
 }
 
 function getFiltered(){
-  let list=yaFilter?P.filter(p=>YANDEX_IDS.has(p.id)):[...P];
+  let list=yaFilter?P.filter(isYandexProblem):[...P];
   if(activeFilter)list=list.filter(p=>p.p===activeFilter||p.p2===activeFilter);
   if(diffFilter)list=list.filter(p=>p.d===diffFilter);
   if(showMarkedOnly)list=list.filter(p=>markedIds.has(p.id));
@@ -1496,7 +1497,8 @@ function renderFilters(){
   const markedBtn=markedCount>0
     ?`<div class="filter-btn marked-filter${showMarkedOnly?' active':''}" onclick="setShowMarked(${!showMarkedOnly})">⭐ Отмеченные (${markedCount})</div>`
     :'';
-  const yaBtn=`<div class="filter-btn${yaFilter?' active':''}" style="${yaFilter?'border-color:#fc3f1d;background:#fc3f1d22;color:#fc3f1d':'border-color:#fc3f1d44;color:#fc9d8d'}" onclick="toggleYaFilter()">🦊 Яндекс (32)</div>`;
+  const yaCount=P.filter(isYandexProblem).length;
+  const yaBtn=`<div class="filter-btn${yaFilter?' active':''}" style="${yaFilter?'border-color:#fc3f1d;background:#fc3f1d22;color:#fc3f1d':'border-color:#fc3f1d44;color:#fc9d8d'}" onclick="toggleYaFilter()">🦊 Яндекс (${yaCount})</div>`;
   const diffBtns=[
     {v:'легко',   label:'Лёгкие',  color:'#22c55e'},
     {v:'средне',  label:'Средние', color:'#f59e0b'},

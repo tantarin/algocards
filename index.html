@@ -1051,6 +1051,11 @@ const THEORY_FILE_PATH='theory.js';
 const allPatterns=[...new Set(P.flatMap(p=>[p.p,p.p2].filter(Boolean)))].sort();
 const YANDEX_IDS=new Set(['tp11','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','tp19','tp52','sw8','gh2','sw3','pse5','pse3','pse4','ps2','ms2','ms1','uf1','tp13','iss5','gop5','gop4','gop6','tr15','swd1','tp54','ya1','ya2']);
 function isYandexProblem(p){return YANDEX_IDS.has(p.id)||p.ya===true;}
+function yandexTagHtml(p){
+  return isYandexProblem(p)
+    ?'<span class="tag" style="background:#fc3f1d22;color:#fc3f1d;border:1px solid #fc3f1d44;margin-left:6px">Яндекс</span>'
+    :'';
+}
 let activeFilter=null;
 let yaFilter=false;
 let searchQuery='';
@@ -1427,7 +1432,7 @@ function getFiltered(){
         (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
       );
     }else{
-      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p+(p.p2?' '+p.p2:'')).toLowerCase().includes(q));
+      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p+(p.p2?' '+p.p2:'')+(isYandexProblem(p)?' Яндекс':'')).toLowerCase().includes(q));
     }
   }
   return list;
@@ -1602,6 +1607,7 @@ function renderEditCard(){
     <div class="flashcard" style="cursor:default">
       <span class="tag" style="background:#7c3aed30;color:#7c3aed">${esc(p.p)}</span>
       <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:4px">${esc(p.d)}</span>
+      ${yandexTagHtml(p)}
       ${fields}
       <button class="edit-save" id="saveBtn" onclick="saveCard()">💾 Сохранить и запушить</button>
       <div class="edit-status" id="editStatus"></div>
@@ -1649,6 +1655,7 @@ function renderCard(){
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
         <span class="tag" style="background:#22c55e30;color:#22c55e;margin-left:6px">${esc(p.d)}</span>
+        ${yandexTagHtml(p)}
         <h3 style="margin:12px 0;font-size:17px"><span style="color:var(--dim)">#${P.indexOf(p)+1}</span> ${esc(p.t)}</h3>
         <div class="code-wrap" style="margin-top:4px">
           <button class="copy-btn copy-problem-desc" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
@@ -1664,6 +1671,7 @@ function renderCard(){
       <div class="fc-face${fcFlipped?' visible':''}">
         <div style="display:inline-block"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p}')">${esc(p.p)}</span></div>
         ${p.p2?`<div style="display:inline-block;margin-left:6px"><span style="display:block;font-size:10px;color:var(--dim);margin-bottom:2px">кликни ↓</span><span class="tag clickable" style="background:#7c3aed30;color:#7c3aed" onclick="event.stopPropagation();showTheory('${p.p2}')">${esc(p.p2)}</span></div>`:''}
+        ${yandexTagHtml(p)}
         <div style="margin-top:10px;font-size:13px;color:var(--dim);white-space:pre-wrap;line-height:1.65">${esc(p.expl||'')}</div>
         <div class="code-wrap" style="margin-top:10px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>

@@ -5830,7 +5830,7 @@ expl:`slow отстаёт от fast: slow фиксирует позицию по
 p2:"Read / Write",
 lcSimilar:[{"n":27,"t":"Remove Element","h":"remove-element"},{"n":80,"t":"Remove Duplicates II","h":"remove-duplicates-ii"}]},
 
-{id:"tp35",t:"Remove Element",p:"Two Pointers",d:"легко",
+{id:"tp35",t:"LC 27 Remove Element",p:"Two Pointers",d:"легко",
 desc:`Дан массив nums и число val. Удалить ==in-place== все вхождения val, вернуть количество оставшихся элементов.
 
 Пример:
@@ -5856,7 +5856,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). In-place — O(1).`,
 expl:`slow — курсор записи. Копируем в начало только нужные элементы (не равные val). O(n) время, O(1) память.`,
 p2:"Read / Write",
-lcSimilar:[{"n":26,"t":"Remove Duplicates","h":"remove-duplicates-from-sorted-array"},{"n":283,"t":"Move Zeroes","h":"move-zeroes"}]},
+lcSimilar:[{"n":26,"t":"Remove Duplicates","h":"remove-duplicates"},{"n":283,"t":"Move Zeroes","h":"move-zeroes"}]},
 
 {id:"tp36",t:"Move Zeroes",p:"Two Pointers",d:"легко",
 desc:`Дан массив nums. Переместить все нули в конец, ==сохранив порядок== остальных элементов. In-place.

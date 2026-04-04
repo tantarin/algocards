@@ -3344,8 +3344,7 @@ class Solution {
 
         for (int l = 0; l < n; l++) {
             int r = l;
-            while (r + 1 < n
-                    && nums.get(r + 1) == nums.get(r) + 1) {
+            while (r + 1 < n && nums.get(r + 1) == nums.get(r) + 1) {
                 r++;
             }
             int start = nums.get(l);

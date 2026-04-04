@@ -6566,24 +6566,20 @@ desc:`Дан отсортированный массив без дубликат
 hint:`Два указателя: start и i расширяют диапазон последовательных чисел.`,
 code:`class Solution {
     public List<String> summaryRanges(int[] nums) {
-        List<String> result = new ArrayList<>();
-        int i = 0;
-
-        while (i < nums.length) {
+        List<String> list = new ArrayList<>();
+        
+        for (int i = 0; i < nums.length; i++) {
             int start = nums[i];
             while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
                 i++;
             }
-
             if (start == nums[i]) {
-                result.add(String.valueOf(start));
+                list.add(String.valueOf(start));
             } else {
-                result.add(start + "->" + nums[i]);
+                list.add(start + "->" + nums[i]);
             }
-            i++;
         }
-
-        return result;
+        return list;
     }
 }`,
 complexity:`Время: O(n), Память: O(1)`,

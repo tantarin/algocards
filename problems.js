@@ -5885,7 +5885,7 @@ expl:`slow фиксирует позицию записи ненулевых. П
 p2:"Read / Write",
 lcSimilar:[{"n":27,"t":"Remove Element","h":"remove-element"}]},
 
-{id:"tp37",t:"Is Subsequence",p:"Two Pointers",d:"легко",
+{id:"tp37",t:"LC 392 · Is Subsequence",p:"Two Pointers",d:"легко",
 desc:`Даны строки s и t. Определить, является ли s ==подпоследовательностью== t (символы s встречаются в t в том же порядке, но не обязательно подряд).
 
 Пример:

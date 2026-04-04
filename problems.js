@@ -828,8 +828,7 @@ expl:`Безопасные узлы = не участвующие в цикле 
 lcSimilar:[{"n":802,"t":"Find Eventual Safe States","h":"find-eventual-safe-states"}]},
 
 // ===== GREEDY =====
-{id:"gop1",t:"LeetCode 122. Best Time to Buy and Sell Stock II
-",p:"Greedy",d:"легко",
+{id:"gop1",t:"LeetCode 122. Best Time to Buy and Sell Stock II",p:"Greedy",d:"легко",
 desc:`Дан массив prices, где prices[i] — цена акции в день i.
 Можно совершать несколько транзакций (покупку и продажу):
 - Покупать и продавать в любой день

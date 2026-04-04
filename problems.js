@@ -1684,7 +1684,6 @@ code:`class Solution {
         int n = intervals.length;
         int[] starts = new int[n];//массив всех времен начала встреч
         int[] ends = new int[n];//массив всех времен окончания встреч
-        
         for (int i = 0; i < n; i++) {
             starts[i] = intervals[i][0];
             ends[i] = intervals[i][1];

@@ -6333,7 +6333,7 @@ complexityExpl:`Один проход — O(n). Только три переме
 expl:`Окно с не более k нулями. Расширяем right, при превышении нулей — сужаем left. Максимальная длина такого окна — ответ. O(n) время, O(1) память.`,
 lcSimilar:[{"n":424,"t":"Longest Repeating Character Replacement","h":"longest-repeating-character-replacement"}]},
 
-{id:"tp51",t:"Merge Strings Alternately",p:"Two Pointers",d:"легко",
+{id:"tp51",t:"LC 1768 · Merge Strings Alternately",p:"Two Pointers",d:"легко",
 desc:`Даны две строки word1 и word2. Составить новую строку, ==поочерёдно беря символы==: сначала из word1, затем из word2. Если одна строка длиннее — дописать остаток.
 
 Пример:

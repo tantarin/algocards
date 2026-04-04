@@ -5744,7 +5744,7 @@ complexityExpl:`Один проход двумя указателями — O(n)
 expl:`Два указателя с концов, пропускаем не-алфавитные символы. Сравниваем без регистра. O(n) время, O(1) память.`,
 lcSimilar:[{"n":680,"t":"Valid Palindrome II","h":"valid-palindrome-ii"}]},
 
-{id:"tp32",t:"Two Sum II",p:"Two Pointers",d:"легко",
+{id:"tp32",t:"LC 167 · Two Sum II - Input Array Is Sorted",p:"Two Pointers",d:"легко",
 desc:`Дан ==отсортированный== массив numbers (1-индексация) и target. Найти два числа, дающих в сумме target. Вернуть их индексы.
 
 Пример:

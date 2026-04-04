@@ -5086,8 +5086,7 @@ code:`class Solution {
     private boolean dfs(TreeNode node, int depth) {
         if (node == null) return true;
 
-        if (node.left == null
-            && node.right == null) {
+        if (node.left == null && node.right == null) {
             if (leafDepth == -1) {
                 leafDepth = depth;
             }

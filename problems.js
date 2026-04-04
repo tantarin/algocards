@@ -6672,7 +6672,7 @@ complexityExpl:`Один цикл с обновлением freq и счётчи
 expl:`Перестановки содержат числа 1..n по одному разу. freq[v] считает суммарные вхождения. Когда freq == 2 — число встречено в обоих массивах. O(n) время и память.`},
 
 // ===== ONE PASS WITH STATE =====
-{id:"sw13",t:"Longest Continuous Increasing Subsequence",p:"One Pass with State",d:"легко",
+{id:"sw13",t:"LC 674 · Longest Continuous Increasing Subsequence",p:"One Pass with State",d:"легко",
 desc:`Найти длину самой длинной ==непрерывно возрастающей подпоследовательности== (подмассива).
 
 Пример:
@@ -6701,7 +6701,8 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с curLen — O(n). Несколько переменных — O(1) памяти.`,
-expl:`Один проход: если nums[i] > nums[i-1] — увеличиваем текущую длину. Иначе сбрасываем в 1. Отслеживаем максимум. O(n) время, O(1) память.`},
+expl:`Один проход: если nums[i] > nums[i-1] — увеличиваем текущую длину. Иначе сбрасываем в 1. Отслеживаем максимум. O(n) время, O(1) память.`,
+lcSimilar:[{"t":"LC 674 · Longest Continuous Increasing Subsequence","h":"lc-674-longest-continuous-increasing-subsequence"}]},
 
 // ===== SLIDING WINDOW =====
 {id:"sw14",t:"LC 643 · Maximum Average Subarray I ",p:"Sliding Window",d:"легко",

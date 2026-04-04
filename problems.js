@@ -5569,8 +5569,7 @@ code:`class Solution {
             }
 
             if (pos1 != -1 && pos2 != -1) {
-                minDist = Math.min(minDist,
-                    Math.abs(pos1 - pos2));
+                minDist = Math.min(minDist, Math.abs(pos1 - pos2));
             }
         }
 

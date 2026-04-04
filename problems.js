@@ -6346,13 +6346,17 @@ hint:`Два указателя i и j. Поочерёдно добавлять 
 code:`class Solution {
     public String mergeAlternately(String word1, String word2) {
         StringBuilder sb = new StringBuilder();
-        int i = 0, j = 0;
-        while (i < word1.length() && j < word2.length()) {
-            sb.append(word1.charAt(i++));
-            sb.append(word2.charAt(j++));
+        int p1 = 0, p2 = 0;
+        
+        while (p1 < word1.length() && p2 < word2.length()) {
+            sb.append(word1.charAt(p1++));
+            sb.append(word2.charAt(p2++));
         }
-        sb.append(word1.substring(i));
-        sb.append(word2.substring(j));
+        
+        // Добавляем остатки (если есть)
+        sb.append(word1.substring(p1));
+        sb.append(word2.substring(p2));
+        
         return sb.toString();
     }
 }`,

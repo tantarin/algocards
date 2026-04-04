@@ -6391,7 +6391,8 @@ class Solution {
 complexity:`Время: O(n+m), Память: O(1) доп.`,
 complexityExpl:`Каждый указатель движется только вперёд — суммарно O(n+m) шагов. Результирующий список не считается за доп. память.`,
 expl:`Два указателя по двум отсортированным массивам. Меньший элемент nums1 не встречается в nums2 — берём его. Равные — пропускаем (есть в обоих). Больший p2 — сдвигаем. O(n+m) время.`,
-lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
+lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}],
+ya:true},
 
 {id:"tp54",t:"К ближайших чисел (якорь idx)",p:"Two Pointers",d:"легко",
 desc:`Дан массив nums, отсортированный в ==неубывающем порядке==, индекс idx и число k. Нужно найти ==k ближайших к значению nums[idx]== чисел в массиве и вернуть в любом порядке. При равных расстояниях предпочтение отдаётся ==меньшим числам==.

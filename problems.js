@@ -5337,7 +5337,7 @@ a = b + k  или  a = b - k
 и добавляю эти количества к ответу. После этого добавляю текущий num в map, чтобы он мог участвовать в парах для следующих элементов.`,
 lcSimilar:[{"t":"Number of Pairs With Absolute Difference K","h":"number-of-pairs-with-absolute-difference-k"},{"t":"K-diff Pairs in an Array","h":"k-diff-pairs-in-an-array"}]},
 
-{id:"hf9",t:"Intersection of Two Arrays II",p:"HashMap",d:"легко",
+{id:"hf9",t:"LC 350 Intersection of Two Arrays II",p:"HashMap",d:"легко",
 desc:`Найти ==пересечение двух массивов с учётом кратности== (каждый элемент в результате появляется столько раз, сколько он встречается в обоих).
 
 Пример:

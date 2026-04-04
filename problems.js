@@ -441,25 +441,27 @@ code:`class Solution {
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
         Map<String, Integer> countMap = new HashMap<>();
-
         for (int[] p : points) {
             minX = Math.min(minX, p[0]);
             maxX = Math.max(maxX, p[0]);
             String key = p[0] + "," + p[1];
             countMap.merge(key, 1, Integer::sum);
         }
-
-        double axis = (minX + maxX) / 2.0;
-
+        
+        // Ось симметрии
+        int axisSum = minX + maxX;  // 2 * axis, всегда целое число
+        
         for (int[] p : points) {
-            double mirrorX = 2 * axis - p[0];
-            if (mirrorX != (int) mirrorX) return false;
+            int mirrorX = axisSum - p[0];  // зеркальная координата X
             String key = p[0] + "," + p[1];
-            String mirror = (int) mirrorX + "," + p[1];
-            int countSelf = countMap.getOrDefault(key, 0);
-            int countMirror = countMap.getOrDefault(mirror, 0);
-            if (countSelf != countMirror) return false;
+            String mirrorKey = mirrorX + "," + p[1];
+            
+            // Количество точек должно совпадать с количеством их зеркальных отражений
+            if (!countMap.getOrDefault(key, 0).equals(countMap.getOrDefault(mirrorKey, 0))) {
+                return false;
+            }
         }
+        
         return true;
     }
 }`,

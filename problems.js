@@ -6439,9 +6439,7 @@ class Solution {
         int ref = nums.get(idx);
 
         for (int i = 0; i < k - 1; i++) {
-            if (r >= nums.size()
-                    || (l >= 0 && Math.abs(ref - nums.get(l))
-                        <= Math.abs(ref - nums.get(r)))) {
+            if (r >= nums.size() || (l >= 0 && Math.abs(ref - nums.get(l)) <= Math.abs(ref - nums.get(r)))) {
                 result.add(nums.get(l));
                 l--;
             } else {

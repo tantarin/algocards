@@ -3534,30 +3534,23 @@ desc:`Дан массив графиков, где каждый график —
 Объяснение: t=1: 2, t=2: 2+3=5, t=3: 1+3=4, t=4: 1+2=3`,
 hint:`Min-heap для событий из всех графиков. Обрабатываем все события с одинаковым временем вместе.`,
 code:`public class Solution {
-    public List<List<Integer>> merge(
-            List<List<List<Integer>>> graphics) {
+    public List<List<Integer>> merge(List<List<List<Integer>>> graphics) {
         int k = graphics.size();
         int[] currentValues = new int[k];
         long currentSum = 0;
 
-        PriorityQueue<int[]> heap =
-            new PriorityQueue<>(
-                Comparator.comparingInt(a -> a[0]));
-
+        PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
         for (int i = 0; i < k; i++) {
             var g = graphics.get(i);
             if (g != null && !g.isEmpty())
-                heap.offer(new int[]{
-                    g.get(0).get(0), i, 0});
+                heap.offer(new int[]{g.get(0).get(0), i, 0});
         }
 
         List<List<Integer>> result = new ArrayList<>();
-
         while (!heap.isEmpty()) {
             int curTime = heap.peek()[0];
 
-            while (!heap.isEmpty()
-                   && heap.peek()[0] == curTime) {
+            while (!heap.isEmpty() && heap.peek()[0] == curTime) {
                 int[] ev = heap.poll();
                 int gi = ev[1], pi = ev[2];
                 var g = graphics.get(gi);
@@ -3566,18 +3559,14 @@ code:`public class Solution {
 
                 if (newVal != oldVal) {
                     currentValues[gi] = newVal;
-                    currentSum +=
-                        (long) newVal - oldVal;
+                    currentSum += (long) newVal - oldVal;
                 }
 
                 if (pi + 1 < g.size())
-                    heap.offer(new int[]{
-                        g.get(pi + 1).get(0), gi,
-                        pi + 1});
+                    heap.offer(new int[]{g.get(pi + 1).get(0), gi, pi + 1});
             }
 
-            result.add(Arrays.asList(
-                curTime, (int) currentSum));
+            result.add(Arrays.asList(curTime, (int) currentSum));
         }
         return result;
     }

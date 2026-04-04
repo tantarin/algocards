@@ -6459,7 +6459,7 @@ lcSimilar:[{"t":"Find K Closest Elements","h":"find-k-closest-elements"}],
 repoSimilar:["tp16","tp15"]},
 
 // ===== INTERVALS SWEEP =====
-{id:"iss6",t:"Missing Ranges",p:"Intervals Sweep",d:"легко",
+{id:"iss6",t:"LC 163 · Missing Ranges",p:"Intervals Sweep",d:"легко",
 desc:`Дан отсортированный массив уникальных чисел и границы [lower, upper]. Найти все ==пропущенные диапазоны==.
 
 Пример:

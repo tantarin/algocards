@@ -6427,8 +6427,7 @@ hint:`Стартуем с nums[idx]. Два указателя l = idx−1 и r 
 code:`import java.util.*;
 
 class Solution {
-    public List<Integer> findNearestNumbers(
-            List<Integer> nums, int idx, int k) {
+    public List<Integer> findNearestNumbers(List<Integer> nums, int idx, int k) {
         if (k == 0) {
             return new ArrayList<>();
         }

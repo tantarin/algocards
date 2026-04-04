@@ -1695,7 +1695,6 @@ code:`class Solution {
         int rooms = 0;
         // максимум одновременно занятых комнат (ответ)
         int maxRooms = 0;
-
         // указатели по массивам starts и ends
         int si = 0, ei = 0;
         while (si < n) {
@@ -1708,13 +1707,10 @@ code:`class Solution {
                 rooms++;
                 // обновляем максимум
                 maxRooms = Math.max(maxRooms, rooms);
-
                 // переходим к следующему старту
                 si++;
             } else {
                 /**
-                 * иначе:
-                 * встреча уже закончилась →
                  * освобождаем комнату
                  */
                 rooms--;

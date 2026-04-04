@@ -4668,7 +4668,7 @@ lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"f
 diagram:{"type":"tree","data":[1,2,3,4,5,null,6],"steps":[{"active":[0],"visited":[],"desc":"Уровень 0: [1] →"},{"active":[1,2],"visited":[0],"desc":"Уровень 1: [3,2] ←"},{"active":[3,4,6],"visited":[0,1,2],"desc":"Уровень 2: [4,5,6] →"},{"active":[],"visited":[0,1,2,3,4,6],"desc":"Итог: [[1],[3,2],[4,5,6]]"}]}},
 
 // ===== TREES / DFS =====
-{id:"tr7",t:"Same Tree",p:"Trees / DFS",d:"легко",
+{id:"tr7",t:"LC 100 Same Tree",p:"Trees / DFS",d:"легко",
 desc:`Даны корни двух бинарных деревьев p и q. Проверить, являются ли они ==одинаковыми== (совпадают ==структура и все значения узлов==).
 
 Пример 1:

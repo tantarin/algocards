@@ -1678,8 +1678,7 @@ function renderCard(){
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         </div>
 
-        ${p.code2?`<div style="font-size:12px;color:var(--dim);margin-top:14px;margin-bottom:6px">Решение 2 — HashMap по частотам, O(n) время, O(n) память</div>
-        <div class="code-wrap" style="margin-top:10px">
+        ${p.code2?`<div class="code-wrap" style="margin-top:14px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
         </div>
@@ -1738,7 +1737,7 @@ function copyProblemBundle(btn){
   const num=P.indexOf(p)+1;
   const parts=['#'+num+' '+p.t,'','Условие:',stripHighlightMarkers(p.desc||''),'','Решение:',explTextBeforeCode(p.expl)+(p.code||'')];
   if(p.code2){
-    parts.push('','Решение 2 (HashMap, O(n)):');
+    parts.push('','Решение 2:');
     parts.push(p.code2);
   }
   const text=parts.join('\n');

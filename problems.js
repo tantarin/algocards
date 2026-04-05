@@ -6889,34 +6889,36 @@ desc:`Дан массив spots, где spots[i] = 1 — ==занятое мес
 Вывод: 3
 Объяснение: лучшее место — индекс 0. Машин слева нет, справа ближайшая на индексе 3 (расстояние 3).`,
 hint:`Сгруппируй подряд идущие одинаковые значения. Для блока нулей у края массива ответ — длина блока; для блока между единицами — «половина» ширины блока: (длина + 2) / 2.`,
-code:`public int bestParkingSpot(List<Integer> spots) {
-    int result = 0;
-    int n = spots.size();
-    
-    for (int l = 0; l < n; l++) {
-        // Пропускаем единицы
-        if (spots.get(l) == 1) continue;
-        
-        // Нашли начало блока нулей → ищем его конец
-        int r = l;
-        while (r + 1 < n && spots.get(r + 1) == 0) {
-            r++;
+code:`import java.util.*;
+
+public class Solution {
+    public int bestParkingSpot(List<Integer> spots) {
+        int l = 0;
+        int r = 0;
+        int result = 0;
+        while (l < spots.size()) {
+            while (r + 1 < spots.size() && spots.get(r) == spots.get(r + 1)) {
+                r += 1;
+            }
+
+            // обновляем ответ, только если в плавающем окне были нули
+            if (spots.get(r) == 0) {
+                if (l == 0 || r == spots.size() - 1) {
+                    // если 0 прижат к стенке слева или справа,
+                    // то свободных мест будет r - l + 1, т. к. посадим в самый край
+                    result = Math.max(result, r - l + 1);
+                } else {
+                    // окно располагается между 1-ами:
+                    // поэтому находим число мест по формуле (r - l + 2) // 2
+                    result = Math.max(result, (r - l + 2) / 2);
+                }
+            }
+
+            l = r + 1;
+            r = r + 1;
         }
-        
-        // Длина блока
-        int len = r - l + 1;
-        
-        // Расчёт лучшего места в этом блоке
-        if (l == 0 || r == n - 1) {
-            result = Math.max(result, len);
-        } else {
-            result = Math.max(result, (len + 1) / 2);
-        }
-        
-        l = r;  // перепрыгиваем
+        return result;
     }
-    
-    return result;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при движении l и r — O(n). Только несколько целых — O(1) доп. памяти.`,

@@ -6944,21 +6944,15 @@ public class Solution {
             boolean has1 = p1 < nums1.size();
             boolean has2 = p2 < nums2.size();
 
-            int time;
-            if (has1 && has2) {
-                time = Math.min(nums1.get(p1).get(0), nums2.get(p2).get(0));
-            } else if (has1) {
-                time = nums1.get(p1).get(0);
-            } else {
-                time = nums2.get(p2).get(0);
-            }
+            int time1 = has1 ? nums1.get(p1).get(0) : Integer.MAX_VALUE;
+            int time2 = has2 ? nums2.get(p2).get(0) : Integer.MAX_VALUE;
+            int time = Math.min(time1, time2);
 
-            if (has1 && nums1.get(p1).get(0) == time) {
+            if (time1 == time) {
                 currentValue1 = nums1.get(p1).get(1);
                 p1++;
             }
-
-            if (has2 && nums2.get(p2).get(0) == time) {
+            if (time2 == time) {
                 currentValue2 = nums2.get(p2).get(1);
                 p2++;
             }

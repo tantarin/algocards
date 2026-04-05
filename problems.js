@@ -3217,6 +3217,7 @@ code:`class Solution {
         boolean prevSpace = false;
         for (int read = 0; read < arr.length; read++) {
             if (arr[read] == ' ') {
+                //если до этого был не пробел
                 if (!prevSpace) {
                     arr[write++] = ' ';
                     prevSpace = true;

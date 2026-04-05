@@ -5227,8 +5227,7 @@ hint:`DFS: для каждого узла считай ==битовую маск
 code:`import java.util.*;
 
 public class Solution {
-    private Map<Integer,
-        AbstractMap.SimpleEntry<TreeNode, Integer>> best;
+    private Map<Integer, AbstractMap.SimpleEntry<TreeNode, Integer>> best;
     private List<TreeNode> result;
     private int resultSum;
 
@@ -5247,8 +5246,7 @@ public class Solution {
         int[] left  = dfs(node.left);
         int[] right = dfs(node.right);
 
-        int mask = left[0] | right[0]
-                   | (1 << (node.val - 'A'));
+        int mask = left[0] | right[0] | (1 << (node.val - 'A'));
         int size = left[1] + right[1] + 1;
 
         if (best.containsKey(mask)) {
@@ -5262,10 +5260,8 @@ public class Solution {
         }
 
         // Сохраняем наибольшее поддерево для данной маски
-        if (!best.containsKey(mask)
-                || size > best.get(mask).getValue()) {
-            best.put(mask,
-                new AbstractMap.SimpleEntry<>(node, size));
+        if (!best.containsKey(mask) || size > best.get(mask).getValue()) {
+            best.put(mask, new AbstractMap.SimpleEntry<>(node, size));
         }
 
         return new int[]{mask, size};

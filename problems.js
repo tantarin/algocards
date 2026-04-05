@@ -3262,8 +3262,7 @@ complexity:`Время: O(|t|), Память: O(1)`,
 complexityExpl:`Указатель по t проходит строку один раз — O(|t|). Два индекса — O(1) памяти.`,
 expl:`Два указателя: p1 по s, p2 по t. При совпадении продвигаем оба, иначе только p2. Если p1 дошёл до конца — s является подпоследовательностью t. O(|t|).`,
 lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{"t":"Valid Parentheses","h":"valid-parentheses"}],
-diagram:{"type":"twoptr","data":["a","1","b","2","c","3"],"steps":[{"l":0,"r":0,"desc":"s=abc, t=a1b2c3"},{"l":0,"r":0,"found":[0],"desc":"a == a ✓"},{"l":1,"r":2,"found":[2],"desc":"b == b ✓"},{"l":2,"r":4,"found":[4],"desc":"c == c ✓ Найдено!"}]},
-ya:true},
+diagram:{"type":"twoptr","data":["a","1","b","2","c","3"],"steps":[{"l":0,"r":0,"desc":"s=abc, t=a1b2c3"},{"l":0,"r":0,"found":[0],"desc":"a == a ✓"},{"l":1,"r":2,"found":[2],"desc":"b == b ✓"},{"l":2,"r":4,"found":[4],"desc":"c == c ✓ Найдено!"}]}},
 
 {id:"tp6",t:"LC 167. Two Sum II - Input Array Is Sorted",p:"Two Pointers",d:"легко",
 desc:`Найти ==два элемента в отсортированном массиве, дающих в сумме target==. Вернуть их индексы (1-based). O(1) доп. памяти.
@@ -6391,8 +6390,7 @@ class Solution {
 complexity:`Время: O(n+m), Память: O(1) доп.`,
 complexityExpl:`Каждый указатель движется только вперёд — суммарно O(n+m) шагов. Результирующий список не считается за доп. память.`,
 expl:`Два указателя по двум отсортированным массивам. Меньший элемент nums1 не встречается в nums2 — берём его. Равные — пропускаем (есть в обоих). Больший p2 — сдвигаем. O(n+m) время.`,
-lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}],
-ya:true},
+lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
 
 {id:"tp54",t:"К ближайших чисел (якорь idx)",p:"Two Pointers",d:"легко",
 desc:`Дан массив nums, отсортированный в ==неубывающем порядке==, индекс idx и число k. Нужно найти ==k ближайших к значению nums[idx]== чисел в массиве и вернуть в любом порядке. При равных расстояниях предпочтение отдаётся ==меньшим числам==.
@@ -6891,35 +6889,34 @@ desc:`Дан массив spots, где spots[i] = 1 — ==занятое мес
 Вывод: 3
 Объяснение: лучшее место — индекс 0. Машин слева нет, справа ближайшая на индексе 3 (расстояние 3).`,
 hint:`Сгруппируй подряд идущие одинаковые значения. Для блока нулей у края массива ответ — длина блока; для блока между единицами — «половина» ширины блока: (длина + 2) / 2.`,
-steps:`1) Идём по spots, для каждого максимально расширяем r, пока значение совпадает с spots[r].
-2) Если сегмент из нулей: при l==0 или r==n−1 — кандидат (r−l+1); иначе блок между единицами — кандидат (r−l+2)/2.
-3) Сдвигаем l = r+1 и повторяем.
-4) Максимум по кандидатам — ответ.`,
-code:`import java.util.*;
-
-public class Solution {
-    public int bestParkingSpot(List<Integer> spots) {
-        int l = 0;
-        int r = 0;
-        int result = 0;
-        while (l < spots.size()) {
-            while (r + 1 < spots.size() && spots.get(r) == spots.get(r + 1)) {
-                r += 1;
-            }
-
-            if (spots.get(r) == 0) {
-                if (l == 0 || r == spots.size() - 1) {
-                    result = Math.max(result, r - l + 1);
-                } else {
-                    result = Math.max(result, (r - l + 2) / 2);
-                }
-            }
-
-            l = r + 1;
-            r = r + 1;
+code:`public int bestParkingSpot(List<Integer> spots) {
+    int result = 0;
+    int n = spots.size();
+    
+    for (int l = 0; l < n; l++) {
+        // Пропускаем единицы
+        if (spots.get(l) == 1) continue;
+        
+        // Нашли начало блока нулей → ищем его конец
+        int r = l;
+        while (r + 1 < n && spots.get(r + 1) == 0) {
+            r++;
         }
-        return result;
+        
+        // Длина блока
+        int len = r - l + 1;
+        
+        // Расчёт лучшего места в этом блоке
+        if (l == 0 || r == n - 1) {
+            result = Math.max(result, len);
+        } else {
+            result = Math.max(result, (len + 1) / 2);
+        }
+        
+        l = r;  // перепрыгиваем
     }
+    
+    return result;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при движении l и r — O(n). Только несколько целых — O(1) доп. памяти.`,

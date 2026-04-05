@@ -2532,8 +2532,6 @@ code:`class Solution {
 
         for (int right = 0; right < s.length(); right++) {
             char rightChar = s.charAt(right);
-
-            // Добавляем правый символ
             freq[rightChar]++;
             if (freq[rightChar] == 1) haveCount++;
 

@@ -2857,13 +2857,11 @@ code:`class Solution {
         while (i < s.length()) {
             if (s.charAt(i) == ' ') {
                 int start = i;
-                while (i < s.length()
-                    && s.charAt(i) == ' ') i++;
+                while (i < s.length() && s.charAt(i) == ' ') i++;
                 parts.add(s.substring(start, i));
             } else {
                 int start = i;
-                while (i < s.length()
-                    && s.charAt(i) != ' ') i++;
+                while (i < s.length() && s.charAt(i) != ' ') i++;
                 String word = s.substring(start, i);
                 parts.add(word);
                 words.addFirst(word);

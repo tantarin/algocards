@@ -2796,6 +2796,7 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход по токенам, на каждом операторе два pop и push — O(n). Стек до O(n) операндов — O(n) памяти.`,
 expl:`Стек для RPN-вычислений. Числа — в стек. Оператор — извлекаем два операнда, считаем, результат обратно. Порядок важен для - и /. O(n).`},
 
+// ===== MATH / SIMULATION =====
 {id:"st4",t:"Простой калькулятор",p:"Math / Simulation",d:"средне",
 desc:`Дан массив \`s\` с положительными числами и знаками \`*\` и \`+\`. Нужно вернуть результат вычислений и важно, чтобы решение было за \`O(1)\` по дополнительной памяти.
 
@@ -2805,23 +2806,30 @@ desc:`Дан массив \`s\` с положительными числами
 Вывод: 8`,
 hint:`Накапливаем произведение. При + добавляем к result и начинаем новое произведение.`,
 code:`class Solution {
-    public int calculate(String[] tokens) {
+    public int calculate(String[] s) {
         int result = 0;
-        int prevMultiply = Integer.parseInt(tokens[0]);
+        int currentProduct = 1;
 
-        for (int i = 1; i < tokens.length; i += 2) {
-            String op = tokens[i];
-            int num = Integer.parseInt(tokens[i + 1]);
+        for (int i = 0; i < s.length; i++) {
+            String token = s[i];
 
-            if (op.equals("*")) {
-                prevMultiply *= num;
+            if (token.equals("*")) {
+                // просто пропускаем, умножение обработаем на числе
+                continue;
+            } else if (token.equals("+")) {
+                // закончили блок умножений
+                result += currentProduct;
+                currentProduct = 1;
             } else {
-                result += prevMultiply;
-                prevMultiply = num;
+                // это число
+                int num = Integer.parseInt(token);
+                currentProduct *= num;
             }
         }
 
-        result += prevMultiply;
+        // добавить последний блок
+        result += currentProduct;
+
         return result;
     }
 }`,
@@ -2829,6 +2837,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по токенам — O(n). Только result и prevMultiply — O(1) памяти.`,
 expl:`Выражение — сумма произведений. prevMultiply накапливает текущее произведение. При + — добавляем его к result и начинаем новое. O(n) время, O(1) память.`},
 
+// ===== STACK =====
 {id:"st5",t:"Разворот слов",p:"Stack",d:"легко",
 desc:`==Развернуть порядок слов==, сохраняя пробелы на своих местах.
 

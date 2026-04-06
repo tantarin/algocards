@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/problems-123-7c3aed?style=for-the-badge" alt="123 problems">
-  <img src="https://img.shields.io/badge/patterns-21-22c55e?style=for-the-badge" alt="21 patterns">
+  <img src="https://img.shields.io/badge/patterns-20-22c55e?style=for-the-badge" alt="20 patterns">
   <img src="https://img.shields.io/badge/PWA-offline%20ready-f59e0b?style=for-the-badge" alt="PWA">
 </p>
 
@@ -42,7 +42,7 @@
 | Heap / PQ | 2 | | Linked List | 2 |
 | Union-Find | 2 | | Window + Deque | 2 |
 | Graph BFS | 1 | | Graph Toposort | 1 |
-| Strings Prefix | 1 | | Dynamic Prog. | 1 |
+| Strings Prefix | 1 | | Dynamic Programming | 2 |
 
 ## Возможности
 

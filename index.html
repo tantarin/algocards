@@ -35,6 +35,10 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 #search{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none;margin-bottom:8px}
 #search::placeholder{color:var(--dim)}
 #search:focus{border-color:var(--purple)}
+.daily-limit-wrap{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.daily-limit-label{font-size:13px;color:var(--dim);white-space:nowrap}
+.daily-limit-input{width:72px;padding:8px 10px;border-radius:10px;border:1px solid #ffffff15;background:var(--card);color:var(--text);font-size:15px;outline:none}
+.daily-limit-input:focus{border-color:var(--purple)}
 .spoiler-row{margin-top:12px}
 .hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;display:inline-block}
 .hint-text{margin-top:8px;color:var(--orange);font-size:14px;font-weight:600}
@@ -493,6 +497,10 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 </div>
 <div class="subtitle" id="info"></div>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
+<div class="daily-limit-wrap">
+  <label class="daily-limit-label" for="dailyLimit">Задач в день</label>
+  <input type="number" class="daily-limit-input" id="dailyLimit" min="1" max="500" inputmode="numeric" title="Сколько карточек в дневной подборке (без поиска и без фильтров)" onchange="applyDailyLimitFromInput()">
+</div>
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>
 <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
@@ -647,12 +655,45 @@ document.addEventListener('click', function(e) {
   if (e.target === modal) closeTheory();
 });
 
-// --- «10 задач на сегодня» (без поиска) ---
-// Из текущего набора (все задачи или выбранный паттерн) каждый календарный день показываем не больше DAILY_LIMIT карточек.
-// Состав и порядок детерминированы от строки seed (дата + фильтр), чтобы за день список не менялся между перезагрузками.
+// --- Дневная подборка (без поиска и без фильтров) ---
+// Лимит задаётся в поле «Задач в день» (localStorage), по умолчанию 10.
+// Состав детерминирован от seed (дата | режим | лимит), чтобы за день список не менялся между перезагрузками.
 // Поиск не ограничиваем — при непустой строке поиска показываются все совпадения из getFiltered().
 
-const DAILY_LIMIT=10;
+const DAILY_LIMIT_DEFAULT=10;
+const DAILY_LIMIT_MIN=1;
+const DAILY_LIMIT_MAX=500;
+const DAILY_LIMIT_STORAGE='algocards_daily_limit';
+
+function getDailyLimit(){
+  try{
+    const v=localStorage.getItem(DAILY_LIMIT_STORAGE);
+    const n=parseInt(v,10);
+    if(Number.isFinite(n))return Math.min(DAILY_LIMIT_MAX,Math.max(DAILY_LIMIT_MIN,n));
+  }catch(_){/* ignore */}
+  return DAILY_LIMIT_DEFAULT;
+}
+
+function setDailyLimit(raw){
+  const n=parseInt(raw,10);
+  const v=Number.isFinite(n)
+    ?Math.min(DAILY_LIMIT_MAX,Math.max(DAILY_LIMIT_MIN,n))
+    :DAILY_LIMIT_DEFAULT;
+  try{localStorage.setItem(DAILY_LIMIT_STORAGE,String(v));}catch(_){/* ignore */}
+  return v;
+}
+
+function applyDailyLimitFromInput(){
+  const el=document.getElementById('dailyLimit');
+  if(!el)return;
+  el.value=setDailyLimit(el.value);
+  if(!searchQuery){
+    rebuildDailyList();
+    fcIdx=Math.min(fcIdx,Math.max(0,fcList.length-1));
+    fcFlipped=false;
+  }
+  renderCard();
+}
 /** Дата (YYYY-MM-DD), для которой уже собран fcList; если наступил новый день — пересобираем список в renderCard */
 let dailyListDateKey='';
 
@@ -681,7 +722,7 @@ function mulberry32(seed){
 
 /**
  * Берёт из list до maxN задач: Fisher–Yates с PRNG от seedStr.
- * seedStr — ключ выборки (например «дата|mixed»), при тех же list и дате набор тот же.
+ * seedStr — ключ выборки (например «дата|mixed|10»), при тех же list и seed набор тот же.
  */
 function pickDailyProblems(list,seedStr,maxN){
   if(!list.length)return[];
@@ -703,7 +744,8 @@ function rebuildDailyList(){
   if(activeFilter||diffFilter||yaFilter){
     fcList=pool;
   }else{
-    fcList=pickDailyProblems(pool,k+'|mixed',DAILY_LIMIT);
+    const n=getDailyLimit();
+    fcList=pickDailyProblems(pool,k+'|mixed|'+n,n);
   }
 }
 
@@ -1604,8 +1646,9 @@ function renderCard(){
   }
   const totalFiltered=getFiltered().length;
   let infoText=fcList.length+' задач';
-  // Подсказка под заголовком: «на сегодня» только когда реально действует лимит DAILY_LIMIT
-  if(!searchQuery&&!activeFilter&&totalFiltered>DAILY_LIMIT)infoText+=' на сегодня';
+  // «на сегодня» только когда дневной лимит реально сужает полный пул
+  const cap=getDailyLimit();
+  if(!searchQuery&&!(activeFilter||diffFilter||yaFilter)&&totalFiltered>cap)infoText+=' на сегодня';
   else if(searchQuery)infoText+=' по поиску';
   document.getElementById('info').textContent=infoText;
   if(!fcList.length){
@@ -1975,6 +2018,10 @@ async function saveTheory(){
 }
 
 renderFilters();
+(function initDailyLimitInput(){
+  const el=document.getElementById('dailyLimit');
+  if(el)el.value=getDailyLimit();
+})();
 applyProblemIdFromUrlParams(); // старт: дневной список или карточка из ?id=
 renderCard();
 window.addEventListener('popstate',function(){

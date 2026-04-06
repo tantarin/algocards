@@ -1,6 +1,6 @@
 const P = [
 // ===== BACKTRACKING =====
-{id:"bt1",t:"Generate Parentheses",p:"Backtracking",d:"средне",
+{id:"bt1",t:"22. Generate Parentheses",p:"Backtracking",d:"средне",
 desc:`Дано число n — количество пар скобок. Необходимо ==сгенерировать все допустимые комбинации== из n пар скобок.
 
 Допустимая комбинация означает:

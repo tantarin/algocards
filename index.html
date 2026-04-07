@@ -481,6 +481,49 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .theory-when-item{background:rgba(124,58,237,0.15);color:var(--purple);padding:4px 10px;border-radius:6px;font-size:12px}
 .tag.clickable{cursor:pointer;transition:.2s}
 .tag.clickable:hover{filter:brightness(1.2);transform:scale(1.05)}
+.sim-launch-btn{
+  width:100%;
+  margin:6px 0 10px;
+  background:linear-gradient(135deg,#ef4444,#f59e0b);
+  border:none;
+  color:#fff;
+  border-radius:12px;
+  padding:11px 14px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.sim-modal{
+  position:fixed;inset:0;z-index:500;
+  background:#0b1020;
+  overflow:auto;
+  padding:10px 12px 14px;
+}
+.sim-shell{max-width:1100px;margin:0 auto}
+.sim-top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid #ffffff1a;background:#0f172a;border-radius:12px;
+  padding:10px 12px;margin-bottom:10px;
+}
+.sim-brand{font-size:15px;font-weight:700}
+.sim-brand .dot{color:#f97316}
+.sim-time{font-size:14px;font-weight:700;color:#e2e8f0}
+.sim-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.sim-btn{
+  background:#1f2937;border:1px solid #ffffff24;color:#e2e8f0;
+  border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer
+}
+.sim-btn.main{background:#7c3aed;border-color:#7c3aed;color:#fff}
+.sim-problem{
+  border:1px solid #ffffff20;background:#111827;border-radius:12px;
+  padding:12px;margin-bottom:10px
+}
+.sim-editor{
+  width:100%;min-height:340px;resize:vertical;
+  border:1px solid #ffffff24;background:#0b1220;color:#e2e8f0;border-radius:12px;
+  padding:12px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  outline:none;
+}
 </style>
 </head>
 <body>
@@ -492,12 +535,14 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
   <span class="peek-cat-paws">🐾</span>
 </div>
 <div class="subtitle" id="info"></div>
+<button id="simLaunchBtn" class="sim-launch-btn" onclick="openInterviewSimulation()">🎯 Интервью-режим</button>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>
 <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
 <div id="tokenModal" class="token-modal" style="display:none"></div>
 <div id="theoryModal" class="theory-modal" style="display:none"></div>
+<div id="simModal" class="sim-modal" style="display:none"></div>
 
 <script charset="UTF-8">
 (function(){
@@ -1013,6 +1058,14 @@ let mascotTyping=false;
 let mascotProfile=null;
 let lastSwipeAt=0;
 let peekCatTimer=null;
+let simState={
+  open:false,
+  problem:null,
+  totalSec:30*60,
+  leftSec:30*60,
+  timerId:null,
+  running:false
+};
 
 // Рыжий кот выглядывает из-за края экрана
 function initPeekCat(){
@@ -1700,6 +1753,109 @@ function fcShuffle(){
     fcList=shuffle(fcList.slice());
   }
   fcIdx=0;renderCard();
+}
+
+function formatSimTime(sec){
+  const s=Math.max(0,sec|0);
+  const m=Math.floor(s/60);
+  const r=s%60;
+  return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0');
+}
+function simStorageKey(problemId){
+  return 'algocards_sim_code_'+problemId;
+}
+function updateSimTimerDisplay(){
+  const el=document.getElementById('simTimerValue');
+  if(el)el.textContent='Remaining time '+formatSimTime(simState.leftSec);
+}
+function getRandomProblemForSimulation(){
+  const list=getFiltered();
+  const pool=list.length?list:P;
+  if(!pool.length)return null;
+  if(pool.length===1)return pool[0];
+  let next=pool[Math.floor(Math.random()*pool.length)];
+  if(simState.problem&&String(next.id)===String(simState.problem.id)){
+    next=pool[(pool.indexOf(next)+1)%pool.length];
+  }
+  return next;
+}
+function openInterviewSimulation(){
+  simState.open=true;
+  simState.problem=getRandomProblemForSimulation();
+  simState.leftSec=simState.totalSec;
+  simState.running=true;
+  if(simState.timerId)clearInterval(simState.timerId);
+  simState.timerId=setInterval(()=>{
+    if(!simState.running)return;
+    simState.leftSec--;
+    if(simState.leftSec<=0){
+      simState.leftSec=0;
+      simState.running=false;
+    }
+    updateSimTimerDisplay();
+  },1000);
+  renderInterviewSimulation();
+  document.getElementById('simModal').style.display='block';
+}
+function closeInterviewSimulation(){
+  simState.open=false;
+  simState.running=false;
+  if(simState.timerId){clearInterval(simState.timerId);simState.timerId=null;}
+  document.getElementById('simModal').style.display='none';
+}
+function toggleInterviewTimer(){
+  if(!simState.open)return;
+  simState.running=!simState.running;
+  renderInterviewSimulation();
+}
+function resetInterviewTimer(){
+  if(!simState.open)return;
+  simState.leftSec=simState.totalSec;
+  simState.running=true;
+  renderInterviewSimulation();
+}
+function nextInterviewProblem(){
+  if(!simState.open)return;
+  simState.problem=getRandomProblemForSimulation();
+  simState.leftSec=simState.totalSec;
+  simState.running=true;
+  renderInterviewSimulation();
+}
+function onInterviewCodeInput(el){
+  if(!simState.problem)return;
+  try{localStorage.setItem(simStorageKey(simState.problem.id),el.value);}catch(e){}
+}
+function renderInterviewSimulation(){
+  if(!simState.open)return;
+  const m=document.getElementById('simModal');
+  const p=simState.problem;
+  if(!p){
+    m.innerHTML='<div class="sim-shell"><div class="sim-top"><div class="sim-brand"><span class="dot">Y.</span>Interview</div></div><div class="sim-problem">Нет задач для симуляции</div></div>';
+    return;
+  }
+  m.innerHTML=`
+    <div class="sim-shell">
+      <div class="sim-top">
+        <div class="sim-brand"><span class="dot">Y.</span>Interview</div>
+        <div class="sim-time" id="simTimerValue">Remaining time ${formatSimTime(simState.leftSec)}</div>
+      </div>
+      <div class="sim-controls">
+        <button class="sim-btn main" onclick="toggleInterviewTimer()">${simState.running?'Пауза':'Старт'}</button>
+        <button class="sim-btn" onclick="resetInterviewTimer()">Сбросить время</button>
+        <button class="sim-btn" onclick="nextInterviewProblem()">Другая задача</button>
+        <button class="sim-btn" onclick="closeInterviewSimulation()">Закрыть</button>
+      </div>
+      <div class="sim-problem">${renderProblemDescHtml(p.desc||'')}</div>
+      <textarea id="simCodeInput" class="sim-editor" placeholder="Введите решение на Java..."></textarea>
+    </div>
+  `;
+  const ta=document.getElementById('simCodeInput');
+  if(ta){
+    const saved=localStorage.getItem(simStorageKey(p.id))||'';
+    ta.value=saved;
+    ta.oninput=function(){onInterviewCodeInput(this);};
+    ta.focus();
+  }
 }
 
 function buildProblemsJs(){

@@ -1805,7 +1805,7 @@ function openInterviewSimulation(){
     }
     updateSimTimerDisplay();
   },1000);
-  renderInterviewSimulation();
+  renderInterviewSimulation({focusEditor:true});
   document.getElementById('simModal').style.display='block';
 }
 function closeInterviewSimulation(){
@@ -1927,7 +1927,9 @@ function onSimEditorKeydown(e){
   }
   onInterviewCodeInput(ta);
 }
-function renderInterviewSimulation(){
+function renderInterviewSimulation(options){
+  const opts=options||{};
+  const focusEditor=!!opts.focusEditor;
   if(!simState.open)return;
   const m=document.getElementById('simModal');
   const p=simState.problem;
@@ -1960,7 +1962,13 @@ function renderInterviewSimulation(){
     ta.value=saved;
     ta.oninput=function(){onInterviewCodeInput(this);};
     ta.addEventListener('keydown',onSimEditorKeydown);
-    ta.focus();
+    if(focusEditor){
+      ta.focus();
+      try{
+        const len=ta.value.length;
+        ta.setSelectionRange(len,len);
+      }catch(_){}
+    }
   }
 }
 

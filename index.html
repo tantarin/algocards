@@ -1769,8 +1769,9 @@ function updateSimTimerDisplay(){
   if(el)el.textContent='Remaining time '+formatSimTime(simState.leftSec);
 }
 function getRandomProblemForSimulation(){
-  const list=getFiltered();
-  const pool=list.length?list:P;
+  // Временно для собес-режима берём только Яндекс-задачи.
+  const yandexOnly=P.filter(isYandexProblem);
+  const pool=yandexOnly.length?yandexOnly:P;
   if(!pool.length)return null;
   if(pool.length===1)return pool[0];
   let next=pool[Math.floor(Math.random()*pool.length)];
@@ -1825,6 +1826,56 @@ function onInterviewCodeInput(el){
   if(!simState.problem)return;
   try{localStorage.setItem(simStorageKey(simState.problem.id),el.value);}catch(e){}
 }
+/** IDE-style Tab: 4 пробела; по выделенным строкам — отступ каждой. Shift+Tab — убрать до 4 пробелов с начала строк(и). */
+function simSelectedLinesRange(v,start,end){
+  const from=v.lastIndexOf('\n',start-1)+1;
+  const toNext=v.indexOf('\n',Math.max(0,end-1));
+  const to=toNext===-1?v.length:toNext+1;
+  return [from,to];
+}
+function onSimEditorKeydown(e){
+  if(e.key!=='Tab')return;
+  e.preventDefault();
+  const ta=e.target;
+  if(!ta||ta.tagName!=='TEXTAREA')return;
+  const INDENT='    ';
+  const v=ta.value;
+  const start=ta.selectionStart;
+  const end=ta.selectionEnd;
+  if(e.shiftKey){
+    if(start===end){
+      let rm=0;
+      for(let i=start-1;i>=0&&rm<4;i--){
+        if(v[i]===' ')rm++;
+        else break;
+      }
+      if(rm>0){
+        ta.value=v.slice(0,start-rm)+v.slice(start);
+        ta.setSelectionRange(start-rm,start-rm);
+      }
+    }else{
+      const [from,to]=simSelectedLinesRange(v,start,end);
+      const block=v.slice(from,to);
+      const lines=block.split('\n');
+      const out=lines.map(function(line){return line.replace(/^ {1,4}/,'');}).join('\n');
+      ta.value=v.slice(0,from)+out+v.slice(to);
+      ta.setSelectionRange(from,from+out.length);
+    }
+  }else{
+    if(start===end){
+      ta.value=v.slice(0,start)+INDENT+v.slice(end);
+      ta.setSelectionRange(start+4,start+4);
+    }else{
+      const [from,to]=simSelectedLinesRange(v,start,end);
+      const block=v.slice(from,to);
+      const lines=block.split('\n');
+      const out=lines.map(function(l){return INDENT+l;}).join('\n');
+      ta.value=v.slice(0,from)+out+v.slice(to);
+      ta.setSelectionRange(from,from+out.length);
+    }
+  }
+  onInterviewCodeInput(ta);
+}
 function renderInterviewSimulation(){
   if(!simState.open)return;
   const m=document.getElementById('simModal');
@@ -1854,6 +1905,7 @@ function renderInterviewSimulation(){
     const saved=localStorage.getItem(simStorageKey(p.id))||'';
     ta.value=saved;
     ta.oninput=function(){onInterviewCodeInput(this);};
+    ta.addEventListener('keydown',onSimEditorKeydown);
     ta.focus();
   }
 }

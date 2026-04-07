@@ -1833,14 +1833,55 @@ function simSelectedLinesRange(v,start,end){
   return [from,to];
 }
 function onSimEditorKeydown(e){
-  if(e.key!=='Tab')return;
-  e.preventDefault();
+  if(e.key!=='Tab'&&e.key!=='Enter'&&e.key!=='{')return;
   const ta=e.target;
   if(!ta||ta.tagName!=='TEXTAREA')return;
   const INDENT='    ';
   const v=ta.value;
   const start=ta.selectionStart;
   const end=ta.selectionEnd;
+  if(e.key==='{'){
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    e.preventDefault();
+    const before=v.slice(0,start);
+    const selected=v.slice(start,end);
+    const after=v.slice(end);
+    ta.value=before+'{'+selected+'}'+after;
+    const pos=start+1;
+    ta.setSelectionRange(pos,pos);
+    onInterviewCodeInput(ta);
+    return;
+  }
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const lineStart=v.lastIndexOf('\n',start-1)+1;
+    const lineToCursor=v.slice(lineStart,start);
+    const baseIndent=(lineToCursor.match(/^\s*/)||[''])[0];
+    const before=v.slice(0,start);
+    const after=v.slice(end);
+    let left=start-1;
+    while(left>=0&&/\s/.test(v[left]))left--;
+    let right=end;
+    while(right<v.length&&/\s/.test(v[right]))right++;
+    const prevChar=left>=0?v[left]:'';
+    const nextChar=right<v.length?v[right]:'';
+    // Enter между { и }: ставим курсор на внутреннюю строку, а } оставляем на базовом уровне.
+    if(prevChar==='{'&&nextChar==='}'){
+      const chunk='\n'+baseIndent+INDENT+'\n'+baseIndent;
+      ta.value=before+chunk+after;
+      const pos=start+1+baseIndent.length+INDENT.length;
+      ta.setSelectionRange(pos,pos);
+    }else{
+      const extra=(prevChar==='{')?INDENT:'';
+      const chunk='\n'+baseIndent+extra;
+      ta.value=before+chunk+after;
+      const pos=start+chunk.length;
+      ta.setSelectionRange(pos,pos);
+    }
+    onInterviewCodeInput(ta);
+    return;
+  }
+  e.preventDefault();
   if(e.shiftKey){
     if(start===end){
       let rm=0;

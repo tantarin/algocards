@@ -1905,7 +1905,7 @@ lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"f
 diagram:{"type":"array","data":[6,5,3,1,0],"steps":[{"active":[],"labels":{},"desc":"Сортируем: [6,5,3,1,0]"},{"active":[0],"labels":{"1":0},"desc":"i=1: 6≥1 ✓"},{"active":[1],"labels":{"2":1},"desc":"i=2: 5≥2 ✓"},{"active":[2],"labels":{"3":2},"desc":"i=3: 3≥3 ✓ h=3"},{"active":[3],"labels":{"4":3},"desc":"i=4: 1<4 ✗ Ответ: h=3"}]}},
 
 // ===== PREFIX SUM =====
-{id:"ps1",t:"Subarray Sum Equals K",p:"Prefix Sum",d:"средне",
+{id:"ps1",t:"LC 560 Subarray Sum Equals K",p:"Prefix Sum",d:"средне",
 desc:`Дан массив целых чисел nums и число k. Найти общее ==количество непрерывных подмассивов, сумма== элементов которых ==равна k==.
 
 Пример 1:

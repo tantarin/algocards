@@ -23,27 +23,39 @@ desc:`Дано число n — количество пар скобок. Нео
 - 1 ≤ n ≤ 8`,
 hint:`Два счётчика open/close. Если open < n — добавляем '(', если close < open — добавляем ')'. По сути перебираем все варианты, но соблюдаем ограничения.`,
 code:`class Solution {
-    private List<String> result = new ArrayList<>();
-    private int pairCount;
+    public int search(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length - 1;
 
-    public List<String> generateParenthesis(int n) {
-        this.pairCount = n;
-        backtrack(0, 0, "");
-        return result;
-    }
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
 
-    private void backtrack(int openCount, int closeCount, String currentString) {
-        if (openCount > pairCount || closeCount > pairCount || openCount < closeCount) {
-            return;
+            if (nums[mid] == target) {
+                return mid;
+            }
+
+            // левая половина [left..mid] отсортирована
+            if (nums[left] <= nums[mid]) {
+                // target входит в отсортированный диапазон [left..mid)
+                if (nums[left] <= target && target < nums[mid]) {
+                    right = mid - 1;
+                } else {
+                    // target вне левой половины — ищем справа
+                    left = mid + 1;
+                }
+            } else {
+                // правая половина [mid..right] отсортирована
+                // target входит в отсортированный диапазон (mid..right]
+                if (nums[mid] < target && target <= nums[right]) {
+                    left = mid + 1;
+                } else {
+                    // target вне правой половины — ищем слева
+                    right = mid - 1;
+                }
+            }
         }
 
-        if (openCount == pairCount && closeCount == pairCount) {
-            result.add(currentString);
-            return;
-        }
-
-        backtrack(openCount + 1, closeCount, currentString + "(");
-        backtrack(openCount, closeCount + 1, currentString + ")");
+        return -1;
     }
 }`,
 complexity:`Время: O(4^n / √n), Память: O(n)`,

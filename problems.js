@@ -3639,23 +3639,19 @@ code:`class Solution {
         int left = 0;
         int result = 0;
 
-        for (int right = 0; right < nums.length; right++){
-            while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right]) //удаляем все элементы с конца deque, которые ≤ текущего. Потому что в начале deque     
-                maxD.pollLast();                         // хранится текущий максимум, а в конце — кандидаты, которые можно выкидывать.
-
+        for (int right = 0; right < nums.length; right++) {
+            while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right])
+                maxD.pollLast();
             maxD.addLast(right);
 
             while (!minD.isEmpty() && nums[minD.peekLast()] >= nums[right])
                 minD.pollLast();
-
             minD.addLast(right);
 
             while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {
                 left++;
-                if (maxD.peekFirst() < left)
-                    maxD.pollFirst();
-                if (minD.peekFirst() < left)
-                    minD.pollFirst();
+                if (maxD.peekFirst() < left) maxD.pollFirst();
+                if (minD.peekFirst() < left) minD.pollFirst();
             }
 
             result = Math.max(result, right - left + 1);

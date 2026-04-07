@@ -1769,9 +1769,8 @@ function updateSimTimerDisplay(){
   if(el)el.textContent='Remaining time '+formatSimTime(simState.leftSec);
 }
 function getRandomProblemForSimulation(){
-  // Временно для собес-режима берём только Яндекс-задачи.
-  const yandexOnly=P.filter(isYandexProblem);
-  const pool=yandexOnly.length?yandexOnly:P;
+  // Только задачи с тегом Яндекс (как на карточке). Без fallback на весь пул — иначе при пустом списке случайно попадут чужие.
+  const pool=P.filter(isYandexProblem);
   if(!pool.length)return null;
   if(pool.length===1)return pool[0];
   let next=pool[Math.floor(Math.random()*pool.length)];
@@ -1881,13 +1880,16 @@ function renderInterviewSimulation(){
   const m=document.getElementById('simModal');
   const p=simState.problem;
   if(!p){
-    m.innerHTML='<div class="sim-shell"><div class="sim-top"><div class="sim-brand"><span class="dot">Y.</span>Interview</div></div><div class="sim-problem">Нет задач для симуляции</div></div>';
+    m.innerHTML='<div class="sim-shell"><div class="sim-top"><div class="sim-brand"><span class="dot">Y.</span>Interview</div></div><div class="sim-problem">Нет задач с тегом Яндекс в этой коллекции.</div><div class="sim-controls"><button class="sim-btn" onclick="closeInterviewSimulation()">Закрыть</button></div></div>';
     return;
   }
   m.innerHTML=`
     <div class="sim-shell">
       <div class="sim-top">
-        <div class="sim-brand"><span class="dot">Y.</span>Interview</div>
+        <div class="sim-top-left" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="sim-brand"><span class="dot">Y.</span>Interview</div>
+          ${yandexTagHtml(p)}
+        </div>
         <div class="sim-time" id="simTimerValue">Remaining time ${formatSimTime(simState.leftSec)}</div>
       </div>
       <div class="sim-controls">

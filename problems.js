@@ -231,22 +231,27 @@ code:`class Solution {
                 return mid;
             }
 
+            // левая половина [left..mid] отсортирована
             if (nums[left] <= nums[mid]) {
-                if (nums[left] <= target
-                    && target < nums[mid]) {
+                // target входит в отсортированный диапазон [left..mid)
+                if (nums[left] <= target && target < nums[mid]) {
                     right = mid - 1;
                 } else {
+                    // target вне левой половины — ищем справа
                     left = mid + 1;
                 }
             } else {
-                if (nums[mid] < target
-                    && target <= nums[right]) {
+                // правая половина [mid..right] отсортирована
+                // target входит в отсортированный диапазон (mid..right]
+                if (nums[mid] < target && target <= nums[right]) {
                     left = mid + 1;
                 } else {
+                    // target вне правой половины — ищем слева
                     right = mid - 1;
                 }
             }
         }
+
         return -1;
     }
 }`,

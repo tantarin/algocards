@@ -409,24 +409,25 @@ code:`class Solution {
     public boolean isSymmetric(int[][] points) {
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
-        Set<String> set = new HashSet<>();
+        Set<String> pointSet = new HashSet<>();
 
         for (int[] p : points) {
             minX = Math.min(minX, p[0]);
             maxX = Math.max(maxX, p[0]);
-            set.add(p[0] + "," + p[1]);
+            pointSet.add(p[0] + "," + p[1]);
         }
 
-        double axis = (minX + maxX) / 2.0;
+        // axis = (minX + maxX) / 2, но умножаем на 2 чтобы не работать с double
+        // mirrorX = 2*axis - x = (minX + maxX) - x
+        int axisDouble = minX + maxX;
 
         for (int[] p : points) {
-            double mirrorX = 2 * axis - p[0];
-            String mirror = (int) mirrorX + "," + p[1];
-            if (mirrorX != (int) mirrorX
-                || !set.contains(mirror)) {
+            int mirrorX = axisDouble - p[0];
+            if (!pointSet.contains(mirrorX + "," + p[1])) {
                 return false;
             }
         }
+
         return true;
     }
 }`,

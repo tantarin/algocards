@@ -2995,10 +2995,7 @@ expl:`Рекурсия с границами: для левого поддере
 lcSimilar:[{"t":"LC 98 · Validate Binary Search Tree","h":"lc-98-validate-binary-search-tree"}]},
 
 {id:"tr4",t:"Поиск k-ого наименьшего",p:"Trees / DFS",d:"средне",
-desc:`средне
-# Amazon, Meta, Яндекс
-
-Дан корень BST и число k. Найти ==k-й наименьший элемент== в дереве (1-indexed).
+desc:`Дан корень BST и число k. Найти ==k-й наименьший элемент== в дереве (1-indexed).
 
 Пример 1:
 Ввод: root = [3, 1, 4, null, 2], k = 1

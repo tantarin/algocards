@@ -6889,6 +6889,70 @@ public class Solution {
 complexity:`Время: O(n log n + m log m), Память: O(n + m)`,
 complexityExpl:`Сортировка — O(n log n) и O(m log m). Слияние указателями — O(n+m). Список результата — O(n+m) пар.`,
 expl:`Каждый график — кусочно-постоянная функция времени. После сортировки сливаем уникальные моменты времени как при merge двух отсортированных последовательностей: при совпадении времени с очередной точкой графика обновляем его текущее значение и сдвигаем указатель; в ответ всегда пишем сумму двух текущих значений.`,
-lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}]}
+lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}]},
+
+{id:"ya4",t:"UserStatistics: окно k мс и ≥ limit запросов",p:"Sliding Window",d:"средне",
+desc:`Есть последовательность запросов пользователей: каждый запрос — это пара **(time, userId)**. Запросы приходят в ==отсортированном по времени== порядке.
+
+Нужно реализовать класс **UserStatistics**, который умеет:
+- \`event(now, userId)\` — зарегистрировать запрос;
+- \`robotCount(now)\` — вернуть, **сколько различных пользователей** за последние **k** миллисекунд (окно **[now − k, now]**) сделали **не менее limit** запросов.
+
+Параметры **k > 0** и **limit > 0** задай в конструкторе (в скелете интервью их задают отдельно от методов).
+
+Пример:
+Конструктор: k = 1000, limit = 3. После серии \`event\` при \`robotCount(now)\` считаем только тех userId, у кого в окне ровно не меньше трёх событий.`,
+hint:`Очередь (дек) пар (время, userId) для событий в текущем окне; HashMap: userId → сколько запросов в окне. При \`event\` и \`robotCount\` выкидывай с головы события с временем < now − k. Отдельно храни число пользователей с частотой ≥ limit.`,
+code:`import java.util.*;
+
+class UserStatistics {
+    private final long k;
+    private final long limit;
+
+    private final ArrayDeque<long[]> queue = new ArrayDeque<>();
+    private final HashMap<Long, Integer> freq = new HashMap<>();
+    private int hotCount = 0;
+
+    public UserStatistics(long k, long limit) {
+        this.k = k;
+        this.limit = limit;
+    }
+
+    private void expire(long now) {
+        long from = now - k;
+        while (!queue.isEmpty() && queue.peekFirst()[0] < from) {
+            long[] ev = queue.pollFirst();
+            long uid = ev[1];
+            int c = freq.get(uid);
+            if (c == limit) {
+                hotCount--;
+            }
+            if (c == 1) {
+                freq.remove(uid);
+            } else {
+                freq.put(uid, c - 1);
+            }
+        }
+    }
+
+    public void event(long now, long userId) {
+        queue.addLast(new long[]{now, userId});
+        int c = freq.merge(userId, 1, Integer::sum);
+        if (c == limit) {
+            hotCount++;
+        }
+        expire(now);
+    }
+
+    public int robotCount(long now) {
+        expire(now);
+        return hotCount;
+    }
+}`,
+complexity:`Время: амортизированно O(1) на вызов, Память: O(число событий в окне)`,
+complexityExpl:`Каждое событие один раз попадает в дек и один раз из него удаляется — за всю последовательность линейно по числу событий.`,
+expl:`Скользящее окно по времени: дек хранит события в порядке прихода. Карта — сколько запросов у каждого userId внутри окна. **hotCount** увеличивается, когда частота пользователя впервые становится ≥ limit, и уменьшается, когда после удаления устаревших событий она падает ниже limit.`,
+lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
+repoSimilar:["ya2"]}
 
 ];

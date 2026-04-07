@@ -3640,19 +3640,17 @@ code:`class Solution {
         int result = 0;
 
         for (int right = 0; right < nums.length; right++){
-            while (!maxD.isEmpty()
-                && nums[maxD.peekLast()] <= nums[right]) //удаляем все элементы с конца deque, которые ≤ текущего. Потому что в начале deque     
+            while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right]) //удаляем все элементы с конца deque, которые ≤ текущего. Потому что в начале deque     
                 maxD.pollLast();                         // хранится текущий максимум, а в конце — кандидаты, которые можно выкидывать.
 
             maxD.addLast(right);
 
-            while (!minD.isEmpty()
-                && nums[minD.peekLast()] >= nums[right])
+            while (!minD.isEmpty() && nums[minD.peekLast()] >= nums[right])
                 minD.pollLast();
+
             minD.addLast(right);
 
-            while (nums[maxD.peekFirst()]
-                   - nums[minD.peekFirst()] > limit) {
+            while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {
                 left++;
                 if (maxD.peekFirst() < left)
                     maxD.pollFirst();
@@ -3660,8 +3658,7 @@ code:`class Solution {
                     minD.pollFirst();
             }
 
-            result = Math.max(result,
-                right - left + 1);
+            result = Math.max(result, right - left + 1);
         }
 
         return result;

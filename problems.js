@@ -7121,40 +7121,45 @@ T = "abcd", S = "aaa" => -1
 T = "abcd", S = "cbd" => 1
 T = "abcdda", S = "bcdd" => 1`,
 hint:`Скользящее окно длины |S| + массив/карта частот. Сравнивай частоты окна и S при сдвиге на 1.`,
-code:`class Solution {
-    public int findPermutationStart(String text, String pattern) {
-        if (text == null || pattern == null) {
-            throw new IllegalArgumentException("Input must be non-null");
-        }
-        int n = text.length();
-        int m = pattern.length();
-        if (m == 0 || m > n) return -1;
+code:`public int findPermutationStart(String text, String pattern) {
+    int n = text.length();
+    int m = pattern.length();
+    if (m > n) return -1;
 
-        int[] need = new int[256];
-        int[] win = new int[256];
+    int[] need = new int[256];
+    int[] win  = new int[256];
 
-        for (int i = 0; i < m; i++) {
-            need[pattern.charAt(i)]++;
-            win[text.charAt(i)]++;
-        }
-        if (matches(need, win)) return 0;
-
-        for (int r = m; r < n; r++) {
-            win[text.charAt(r)]++;
-            win[text.charAt(r - m)]--;
-            if (matches(need, win)) {
-                return r - m + 1;
-            }
-        }
-        return -1;
+    for (int i = 0; i < m; i++) {
+        need[pattern.charAt(i)]++;
+        win[text.charAt(i)]++;
     }
 
-    private boolean matches(int[] a, int[] b) {
-        for (int i = 0; i < 256; i++) {
-            if (a[i] != b[i]) return false;
-        }
-        return true;
+    // считаем сколько символов уже совпадают по частоте
+    int matched = 0;
+    for (int i = 0; i < 256; i++) {
+        if (need[i] == win[i]) matched++;
     }
+
+    if (matched == 256) return 0;
+
+    for (int r = m; r < n; r++) {
+        int in  = text.charAt(r);
+        int out = text.charAt(r - m);
+
+        // добавляем правый символ
+        win[in]++;
+        if (win[in] == need[in])      matched++;
+        else if (win[in] == need[in] + 1) matched--;
+
+        // убираем левый символ
+        win[out]--;
+        if (win[out] == need[out])        matched++;
+        else if (win[out] == need[out] - 1) matched--;
+
+        if (matched == 256) return r - m + 1;
+    }
+
+    return -1;
 }`,
 complexity:`Время: O(n * A), Память: O(A), где A = 256`,
 complexityExpl:`Окно двигается O(n) раз, на каждом шаге сравниваем частоты размера A. При фиксированном алфавите это близко к O(n).`,

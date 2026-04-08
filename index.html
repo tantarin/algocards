@@ -370,6 +370,18 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .diagram-wrap .vars-name{color:#c4b5fd}
 .diagram-wrap .vars-eq,.diagram-wrap .struct-arrow,.diagram-wrap .ll-arrow{color:rgba(226,232,240,0.5)}
 
+/* UserStatistics timeline diagram */
+.us-wrap{position:relative;padding:8px 4px 0}
+.us-grid{position:relative;height:220px;border-bottom:2px solid rgba(255,255,255,.35);margin:8px 0 12px}
+.us-row{position:absolute;left:0;right:0;height:1px;border-top:1px dashed rgba(255,255,255,.14)}
+.us-row-label{position:absolute;left:4px;transform:translateY(-50%);font-weight:700;color:#cbd5e1}
+.us-window{position:absolute;top:16px;bottom:22px;border:2px dashed #22d3ee;border-radius:14px;background:rgba(34,211,238,.12)}
+.us-dot{position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(0,0,0,.28)}
+.us-dot.dim{opacity:.3;filter:grayscale(.2)}
+.us-axis-label{position:absolute;bottom:-28px;transform:translateX(-50%);font-size:12px;color:#94a3b8}
+.us-notes{font-size:13px;line-height:1.6;color:#e2e8f0;margin-top:6px}
+.us-result{margin-top:10px;padding:10px 12px;border:1px solid rgba(34,211,238,.5);border-radius:12px;background:rgba(34,211,238,.1);font-weight:700;color:#67e8f9;text-align:center}
+
 @media (prefers-reduced-motion:reduce){
   .diagram-wrap::before,.diagram-wrap::after{animation:none}
 }
@@ -829,6 +841,8 @@ function diagramHtml(p) {
     content = renderMultiDiagram(d, currentStep);
   } else if (d.type === 'cartesian') {
     content = renderCartesianDiagram(d, currentStep);
+  } else if (d.type === 'userstats') {
+    content = renderUserStatsDiagram(d, currentStep);
   }
 
   const controls = d.steps && d.steps.length > 1 ? `
@@ -1041,6 +1055,43 @@ function renderCartesianDiagram(d, step){
         <div class="cart-results">${resultHtml}</div>
       </div>
     </div>
+  </div>`;
+}
+
+function renderUserStatsDiagram(d){
+  const users=Array.isArray(d.users)?d.users:[];
+  const minT=Math.min(...users.flatMap(u=>u.events||[]), d.from||0);
+  const maxT=Math.max(...users.flatMap(u=>u.events||[]), d.now||0);
+  const span=Math.max(1,maxT-minT);
+  const toX=t=>((t-minT)/span)*100;
+  const rowTop=i=>36+i*56;
+
+  const rows=users.map((u,i)=>{
+    const y=rowTop(i);
+    return `<div class="us-row" style="top:${y}px"></div>
+      <div class="us-row-label" style="top:${y}px">${esc(u.name)}</div>`;
+  }).join('');
+
+  const dots=users.map((u,i)=>{
+    const y=rowTop(i);
+    return (u.events||[]).map(t=>{
+      const inWin=t>=(d.from||0)&&t<=(d.now||0);
+      return `<span class="us-dot${inWin?'':' dim'}" style="left:${toX(t)}%;top:${y}px;background:${u.color||'#94a3b8'}"></span>`;
+    }).join('');
+  }).join('');
+
+  const result=(Array.isArray(d.robots)?d.robots:[]).join(' и ');
+  return `<div class="us-wrap">
+    <div class="us-grid">
+      ${rows}
+      <div class="us-window" style="left:${toX(d.from||0)}%;width:${Math.max(2,toX(d.now||0)-toX(d.from||0))}%"></div>
+      ${dots}
+      <div class="us-axis-label" style="left:${toX(d.from||0)}%">now-k = ${d.from}</div>
+      <div class="us-axis-label" style="left:${toX(d.now||0)}%">now = ${d.now}</div>
+    </div>
+    <div class="us-notes">k = ${d.k}, limit = ${d.limit}, вызов robotCount(${d.now})</div>
+    <div class="us-notes">A: ${d.inWindowCount?.[0]||0}, B: ${d.inWindowCount?.[1]||0}, C: ${d.inWindowCount?.[2]||0} событий в окне</div>
+    <div class="us-result">robotCount(${d.now}) = ${(d.robots||[]).length} (${result})</div>
   </div>`;
 }
 

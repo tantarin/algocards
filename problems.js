@@ -7051,7 +7051,6 @@ repoSimilar:["ya2"]},
 // ===== TWO POINTERS =====
 {id:"ya6",t:"RLE с валидацией строки A-Z",p:"Two Pointers",d:"средне",
 desc:`Дана строка, содержащая только заглавные буквы английского алфавита (A-Z).
-
 Нужно реализовать RLE-сжатие:
 - если символ встречается один раз — оставляем символ как есть;
 - если символ повторяется несколько раз — после символа пишем количество повторений.
@@ -7067,7 +7066,6 @@ code:`public String rle(String s) {
 
     StringBuilder out = new StringBuilder();
     int count = 1;
-
     for (int i = 1; i <= s.length(); i++) {
         if (i < s.length() && s.charAt(i) == s.charAt(i - 1)) {
             count++;

@@ -1218,7 +1218,10 @@ code:`class Solution {
         int[] lastSeenS = new int[256];
         int[] lastSeenT = new int[256];
         for (int i = 0; i < s.length(); i++) {
-            if (lastSeenS[s.charAt(i)] != lastSeenT[t.charAt(i)]) return false;
+            if (lastSeenS[s.charAt(i)] != lastSeenT[t.charAt(i)]) {
+                return false;
+            }
+
             lastSeenS[s.charAt(i)] = i + 1;  // +1 чтобы 0 означал "не видели"
             lastSeenT[t.charAt(i)] = i + 1;
         }

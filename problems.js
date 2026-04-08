@@ -7128,32 +7128,30 @@ code:`public int findPermutationStart(String text, String pattern) {
     if (m > n) return -1;
 
     int[] delta = new int[256];
-    int nonZero = 0; // сколько символов с ненулевой дельтой
+    int nonZero = 0;
 
-    for (int i = 0; i < m; i++) {
-        delta[pattern.charAt(i)]++;  // нужен
-        delta[text.charAt(i)]--;     // уже есть в начальном окне
+    for (char c : pattern.toCharArray()) {
+        if (delta[c] == 0) nonZero++;
+        delta[c]++;
+        if (delta[c] == 0) nonZero--;
     }
-    for (int i = 0; i < 256; i++) {
-        if (delta[i] != 0) nonZero++;
-    }
-    if (nonZero == 0) return 0;
 
-    for (int r = m; r < n; r++) {
-        int in  = text.charAt(r);
-        int out = text.charAt(r - m);
-
-        // добавляем правый символ — дельта уменьшается
-        if (delta[in] == 1) nonZero--;
-        else if (delta[in] == 0) nonZero++;
+    for (int r = 0; r < n; r++) {
+        // добавляем правый символ
+        int in = text.charAt(r);
+        if (delta[in] == 0) nonZero++;
         delta[in]--;
+        if (delta[in] == 0) nonZero--;
 
-        // убираем левый символ — дельта увеличивается
-        if (delta[out] == -1) nonZero--;
-        else if (delta[out] == 0) nonZero++;
-        delta[out]++;
+        // убираем левый символ — только когда окно переросло m
+        if (r >= m) {
+            int out = text.charAt(r - m);
+            if (delta[out] == 0) nonZero++;
+            delta[out]++;
+            if (delta[out] == 0) nonZero--;
+        }
 
-        if (nonZero == 0) return r - m + 1;
+        if (nonZero == 0 && r >= m - 1) return r - m + 1;
     }
     return -1;
 }`,

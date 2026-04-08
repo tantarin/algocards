@@ -5471,6 +5471,26 @@ code:`class Solution {
         return sLen + 1 == tLen;
     }
 }`,
+code2:`class Solution {
+    public boolean isOneEditDistance(String s, String t) {
+        int sLen = s.length(), tLen = t.length();
+        if (Math.abs(sLen - tLen) > 1) return false;
+        if (sLen > tLen) return isOneEditDistance(t, s);
+        for (int i = 0; i < sLen; i++) {
+            if (s.charAt(i) != t.charAt(i)) {
+                if (sLen == tLen) {
+                    for (int j = i + 1; j < sLen; j++)
+                        if (s.charAt(j) != t.charAt(j)) return false;
+                } else {
+                    for (int j = i; j < sLen; j++)
+                        if (s.charAt(j) != t.charAt(j + 1)) return false;
+                }
+                return true;
+            }
+        }
+        return sLen + 1 == tLen;
+    }
+}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один линейный проход с ранним выходом — O(n). Несколько индексов — O(1) памяти.`,
 expl:`Если длины равны — при первом расхождении проверяем, что остальные совпадают (замена). Если разница 1 — пропускаем символ в длинной строке (вставка/удаление). O(n).`},

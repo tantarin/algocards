@@ -7127,39 +7127,34 @@ code:`public int findPermutationStart(String text, String pattern) {
     int m = pattern.length();
     if (m > n) return -1;
 
-    int[] need = new int[256];
-    int[] win  = new int[256];
+    int[] delta = new int[256];
+    int nonZero = 0; // сколько символов с ненулевой дельтой
 
     for (int i = 0; i < m; i++) {
-        need[pattern.charAt(i)]++;
-        win[text.charAt(i)]++;
+        delta[pattern.charAt(i)]++;  // нужен
+        delta[text.charAt(i)]--;     // уже есть в начальном окне
     }
-
-    // считаем сколько символов уже совпадают по частоте
-    int matched = 0;
     for (int i = 0; i < 256; i++) {
-        if (need[i] == win[i]) matched++;
+        if (delta[i] != 0) nonZero++;
     }
-
-    if (matched == 256) return 0;
+    if (nonZero == 0) return 0;
 
     for (int r = m; r < n; r++) {
         int in  = text.charAt(r);
         int out = text.charAt(r - m);
 
-        // добавляем правый символ
-        win[in]++;
-        if (win[in] == need[in])      matched++;
-        else if (win[in] == need[in] + 1) matched--;
+        // добавляем правый символ — дельта уменьшается
+        if (delta[in] == 1) nonZero--;
+        else if (delta[in] == 0) nonZero++;
+        delta[in]--;
 
-        // убираем левый символ
-        win[out]--;
-        if (win[out] == need[out])        matched++;
-        else if (win[out] == need[out] - 1) matched--;
+        // убираем левый символ — дельта увеличивается
+        if (delta[out] == -1) nonZero--;
+        else if (delta[out] == 0) nonZero++;
+        delta[out]++;
 
-        if (matched == 256) return r - m + 1;
+        if (nonZero == 0) return r - m + 1;
     }
-
     return -1;
 }`,
 complexity:`Время: O(n * A), Память: O(A), где A = 256`,

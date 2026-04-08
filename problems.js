@@ -6916,11 +6916,8 @@ lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}]},
 // ===== SLIDING WINDOW =====
 {id:"ya4",t:"UserStatistics: окно k мс и ≥ limit запросов",p:"Sliding Window",d:"средне",
 desc:`Есть последовательность запросов пользователей, каждый запрос — это пара (time, userId), запросы всегда приходят в отсортированном по времени порядке.
-
 Нужно быстро отвечать: сколько за последние k мс было пользователей, которые сделали >= limit запросов.
-
 k > 0, limit > 0.`,
-hint:`Скользящее окно по времени + карта частот userId. Для интервью сначала удобно заполнить шаблон методов из условия, затем добавить очередь событий и удаление устаревших элементов.`,
 starter:`class UserStatistics {
     private long limit = 0;
     private long k = 0;
@@ -6937,59 +6934,78 @@ starter:`class UserStatistics {
         // place your code here
     }
 }`,
+hint:`Скользящее окно по времени + карта частот userId. Для интервью сначала удобно заполнить шаблон методов из условия, затем добавить очередь событий и удаление устаревших элементов.`,
 code:`import java.util.*;
 
 class UserStatistics {
     private final long k;
     private final long limit;
-
-    private final ArrayDeque<long[]> queue = new ArrayDeque<>();
-    private final HashMap<Long, Integer> freq = new HashMap<>();
+    private final Deque<Event> queue = new ArrayDeque<>();
+    private final Map<Long, Integer> freq = new HashMap<>();
     private int hotCount = 0;
-
-    public UserStatistics(long k, long limit) {
+    
+    // Вспомогательный класс для читаемости
+    private static class Event {
+        long time;
+        long userId;
+        
+        Event(long time, long userId) {
+            this.time = time;
+            this.userId = userId;
+        }
+    }
+    
+    public UserStatistics(int k, int limit) {
         this.k = k;
         this.limit = limit;
     }
-
-    private void expire(long now) {
-        long from = now - k;
-        while (!queue.isEmpty() && queue.peekFirst()[0] < from) {
-            long[] ev = queue.pollFirst();
-            long uid = ev[1];
-            int c = freq.get(uid);
-            if (c == limit) {
-                hotCount--;
-            }
-            if (c == 1) {
-                freq.remove(uid);
-            } else {
-                freq.put(uid, c - 1);
-            }
-        }
-    }
-
+    
     public void event(long now, long userId) {
-        queue.addLast(new long[]{now, userId});
-        int c = freq.merge(userId, 1, Integer::sum);
-        if (c == limit) {
+        // 1. Сначала удаляем устаревшие события
+        expire(now);
+        
+        // 2. Добавляем новое событие
+        queue.addLast(new Event(now, userId));
+        int count = freq.merge(userId, 1, Integer::sum);
+        
+        // 3. Обновляем счётчик "горячих" пользователей
+        if (count == limit) {
             hotCount++;
         }
-        expire(now);
     }
-
+    
     public int robotCount(long now) {
         expire(now);
         return hotCount;
     }
-}`,
+    
+    private void expire(long now) {
+        long windowStart = now - k;
+        while (!queue.isEmpty() && queue.peekFirst().time < windowStart) {
+            Event oldest = queue.pollFirst();
+            long userId = oldest.userId
+            int count = freq.get(userId);
+            if (count == limit) {
+                hotCount--;
+            }
+            
+            if (count == 1) {
+                freq.remove(userId);
+            } else {
+                freq.put(userId, count - 1);
+            }
+        }
+    }
+}
+
+`,
 complexity:`Время: амортизированно O(1) на вызов, Память: O(число событий в окне)`,
 complexityExpl:`Каждое событие один раз попадает в дек и один раз из него удаляется — за всю последовательность линейно по числу событий.`,
 expl:`Скользящее окно по времени: дек хранит события в порядке прихода. Карта — сколько запросов у каждого userId внутри окна. hotCount увеличивается, когда частота пользователя впервые становится >= limit, и уменьшается, когда после удаления устаревших событий она падает ниже limit.`,
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
-repoSimilar:["ya2"]}
+repoSimilar:["ya2"]},
 
-,{id:"ya5",t:"Максимальная дистанция до ближайшего зрителя",p:"Sliding Window",d:"средне",
+{id:"ya5",t:"Максимальная дистанция до ближайшего зрителя",p:"Sliding Window",d:"средне",
 desc:`Места в кинотеатре расположены в один ряд. Новый зритель хочет сесть так, чтобы ==расстояние до ближайшего занятого места== было ==максимальным==.
 
 Дан массив seats:
@@ -7044,9 +7060,10 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при одном проходе по массиву.`,
 expl:`Группируем подряд идущие нули в блоки. Крайние блоки дают полный размер как расстояние до ближайшей единицы. Внутренний блок между единицами даёт максимум в середине: ceil(len/2).`,
 lcSimilar:[{"n":849,"t":"Maximize Distance to Closest Person","h":"maximize-distance-to-closest-person"}],
-repoSimilar:["ya2"]}
+repoSimilar:["ya2"]},
 
-,{id:"ya6",t:"RLE с валидацией строки A-Z",p:"Two Pointers",d:"средне",
+// ===== TWO POINTERS =====
+{id:"ya6",t:"RLE с валидацией строки A-Z",p:"Two Pointers",d:"средне",
 desc:`Дана строка, содержащая только заглавные буквы английского алфавита (A-Z).
 
 Нужно реализовать RLE-сжатие:
@@ -7090,9 +7107,10 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один линейный проход по строке. Дополнительная память — под результирующую строку.`,
 expl:`Группируем одинаковые соседние символы в блоки. Для каждого блока добавляем символ и, если длина блока больше 1, его размер. Перед этим валидируем каждый символ и бросаем ошибку при нарушении формата.`,
 lcSimilar:[{"n":443,"t":"String Compression","h":"string-compression"}],
-repoSimilar:["ya5"]}
+repoSimilar:["ya5"]},
 
-,{id:"ya7",t:"Поиск подстроки с точностью до перестановки",p:"Sliding Window",d:"средне",
+// ===== SLIDING WINDOW =====
+{id:"ya7",t:"Поиск подстроки с точностью до перестановки",p:"Sliding Window",d:"средне",
 desc:`Дан текст T и строка S. Нужно найти такую подстроку S' в T, что ==S' является перестановкой S== (анаграммой), и вернуть начальный индекс этой подстроки.
 
 Если подходящей подстроки нет — вернуть -1.
@@ -7142,9 +7160,9 @@ complexity:`Время: O(n * A), Память: O(A), где A = 256`,
 complexityExpl:`Окно двигается O(n) раз, на каждом шаге сравниваем частоты размера A. При фиксированном алфавите это близко к O(n).`,
 expl:`Подстрока длины |S| может быть перестановкой S только при равенстве частот символов. Поддерживаем частоты в окне длины |S|, на каждом сдвиге добавляем правый символ и убираем левый. При равенстве массивов частот возвращаем старт окна.`,
 lcSimilar:[{"n":438,"t":"Find All Anagrams in a String","h":"find-all-anagrams-in-a-string"}],
-repoSimilar:["sw2","ya6"]}
+repoSimilar:["sw2","ya6"]},
 
-,{id:"ya8",t:"Кратчайшая подстрока, покрывающая алфавит",p:"Sliding Window",d:"средне",
+{id:"ya8",t:"Кратчайшая подстрока, покрывающая алфавит",p:"Sliding Window",d:"средне",
 desc:`Даны 2 строки: text и alphabet.
 
 Нужно вернуть ==самую короткую подстроку text==, в которой каждый символ из alphabet встречается хотя бы один раз.

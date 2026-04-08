@@ -3288,6 +3288,7 @@ desc:`Дан список неотрицательных целых чисел n
 hint:`После сортировки — два индекса l и r: расширяйте r, пока nums[r+1] == nums[r] + 1. Фиксируйте сегмент и переходите к следующему.`,
 code:`class Solution {
     public List<String> summaryRanges(int[] nums) {
+        Arrays.sort(nums);
         List<String> list = new ArrayList<>();
         for (int i = 0; i < nums.length; i++) {
             int start = nums[i];

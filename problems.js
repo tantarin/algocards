@@ -3290,20 +3290,17 @@ code:`class Solution {
     public List<String> summaryRanges(int[] nums) {
         Arrays.sort(nums);
         List<String> list = new ArrayList<>();
-        int n = nums.length;
-        int l = 0;
-        while (l < n) {
-            int r = l;
-            while (r + 1 < n && nums[r + 1] == nums[r] + 1) {
-                r++;
+        for (int i = 0; i < nums.length; i++) {
+            int start = nums[i];
+            while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
+                i++;
             }
             StringBuilder sb = new StringBuilder();
-            sb.append(nums[l]);
-            if (l != r) {
-                sb.append("->").append(nums[r]);
+            sb.append(start);
+            if (start != nums[i]) {
+                sb.append("->").append(nums[i]);
             }
             list.add(sb.toString());
-            l = r + 1;
         }
         return list;
     }

@@ -3288,23 +3288,27 @@ desc:`Дан список неотрицательных целых чисел n
 hint:`После сортировки — два индекса l и r: расширяйте r, пока nums[r+1] == nums[r] + 1. Фиксируйте сегмент и переходите к следующему.`,
 code:`import java.util.*;
 
-class Solution {
+public class Solution {
     public String counterRanges(List<Integer> nums) {
         Collections.sort(nums);
         List<String> result = new ArrayList<>();
-        int n = nums.size();
-
-        for (int l = 0; l < n; l++) {
-            int r = l;
-            while (r + 1 < n && nums.get(r + 1) == nums.get(r) + 1) {
+        int l = 0, r = 0;
+        
+        while (l < nums.size()) {
+            while (r + 1 < nums.size() && nums.get(r) + 1 == nums.get(r + 1)) {
                 r++;
             }
-            int start = nums.get(l);
-            int end = nums.get(r);
-            result.add(start == end ? String.valueOf(start) : start + "-" + end);
-            l = r;
+            
+            if (r != l) {
+                result.add(nums.get(l) + "-" + nums.get(r));
+            } else {
+                result.add(String.valueOf(nums.get(l)));
+            }
+            
+            l = r + 1;
+            r = r + 1;
         }
-
+        
         return String.join(",", result);
     }
 }`,

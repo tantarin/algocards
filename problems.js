@@ -7004,20 +7004,7 @@ complexityExpl:`Каждое событие один раз попадает в 
 expl:`Скользящее окно по времени: дек хранит события в порядке прихода. Карта — сколько запросов у каждого userId внутри окна. hotCount увеличивается, когда частота пользователя впервые становится >= limit, и уменьшается, когда после удаления устаревших событий она падает ниже limit.`,
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
 repoSimilar:["ya2"],
-diagram:{
-  type:"userstats",
-  now:1000,
-  from:400,
-  k:600,
-  limit:3,
-  users:[
-    {name:"A",color:"#22d3ee",events:[100,350,600,900]},
-    {name:"B",color:"#94a3b8",events:[200,500,700]},
-    {name:"C",color:"#d9f943",events:[400,550,750,950]}
-  ],
-  inWindowCount:[3,2,4],
-  robots:["A","C"]
-}},
+diagram:{"type":"userstats","now":1000,"from":400,"k":600,"limit":3,"users":[{"name":"A","color":"#22d3ee","events":[100,350,600,900]},{"name":"B","color":"#94a3b8","events":[200,500,700]},{"name":"C","color":"#d9f943","events":[400,550,750,950]}],"inWindowCount":[3,2,4],"robots":["A","C"]}},
 
 {id:"ya5",t:"Максимальная дистанция до ближайшего зрителя",p:"Sliding Window",d:"средне",
 desc:`Места в кинотеатре расположены в один ряд. Новый зритель хочет сесть так, чтобы ==расстояние до ближайшего занятого места== было ==максимальным==.
@@ -7193,51 +7180,38 @@ searchPangram("bacb", "bc") => "cb"
 searchPangram("abbc", "ac") => "abbc"
 searchPangram("abacaba", "bcd") => ""`,
 hint:`Скользящее окно: расширяем right, считаем покрытые символы alphabet, затем сжимаем left пока покрытие полное. Поддерживаем лучший (минимальный) отрезок.`,
-code:`class Solution {
-    public String searchPangram(String text, String alphabet) {
-        if (text == null || alphabet == null) {
-            throw new IllegalArgumentException("Input must be non-null");
+code:`public String searchPangram(String text, String alphabet) {
+    Map<Character, Integer> window = new HashMap<>();
+    for (char c : alphabet.toCharArray()) window.put(c, 0);
+
+    int required = alphabet.length();
+    int covered = 0;
+    int bestLeft = -1, bestLen = Integer.MAX_VALUE;
+    int left = 0;
+
+    for (int right = 0; right < text.length(); right++) {
+        char c = text.charAt(right);
+        if (window.containsKey(c)) {
+            window.put(c, window.get(c) + 1);
+            if (window.get(c) == 1) covered++;
         }
-        int n = text.length();
-        int needTotal = alphabet.length();
-        if (needTotal > n) return "";
 
-        boolean[] need = new boolean[256];
-        for (int i = 0; i < alphabet.length(); i++) {
-            need[alphabet.charAt(i)] = true;
-        }
-
-        int[] freq = new int[256];
-        int covered = 0;
-        int left = 0;
-        int bestL = -1;
-        int bestLen = Integer.MAX_VALUE;
-
-        for (int right = 0; right < n; right++) {
-            char rc = text.charAt(right);
-            if (need[rc]) {
-                if (freq[rc] == 0) covered++;
-                freq[rc]++;
+        while (covered == required) {
+            int len = right - left + 1;
+            if (len < bestLen) {
+                bestLen = len;
+                bestLeft = left;
             }
-
-            while (covered == needTotal) {
-                int len = right - left + 1;
-                if (len < bestLen) {
-                    bestLen = len;
-                    bestL = left;
-                }
-
-                char lc = text.charAt(left);
-                if (need[lc]) {
-                    freq[lc]--;
-                    if (freq[lc] == 0) covered--;
-                }
-                left++;
+            char leftChar = text.charAt(left);
+            if (window.containsKey(leftChar)) {
+                window.put(leftChar, window.get(leftChar) - 1);
+                if (window.get(leftChar) == 0) covered--;
             }
+            left++;
         }
-
-        return bestL == -1 ? "" : text.substring(bestL, bestL + bestLen);
     }
+
+    return bestLeft == -1 ? "" : text.substring(bestLeft, bestLeft + bestLen);
 }`,
 complexity:`Время: O(n), Память: O(A), где A = размер алфавита (здесь 256)`,
 complexityExpl:`Каждый указатель (left/right) проходит строку не более одного раза. Доп. память — массивы частот/флагов фиксированного размера.`,

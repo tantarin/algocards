@@ -3279,37 +3279,28 @@ complexityExpl:`Указатели по двум массивам, каждый 
 expl:`Merge-подобная техника на отсортированных массивах. При совпадении — добавляем и двигаем оба указателя. Иначе — двигаем указатель на меньший элемент. O(n+m).`},
 
 {id:"tp8",t:"LC 228. Свертка в диапазоны (Summary Ranges)",p:"Two Pointers",d:"средне",
-desc:`Дан список неотрицательных целых чисел nums, ==повторов нет==. Нужно преобразовать его в строку, сворачивая соседние по числовому ряду числа в диапазоны (сначала список удобно ==отсортировать==).
+desc:`Дан список неотрицательных целых чисел nums, ==повторов нет==. Нужно преобразовать его в строку, сворачивая соседние по числовому ряду числа в диапазоны.
 Если числа идут подряд (разница 1), записать как =="x-y"==. Иначе одно число ==("x")==. Диапазоны через ==запятую==.
 
 Пример 1:
 Ввод: nums = [1,4,5,2,3,9,8,11,0]
 Вывод: "0-5,8-9,11"`,
 hint:`После сортировки — два индекса l и r: расширяйте r, пока nums[r+1] == nums[r] + 1. Фиксируйте сегмент и переходите к следующему.`,
-code:`import java.util.*;
-
-public class Solution {
-    public String counterRanges(List<Integer> nums) {
-        Collections.sort(nums);
-        List<String> result = new ArrayList<>();
-        int l = 0, r = 0;
-        
-        while (l < nums.size()) {
-            while (r + 1 < nums.size() && nums.get(r) + 1 == nums.get(r + 1)) {
-                r++;
+code:`class Solution {
+    public List<String> summaryRanges(int[] nums) {
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            int start = nums[i];
+            while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
+                i++;
             }
-            
-            if (r != l) {
-                result.add(nums.get(l) + "-" + nums.get(r));
+            if (start == nums[i]) {
+                list.add(String.valueOf(start));
             } else {
-                result.add(String.valueOf(nums.get(l)));
+                list.add(start + "->" + nums[i]);
             }
-            
-            l = r + 1;
-            r = r + 1;
         }
-        
-        return String.join(",", result);
+        return list;
     }
 }`,
 complexity:`Время: O(n log n), Память: O(n)`,

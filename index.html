@@ -1060,38 +1060,55 @@ function renderCartesianDiagram(d, step){
 
 function renderUserStatsDiagram(d){
   const users=Array.isArray(d.users)?d.users:[];
-  const minT=Math.min(...users.flatMap(u=>u.events||[]), d.from||0);
-  const maxT=Math.max(...users.flatMap(u=>u.events||[]), d.now||0);
+  const from=(typeof d.from==='number')?d.from:0;
+  const now=(typeof d.now==='number')?d.now:0;
+  let minT=from;
+  let maxT=now;
+  for(let i=0;i<users.length;i++){
+    const events=Array.isArray(users[i].events)?users[i].events:[];
+    for(let j=0;j<events.length;j++){
+      const t=events[j];
+      if(t<minT)minT=t;
+      if(t>maxT)maxT=t;
+    }
+  }
   const span=Math.max(1,maxT-minT);
-  const toX=t=>((t-minT)/span)*100;
-  const rowTop=i=>36+i*56;
+  const toX=function(t){return ((t-minT)/span)*100;};
+  const rowTop=function(i){return 36+i*56;};
 
-  const rows=users.map((u,i)=>{
+  let rows='';
+  for(let i=0;i<users.length;i++){
     const y=rowTop(i);
-    return `<div class="us-row" style="top:${y}px"></div>
-      <div class="us-row-label" style="top:${y}px">${esc(u.name)}</div>`;
-  }).join('');
+    rows+=`<div class="us-row" style="top:${y}px"></div>
+      <div class="us-row-label" style="top:${y}px">${esc(users[i].name||'')}</div>`;
+  }
 
-  const dots=users.map((u,i)=>{
+  let dots='';
+  for(let i=0;i<users.length;i++){
+    const u=users[i];
     const y=rowTop(i);
-    return (u.events||[]).map(t=>{
-      const inWin=t>=(d.from||0)&&t<=(d.now||0);
-      return `<span class="us-dot${inWin?'':' dim'}" style="left:${toX(t)}%;top:${y}px;background:${u.color||'#94a3b8'}"></span>`;
-    }).join('');
-  }).join('');
+    const events=Array.isArray(u.events)?u.events:[];
+    for(let j=0;j<events.length;j++){
+      const t=events[j];
+      const inWin=t>=from&&t<=now;
+      dots+=`<span class="us-dot${inWin?'':' dim'}" style="left:${toX(t)}%;top:${y}px;background:${u.color||'#94a3b8'}"></span>`;
+    }
+  }
 
-  const result=(Array.isArray(d.robots)?d.robots:[]).join(' и ');
+  const robots=Array.isArray(d.robots)?d.robots:[];
+  const cnt=Array.isArray(d.inWindowCount)?d.inWindowCount:[0,0,0];
+  const result=robots.join(' и ');
   return `<div class="us-wrap">
     <div class="us-grid">
       ${rows}
-      <div class="us-window" style="left:${toX(d.from||0)}%;width:${Math.max(2,toX(d.now||0)-toX(d.from||0))}%"></div>
+      <div class="us-window" style="left:${toX(from)}%;width:${Math.max(2,toX(now)-toX(from))}%"></div>
       ${dots}
-      <div class="us-axis-label" style="left:${toX(d.from||0)}%">now-k = ${d.from}</div>
-      <div class="us-axis-label" style="left:${toX(d.now||0)}%">now = ${d.now}</div>
+      <div class="us-axis-label" style="left:${toX(from)}%">now-k = ${from}</div>
+      <div class="us-axis-label" style="left:${toX(now)}%">now = ${now}</div>
     </div>
-    <div class="us-notes">k = ${d.k}, limit = ${d.limit}, вызов robotCount(${d.now})</div>
-    <div class="us-notes">A: ${d.inWindowCount?.[0]||0}, B: ${d.inWindowCount?.[1]||0}, C: ${d.inWindowCount?.[2]||0} событий в окне</div>
-    <div class="us-result">robotCount(${d.now}) = ${(d.robots||[]).length} (${result})</div>
+    <div class="us-notes">k = ${d.k||0}, limit = ${d.limit||0}, вызов robotCount(${now})</div>
+    <div class="us-notes">A: ${cnt[0]||0}, B: ${cnt[1]||0}, C: ${cnt[2]||0} событий в окне</div>
+    <div class="us-result">robotCount(${now}) = ${robots.length} (${result})</div>
   </div>`;
 }
 

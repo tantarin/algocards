@@ -7133,7 +7133,6 @@ code:`public int findPermutationStart(String text, String pattern) {
     for (char c : pattern.toCharArray()) {
         if (delta[c] == 0) nonZero++;
         delta[c]++;
-        if (delta[c] == 0) nonZero--;
     }
 
     for (int r = 0; r < n; r++) {

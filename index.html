@@ -1564,6 +1564,7 @@ function setFilter(pat){
 const EDIT_FIELDS=[
   {key:'t',label:'Название'},
   {key:'desc',label:'Условие',rows:8},
+  {key:'starter',label:'Шаблон кода (в условии)',rows:12},
   {key:'hint',label:'Подсказка',rows:2},
   {key:'code',label:'Код (Java)',rows:12},
   {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
@@ -1664,6 +1665,9 @@ function renderCard(){
           <button class="copy-btn copy-problem-desc" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <div class="desc-display">${problemDescHtml}</div>
         </div>
+        ${p.starter?`<div class="code-wrap" style="margin-top:10px">
+          <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.starter)}</code></pre>
+        </div>`:''}
         <div class="spoiler-row">
           <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
           <div class="hint-text" style="display:none">${esc(p.hint)}</div>
@@ -1986,6 +1990,7 @@ function buildProblemsJs(){
     }
     out+='{id:"'+p.id+'",t:"'+p.t.replace(/"/g,'\\"')+'",p:"'+p.p.replace(/"/g,'\\"')+'",d:"'+p.d.replace(/"/g,'\\"')+'",\n';
     out+='desc:`'+escVal(p.desc)+'`,\n';
+    if(p.starter)out+='starter:`'+escVal(p.starter)+'`,\n';
     out+='hint:`'+escVal(p.hint)+'`,\n';
     out+='code:`'+escVal(p.code)+'`,\n';
     if(p.code2)out+='code2:`'+escVal(p.code2)+'`,\n';

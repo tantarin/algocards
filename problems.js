@@ -1229,8 +1229,7 @@ code:`class Solution {
             if (mapST[cs] == -1 && mapTS[ct] == -1) {
                 mapST[cs] = ct;
                 mapTS[ct] = cs;
-            } else if (mapST[cs] != ct
-                    || mapTS[ct] != cs) {
+            } else if (mapST[cs] != ct || mapTS[ct] != cs) {
                 return false;
             }
         }
@@ -7127,31 +7126,39 @@ code:`public int findPermutationStart(String text, String pattern) {
     int m = pattern.length();
     if (m > n) return -1;
 
-    int[] delta = new int[256];
-    int nonZero = 0;
+    int[] need = new int[256];
+    int[] win  = new int[256];
 
-    for (char c : pattern.toCharArray()) {
-        if (delta[c] == 0) nonZero++;
-        delta[c]++;
+    for (int i = 0; i < m; i++) {
+        need[pattern.charAt(i)]++;
+        win[text.charAt(i)]++;
     }
 
-    for (int r = 0; r < n; r++) {
+    // считаем сколько символов уже совпадают по частоте
+    int matched = 0;
+    for (int i = 0; i < 256; i++) {
+        if (need[i] == win[i]) matched++;
+    }
+
+    if (matched == 256) return 0;
+
+    for (int r = m; r < n; r++) {
+        int in  = text.charAt(r);
+        int out = text.charAt(r - m);
+
         // добавляем правый символ
-        int in = text.charAt(r);
-        if (delta[in] == 0) nonZero++;
-        delta[in]--;
-        if (delta[in] == 0) nonZero--;
+        win[in]++;
+        if (win[in] == need[in])      matched++;
+        else if (win[in] == need[in] + 1) matched--;
 
-        // убираем левый символ — только когда окно переросло m
-        if (r >= m) {
-            int out = text.charAt(r - m);
-            if (delta[out] == 0) nonZero++;
-            delta[out]++;
-            if (delta[out] == 0) nonZero--;
-        }
+        // убираем левый символ
+        win[out]--;
+        if (win[out] == need[out])        matched++;
+        else if (win[out] == need[out] - 1) matched--;
 
-        if (nonZero == 0 && r >= m - 1) return r - m + 1;
+        if (matched == 256) return r - m + 1;
     }
+
     return -1;
 }`,
 complexity:`Время: O(n * A), Память: O(A), где A = 256`,

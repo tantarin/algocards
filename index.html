@@ -680,6 +680,31 @@ function complexityBackFaceHtml(p){
   html+='</div></div>';
   return html;
 }
+/** Текст для редактора: строка сложности + пояснение. */
+function complexityBundleFromProblem(p){
+  const c=(p.complexity||'').trim();
+  const e=(p.complexityExpl||'').trim();
+  if(c&&e)return c+'\n'+e;
+  return c||e;
+}
+/** Из одного textarea: 1-я строка → complexity, остальное → complexityExpl. */
+function applyComplexityBundleToProblem(p, raw){
+  const t=String(raw||'').replace(/\r\n/g,'\n').trimEnd();
+  const nl=t.indexOf('\n');
+  if(nl<0){
+    const line=t.trim();
+    if(/^время\s*:/i.test(line)){
+      p.complexity=line;
+      p.complexityExpl='';
+    }else{
+      p.complexity='';
+      p.complexityExpl=line;
+    }
+  }else{
+    p.complexity=t.slice(0,nl).trim();
+    p.complexityExpl=t.slice(nl+1).trim();
+  }
+}
 /** Делит desc на условие и блок примеров (строка «Пример…:» / «Примеры:»). */
 function splitProblemDesc(desc){
   if(desc==null||desc==='')return{condition:'',examples:null};
@@ -1743,8 +1768,7 @@ const EDIT_FIELDS=[
   {key:'hint',label:'Подсказка',rows:2},
   {key:'code',label:'Код (Java)',rows:12},
   {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
-  {key:'complexity',label:'Сложность (строка: Время: …, Память: …)',rows:1},
-  {key:'complexityExpl',label:'Объяснение: сначала про время, в конце про память',rows:3},
+  {key:'complexityBundle',label:'Сложность и пояснение: первая строка — «Время: …, Память: …», с новой строки — текст пояснения',rows:2},
   {key:'expl',label:'Объяснение алгоритма',rows:3},
   {key:'p2',label:'Доп. тег (паттерн, опционально)',rows:1}
 ];
@@ -1768,10 +1792,13 @@ function textToLcSimilar(text){
 
 function renderEditCard(){
   const p=fcList[fcIdx];
-  let fields=EDIT_FIELDS.map(f=>`
+  let fields=EDIT_FIELDS.map(f=>{
+    const val=f.key==='complexityBundle'?complexityBundleFromProblem(p):(p[f.key]||'');
+    return`
     <div class="edit-label">${f.label}</div>
-    <textarea class="edit-field" data-key="${f.key}" rows="${f.rows||3}">${p[f.key]||''}</textarea>
-  `).join('');
+    <textarea class="edit-field" data-key="${f.key}" rows="${f.rows||3}">${val}</textarea>
+  `;
+  }).join('');
   fields+=`
     <div class="edit-label">LeetCode похожие (одна строка = «532 Two Sum II»)</div>
     <textarea class="edit-field" data-key="lcSimilar" rows="4">${lcSimilarToText(p.lcSimilar)}</textarea>
@@ -2202,6 +2229,8 @@ async function saveCard(){
   document.querySelectorAll('.edit-field').forEach(el=>{
     if(el.dataset.key==='lcSimilar'){
       p.lcSimilar=textToLcSimilar(el.value);
+    }else if(el.dataset.key==='complexityBundle'){
+      applyComplexityBundleToProblem(p,el.value);
     }else{
       p[el.dataset.key]=el.value;
     }

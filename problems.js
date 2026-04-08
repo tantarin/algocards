@@ -7006,7 +7006,7 @@ lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
 repoSimilar:["ya2"],
 diagram:{"type":"userstats","now":1000,"from":400,"k":600,"limit":3,"users":[{"name":"A","color":"#22d3ee","events":[100,350,600,900]},{"name":"B","color":"#94a3b8","events":[200,500,700]},{"name":"C","color":"#d9f943","events":[400,550,750,950]}],"inWindowCount":[3,2,4],"robots":["A","C"]}},
 
-{id:"ya5",t:"Максимальная дистанция до ближайшего зрителя",p:"Sliding Window",d:"средне",
+{id:"ya5",t:"LC 849 · Maximize Distance to Closest Person",p:"Sliding Window",d:"средне",
 desc:`Места в кинотеатре расположены в один ряд. Новый зритель хочет сесть так, чтобы ==расстояние до ближайшего занятого места== было ==максимальным==.
 Дан массив seats:
 - seats[i] = 1 — место занято

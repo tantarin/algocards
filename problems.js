@@ -7024,35 +7024,23 @@ desc:`Места в кинотеатре расположены в один ря
 Ввод: seats = [1,0,1,0]
 Вывод: 1`,
 hint:`Идём по блокам нулей. Для блока в начале/конце ответ равен длине блока. Для блока между единицами — (длина + 1) / 2.`,
-code:`class Solution {
-    public int findBestSeatDist(int[] seats) {
-        int n = seats.length;
-        int i = 0;
-        int best = 0;
-
-        while (i < n) {
-            if (seats[i] == 1) {
-                i++;
-                continue;
-            }
-
-            int j = i;
-            while (j < n && seats[j] == 0) {
-                j++;
-            }
-
-            int len = j - i;
-            if (i == 0 || j == n) {
-                best = Math.max(best, len);
+code:`public int maxDistToClosest(int[] seats) {
+    int n = seats.length;
+    int maxDist = 0;
+    int lastOccupied = -1;
+    for (int i = 0; i < n; i++) {
+        if (seats[i] == 1) {
+            if (lastOccupied == -1) {
+                maxDist = i;                        // левый край
             } else {
-                best = Math.max(best, (len + 1) / 2);
+                maxDist = Math.max(maxDist, (i - lastOccupied) / 2); // середина
             }
-
-            i = j;
+            lastOccupied = i;
         }
-
-        return best;
     }
+
+    maxDist = Math.max(maxDist, n - 1 - lastOccupied); // правый край
+    return maxDist;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при одном проходе по массиву.`,

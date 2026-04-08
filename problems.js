@@ -1215,26 +1215,14 @@ desc:`Проверить, являются ли строки s и t ==изомо
 hint:`Две карты: s→t и t→s для обеспечения биекции. Конфликт в любой — не изоморфны.`,
 code:`class Solution {
     public boolean isIsomorphic(String s, String t) {
-        if (s.length() != t.length()) return false;
-
-        int[] mapST = new int[256];
-        int[] mapTS = new int[256];
-        Arrays.fill(mapST, -1);
-        Arrays.fill(mapTS, -1);
-
-        for (int i = 0; i < s.length(); i++) {
-            char cs = s.charAt(i);
-            char ct = t.charAt(i);
-
-            if (mapST[cs] == -1 && mapTS[ct] == -1) {
-                mapST[cs] = ct;
-                mapTS[ct] = cs;
-            } else if (mapST[cs] != ct || mapTS[ct] != cs) {
-                return false;
-            }
-        }
-
-        return true;
+    int[] lastSeenS = new int[256];
+    int[] lastSeenT = new int[256];
+    for (int i = 0; i < s.length(); i++) {
+        if (lastSeenS[s.charAt(i)] != lastSeenT[t.charAt(i)]) return false;
+        lastSeenS[s.charAt(i)] = i + 1;  // +1 чтобы 0 означал "не видели"
+        lastSeenT[t.charAt(i)] = i + 1;
+    }
+    return true;
     }
 }`,
 complexity:`Время: O(n), Память: O(1)`,

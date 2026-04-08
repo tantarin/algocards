@@ -7266,6 +7266,56 @@ complexity:`Время: O(n), Память: O(A), где A = размер алф
 complexityExpl:`Каждый указатель (left/right) проходит строку не более одного раза. Доп. память — массивы частот/флагов фиксированного размера.`,
 expl:`Поддерживаем окно [left..right]. Когда окно покрывает все символы alphabet, сжимаем его слева до потери покрытия и обновляем лучший ответ. Первое найденное окно минимальной длины автоматически будет левейшим.`,
 lcSimilar:[{"n":76,"t":"Minimum Window Substring","h":"minimum-window-substring"}],
-repoSimilar:["sw2","ya7"]}
+repoSimilar:["sw2","ya7"]},
+
+{id:"ya9",t:"Ближайший митинг",p:"Two Pointers",d:"средне",
+desc:`Даны два списка свободных временных окон двух сотрудников: nums1 и nums2, где каждое окно представлено как [start, end] — начало и конец свободного периода в минутах. Гарантируется, что start < end. Длина окна равна end - start. Оба списка отсортированы по возрастанию начала интервала, интервалы внутри одного списка не пересекаются.
+
+Нужно найти ==первое по времени== окно длины duration, когда оба сотрудника свободны. Вернуть его как [start, end]. Если такого окна нет — вернуть пустой массив.
+
+Пример 1:
+Ввод: nums1 = [[0, 30], [60, 90]], nums2 = [[10, 40], [80, 100]], duration = 15
+Вывод: [10, 25]
+
+Пример 2:
+Ввод: nums1 = [[5, 20], [50, 70]], nums2 = [[0, 10], [55, 80]], duration = 10
+Вывод: [55, 65]
+
+Пример 3:
+Ввод: nums1 = [[0, 5], [20, 25]], nums2 = [[10, 15], [30, 35]], duration = 5
+Вывод: []`,
+hint:`Два указателя по двум спискам интервалов. На каждом шаге смотрите пересечение текущих окон; если его длины хватает на duration, ответ — отрезок длины duration от левого конца пересечения. Иначе сдвиньте указатель у того интервала, который ==раньше заканчивается==.`,
+code:`import java.util.*;
+
+class Solution {
+    public List<Integer> findMeetingTime(List<List<Integer>> nums1, List<List<Integer>> nums2, int duration) {
+        int i = 0, j = 0;
+
+        while (i < nums1.size() && j < nums2.size()) {
+            int start1 = nums1.get(i).get(0), end1 = nums1.get(i).get(1);
+            int start2 = nums2.get(j).get(0), end2 = nums2.get(j).get(1);
+
+            int intersection = Math.min(end1, end2) - Math.max(start1, start2);
+
+            if (intersection >= duration) {
+                int start = Math.max(start1, start2);
+                return Arrays.asList(start, start + duration);
+            }
+
+            if (end1 < end2) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return new ArrayList<>();
+    }
+}`,
+complexity:`Время: O(n + m), Память: O(1)`,
+complexityExpl:`Каждый указатель проходит свой список не более одного раза — O(n+m). Храним только индексы и константное число целых — O(1).`,
+expl:`Пересечение двух текущих свободных отрезков — [max(start1,start2), min(end1,end2)]. Если его длина ≥ duration, самое раннее подходящее окно начинается в max(start1,start2). Если нет — отбрасываем интервал с меньшим end: он уже не даст более раннего пересечения с текущим партнёром.`,
+lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}],
+repoSimilar:["ya1"]}
 
 ];

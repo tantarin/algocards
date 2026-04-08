@@ -1828,10 +1828,12 @@ code:`class Solution {
         }
         return result.reverse().toString();
     }
+
     private int hexToInt(char c) {
         if (c >= '0' && c <= '9') return c - '0';
         return c - 'a' + 10;
     }
+
     private char intToHex(int n) {
         if (n < 10) return (char) ('0' + n);
         return (char) ('a' + n - 10);

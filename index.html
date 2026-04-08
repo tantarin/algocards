@@ -112,6 +112,12 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap:has(.solution-editor),.code-wrap:has(.solution-pre){animation:codeBreathe 6s ease-in-out infinite}
 @keyframes codeBreathe{0%,100%{box-shadow:0 0 15px rgba(124,58,237,0.2)}50%{box-shadow:0 0 25px rgba(124,58,237,0.4),0 0 40px rgba(236,72,153,0.2)}}
 .solution-pre{margin:0}
+.fc-cx-stack{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.fc-cx-block{padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6}
+.fc-cx-h{color:var(--dim);font-weight:600;margin-bottom:6px;font-size:12px}
+.fc-cx-band{color:#7c3aed;font-weight:600;margin-bottom:6px}
+.fc-cx-band--solo{margin-bottom:0}
+.fc-cx-expl{color:var(--dim)}
 .solution-pre code{display:block;padding:12px;font-family:monospace;font-size:11px;line-height:1.5;white-space:pre}
 .solution-pre code.solution-bg{background:var(--card2);color:var(--dim);user-select:none}
 .solution-pre code.no-hljs{background:var(--card2);color:var(--dim);user-select:none}
@@ -586,6 +592,93 @@ function explTextBeforeCode(expl){
   const t=stripHighlightMarkers((expl||'').trim());
   if(!t)return '';
   return t+'\n\n';
+}
+/** Строка «Время: …, Память: …» → две оценки без префиксов. */
+function parseComplexityLine(complexity){
+  const out={time:'',mem:''};
+  if(complexity==null||complexity==='')return out;
+  const s=String(complexity).trim();
+  const idx=s.search(/,\s*память\s*:/i);
+  if(idx<0){
+    const m=s.match(/^время\s*:\s*(.+)$/i);
+    out.time=m?m[1].trim():s;
+    return out;
+  }
+  out.time=s.slice(0,idx).replace(/^время\s*:\s*/i,'').trim();
+  out.mem=s.slice(idx).replace(/^,\s*память\s*:\s*/i,'').trim();
+  return out;
+}
+function splitComplexityExplSentences(raw){
+  const parts=String(raw).split(/\.\s+/);
+  const out=[];
+  for(let i=0;i<parts.length;i++){
+    let seg=parts[i].trim();
+    if(!seg)continue;
+    if(i<parts.length-1)seg+='.';
+    out.push(seg);
+  }
+  return out;
+}
+/** Предложение из complexityExpl относится к памяти (хвост типичного текста). */
+function isMemExplSentence(sent){
+  if(!sent)return false;
+  const s=sent.trim();
+  if(/памят|доп\.?\s*памят/i.test(s))return true;
+  if(/дополнительно\s+O\(/i.test(s))return true;
+  if(/переменные\s*—\s*O\(/i.test(s))return true;
+  if(/только\s+(?:несколько\s+)?(?:индекс|переменн|указател)/i.test(s)&&/O\(1\)/i.test(s))return true;
+  if(/min-heap|max-heap/i.test(s)&&/операц|push|pop|вставк|удален|для каждого элемента/i.test(s)&&!/памят/i.test(s))return false;
+  if(/размер\s+кучи|кучи\s+ограничен/i.test(s))return true;
+  if(/Карта\s+O\(|,\s*куча\s+O\(/i.test(s))return true;
+  if(/стек\s+вызовов/i.test(s))return true;
+  if(/стек\s+до\s+/i.test(s))return true;
+  if(/обратный\s+граф\s+и/i.test(s))return true;
+  if(/StringBuilder\s+длины/i.test(s))return true;
+  if(/passengerChanges/i.test(s))return true;
+  if(/\bHashMap\b|\bHashSet\b/.test(s)){
+    if(/памят|Карта\s+и\s+списки|ключей\s+—|элементов\s+—\s*O\([^)]+\)\s*памят/i.test(s))return true;
+    if(/за\s+O\(1\)|операц/i.test(s)&&!/памят/i.test(s)&&!/Карта\s/i.test(s))return false;
+    if(/проход|зеркальн|кратност|проверк|линейных|собираем|обход|сортировк|подсч|ищем|двух\s+проход|сортируем|клад[ёе]м\s+в/i.test(s)&&!/памят/i.test(s))return false;
+    return true;
+  }
+  if(/массив\s+из\s+\d+/i.test(s))return true;
+  if(/массив\s+(?:результата|result)/i.test(s))return true;
+  if(/boolean\[\]|idx\s+и\s+boolean/i.test(s))return true;
+  if(/buckets\s+—|coords,\s+visited|deque\s+слов/i.test(s))return true;
+  if(/список\s+(merged|результат|частей|маршрута|opерандов|до\s+n)/i.test(s))return true;
+  if(/граф,\s+очеред|Граф,\s+очеред/i.test(s))return true;
+  return false;
+}
+function splitComplexityExplTimeMem(expl){
+  if(expl==null||String(expl).trim()==='')return{time:'',mem:''};
+  const raw=String(expl).trim();
+  const sentences=splitComplexityExplSentences(raw);
+  if(!sentences.length)return{time:raw,mem:''};
+  let memStart=sentences.length;
+  for(let i=sentences.length-1;i>=0;i--){
+    if(isMemExplSentence(sentences[i]))memStart=i;
+    else break;
+  }
+  if(memStart>=sentences.length)return{time:raw,mem:''};
+  return{
+    time:sentences.slice(0,memStart).join(' ').trim(),
+    mem:sentences.slice(memStart).join(' ').trim()
+  };
+}
+function complexityBackFaceHtml(p){
+  if(!p||!p.complexity)return'';
+  const bands=parseComplexityLine(p.complexity);
+  const sx=splitComplexityExplTimeMem(p.complexityExpl||'');
+  let html='<div class="fc-cx-stack">';
+  html+='<div class="fc-cx-block"><div class="fc-cx-h">Время</div>';
+  if(bands.time)html+='<div class="fc-cx-band'+(sx.time?'':' fc-cx-band--solo')+'">'+esc(bands.time)+'</div>';
+  if(sx.time)html+='<div class="fc-cx-expl">'+esc(sx.time)+'</div>';
+  html+='</div>';
+  html+='<div class="fc-cx-block"><div class="fc-cx-h">Память</div>';
+  if(bands.mem)html+='<div class="fc-cx-band'+(sx.mem?'':' fc-cx-band--solo')+'">'+esc(bands.mem)+'</div>';
+  if(sx.mem)html+='<div class="fc-cx-expl">'+esc(sx.mem)+'</div>';
+  html+='</div></div>';
+  return html;
 }
 /** Делит desc на условие и блок примеров (строка «Пример…:» / «Примеры:»). */
 function splitProblemDesc(desc){
@@ -1650,8 +1743,8 @@ const EDIT_FIELDS=[
   {key:'hint',label:'Подсказка',rows:2},
   {key:'code',label:'Код (Java)',rows:12},
   {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
-  {key:'complexity',label:'Сложность',rows:1},
-  {key:'complexityExpl',label:'Объяснение сложности',rows:2},
+  {key:'complexity',label:'Сложность (строка: Время: …, Память: …)',rows:1},
+  {key:'complexityExpl',label:'Объяснение: сначала про время, в конце про память',rows:3},
   {key:'expl',label:'Объяснение алгоритма',rows:3},
   {key:'p2',label:'Доп. тег (паттерн, опционально)',rows:1}
 ];
@@ -1772,10 +1865,7 @@ function renderCard(){
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
         </div>
         `:''}
-        ${p.complexity?`<div style="margin-top:12px;padding:10px 14px;background:var(--card2);border-radius:10px;font-size:13px;line-height:1.6">
-          <div style="color:#7c3aed;font-weight:600;margin-bottom:4px">${esc(p.complexity)}</div>
-          ${p.complexityExpl?`<div style="color:var(--dim)">${esc(p.complexityExpl)}</div>`:''}
-        </div>`:''}
+        ${complexityBackFaceHtml(p)}
         ${diagramHtml(p)}
       </div>
     </div>

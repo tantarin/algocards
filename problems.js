@@ -1838,6 +1838,33 @@ code:`public String addHex(String a, String b) {
     }
     return new String(result);
 }`,
+code2:`public String addStrings(String num1, String num2) {
+    // Реверсируем строки для удобного сложения с начала
+    String rev1 = new StringBuilder(num1).reverse().toString();
+    String rev2 = new StringBuilder(num2).reverse().toString();
+    
+    int maxLen = Math.max(rev1.length(), rev2.length());
+    StringBuilder result = new StringBuilder();
+    int carry = 0;
+    
+    // Складываем с начала (младшие разряды теперь слева)
+    for (int i = 0; i < maxLen; i++) {
+        int digit1 = i < rev1.length() ? rev1.charAt(i) - '0' : 0;
+        int digit2 = i < rev2.length() ? rev2.charAt(i) - '0' : 0;
+        
+        int sum = digit1 + digit2 + carry;
+        result.append(sum % 10);
+        carry = sum / 10;
+    }
+    
+    // Добавляем последний перенос
+    if (carry > 0) {
+        result.append(carry);
+    }
+    
+    // Реверсируем результат обратно
+    return result.reverse().toString();
+}`,
 complexity:`Время: O(max(|a|, |b|)), Память: O(max(|a|, |b|))`,
 complexityExpl:`Один проход с конца строк с carry — O(max(|a|,|b|)). StringBuilder длины результата — O(max(|a|,|b|)) памяти.`,
 expl:`Аналогично десятичному сложению, но в системе 16. Справа налево: складываем цифры + carry. Остаток от 16 — цифра, целая часть — перенос. O(max(a,b)).`},

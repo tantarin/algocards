@@ -1838,35 +1838,34 @@ code:`public String addHex(String a, String b) {
     }
     return new String(result);
 }`,
-code2:`public String addStrings(String num1, String num2) {
-    char[] result = new char[Math.max(num1.length(), num2.length()) + 1];
-    int carry = 0;
-    int idx = 0;
-    
-    // Складываем с конца, но записываем в начало массива
-    for (int i = num1.length() - 1, j = num2.length() - 1; 
-         i >= 0 || j >= 0 || carry > 0; 
-         i--, j--) {
-        
-        int sum = carry;
-        if (i >= 0) sum += num1.charAt(i) - '0';
-        if (j >= 0) sum += num2.charAt(j) - '0';
-        
-        result[idx++] = (char) (sum % 10 + '0');
-        carry = sum / 10;
-    }
-    
-    // Реверсируем результат (теперь он в правильном порядке)
-    reverse(result, 0, idx);
-    
-    return new String(result, 0, idx);
-}
+code2:`class Solution {
 
-private void reverse(char[] arr, int start, int end) {
-    for (int i = start, j = end - 1; i < j; i++, j--) {
-        char temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
+    public String addHex(String a, String b) {
+        StringBuilder result = new StringBuilder();
+        int p1 = a.length() - 1;
+        int p2 = b.length() - 1;
+        int carry = 0;
+        
+        while (p1 >= 0 || p2 >= 0 || carry > 0) {
+            int sum = carry;
+            if (p1 >= 0) sum += hexToInt(a.charAt(p1--));
+            if (p2 >= 0) sum += hexToInt(b.charAt(p2--));
+            
+            result.append(intToHex(sum % 16));
+            carry = sum / 16;
+        }
+        
+        return result.reverse().toString();
+    }
+
+    private int hexToInt(char c) {
+        if (c >= '0' && c <= '9') return c - '0';
+        return c - 'a' + 10;
+    }
+
+    private char intToHex(int n) {
+        if (n < 10) return (char) ('0' + n);
+        return (char) ('a' + n - 10);
     }
 }`,
 complexity:`Время: O(max(|a|, |b|)), Память: O(max(|a|, |b|))`,

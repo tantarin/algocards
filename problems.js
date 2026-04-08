@@ -1435,6 +1435,33 @@ complexity:`Время: O(n log k), Память: O(n + k)`,
 complexityExpl:`Частоты слов O(n), затем операции с кучей размера k — O(n log k). freqMap O(n), куча O(k).`,
 expl:`Min-heap с кастомным компаратором: частота по возрастанию, слово по убыванию (обратный лексикографический). При извлечении переворачиваем результат. O(n log k).`},
 
+{id:"hpq3",t:"LC 215 · Kth Largest Element in an Array",p:"Heap / PQ",d:"средне",
+desc:`Дан массив nums и число k. Найти k-й по величине элемент (не k-й уникальный).
+
+Примеры:
+nums = [3,2,1,5,6,4], k = 2 → 5
+nums = [3,2,3,1,2,4,5,5,1], k = 4 → 4`,
+hint:`Min-heap размера k: держим k наибольших элементов, вершина кучи — это k-й по величине.`,
+code:`class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        for (int num : nums) {
+            minHeap.offer(num);
+            if (minHeap.size() > k) {
+                minHeap.poll();
+            }
+        }
+
+        return minHeap.peek();
+    }
+}`,
+complexity:`Время: O(n log k), Память: O(k)`,
+complexityExpl:`Для каждого элемента делаем вставку в кучу и иногда удаление минимума, обе операции O(log k). Размер кучи ограничен k.`,
+expl:`Это прямое определение min-heap размера k: после прохода в куче остаются k крупнейших элементов массива, а минимальный среди них (peek) — и есть k-й по величине.`,
+lcSimilar:[{"n":215,"t":"Kth Largest Element in an Array","h":"kth-largest-element-in-an-array"}],
+repoSimilar:["hpq1"]},
+
 // ===== INTERVALS SWEEP =====
 {id:"iss1",t:"Merge Intervals",p:"Intervals Sweep",d:"средне",
 desc:`Дан список отрезков [начало, конец]. Необходимо ==объединить все пересекающиеся отрезки==.

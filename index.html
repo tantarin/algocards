@@ -1116,7 +1116,7 @@ const REPO='tantarin/algocards';
 const FILE_PATH='problems.js';
 const THEORY_FILE_PATH='theory.js';
 const allPatterns=[...new Set(P.flatMap(p=>[p.p,p.p2].filter(Boolean)))].sort();
-const YANDEX_IDS=new Set(['tp11','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','tp19','tp52','tp53','sw8','gh2','sw3','pse5','pse3','pse4','ps2','ms2','ms1','tp13','iss5','gop5','gop4','gop6','tr10','tr15','tr16','swd1','tp54','tp5','ya2','ya3','ya4','ya5','ya6','ya7','ya8','hf3']);
+const YANDEX_IDS=new Set(['tp10','tp11','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','tp19','tp52','tp53','sw8','gh2','sw3','pse5','pse3','pse4','ps2','ms2','ms1','tp13','iss5','gop5','gop4','gop6','tr10','tr15','tr16','swd1','tp54','tp5','ya2','ya3','ya4','ya5','ya6','ya7','ya8','hf3']);
 function isYandexProblem(p){return YANDEX_IDS.has(p.id)||p.ya===true;}
 function yandexTagHtml(p){
   return isYandexProblem(p)
@@ -1506,7 +1506,21 @@ function getFiltered(){
         (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
       );
     }else{
-      list=list.filter(p=>(p.t+' '+p.desc+' '+p.hint+' '+p.p+(p.p2?' '+p.p2:'')+(isYandexProblem(p)?' Яндекс':'')).toLowerCase().includes(q));
+      list=list.filter(p=>{
+        const title=String(p.t||'');
+        const lcTitles=Array.isArray(p.lcSimilar)?p.lcSimilar.map(x=>String(x.t||'')).join(' '):'';
+        const haystack=(
+          title+' '+
+          String(p.id||'')+' '+
+          String(p.desc||'')+' '+
+          String(p.hint||'')+' '+
+          String(p.p||'')+' '+
+          (p.p2?String(p.p2)+' ':'')+
+          lcTitles+' '+
+          (isYandexProblem(p)?'Яндекс ':'')
+        ).toLowerCase();
+        return haystack.includes(q);
+      });
     }
   }
   return list;

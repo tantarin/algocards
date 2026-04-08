@@ -1839,31 +1839,35 @@ code:`public String addHex(String a, String b) {
     return new String(result);
 }`,
 code2:`public String addStrings(String num1, String num2) {
-    // Реверсируем строки для удобного сложения с начала
-    String rev1 = new StringBuilder(num1).reverse().toString();
-    String rev2 = new StringBuilder(num2).reverse().toString();
-    
-    int maxLen = Math.max(rev1.length(), rev2.length());
-    StringBuilder result = new StringBuilder();
+    char[] result = new char[Math.max(num1.length(), num2.length()) + 1];
     int carry = 0;
+    int idx = 0;
     
-    // Складываем с начала (младшие разряды теперь слева)
-    for (int i = 0; i < maxLen; i++) {
-        int digit1 = i < rev1.length() ? rev1.charAt(i) - '0' : 0;
-        int digit2 = i < rev2.length() ? rev2.charAt(i) - '0' : 0;
+    // Складываем с конца, но записываем в начало массива
+    for (int i = num1.length() - 1, j = num2.length() - 1; 
+         i >= 0 || j >= 0 || carry > 0; 
+         i--, j--) {
         
-        int sum = digit1 + digit2 + carry;
-        result.append(sum % 10);
+        int sum = carry;
+        if (i >= 0) sum += num1.charAt(i) - '0';
+        if (j >= 0) sum += num2.charAt(j) - '0';
+        
+        result[idx++] = (char) (sum % 10 + '0');
         carry = sum / 10;
     }
     
-    // Добавляем последний перенос
-    if (carry > 0) {
-        result.append(carry);
-    }
+    // Реверсируем результат (теперь он в правильном порядке)
+    reverse(result, 0, idx);
     
-    // Реверсируем результат обратно
-    return result.reverse().toString();
+    return new String(result, 0, idx);
+}
+
+private void reverse(char[] arr, int start, int end) {
+    for (int i = start, j = end - 1; i < j; i++, j--) {
+        char temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
 }`,
 complexity:`Время: O(max(|a|, |b|)), Память: O(max(|a|, |b|))`,
 complexityExpl:`Один проход с конца строк с carry — O(max(|a|,|b|)). StringBuilder длины результата — O(max(|a|,|b|)) памяти.`,

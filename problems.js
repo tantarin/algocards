@@ -3924,30 +3924,38 @@ B = [2, 1, 1, 4]
 Вывод: [0, 2, 2, 2]
 
 `,
-hint:`Массив count[1..n]. При встрече числа в A или B увеличиваем count. Когда count == 2 — число есть в обоих.`,
-code:`class Solution {
-    public int[] findCommonPrefix(int[] A, int[] B) {
-        int n = A.length;
-        int[] count = new int[n + 1];
-        int[] result = new int[n];
-        int common = 0;
+hint:`Два множества used1 и used2: новое значение в nums1 добавляем в used1 и, если оно уже было в used2, увеличиваем счётчик; зеркально для nums2.`,
+code:`import java.util.*;
 
-        for (int i = 0; i < n; i++) {
-            count[A[i]]++;
-            if (count[A[i]] == 2) common++;
+public class Solution {
+    public List<Integer> findCommonPrefix(List<Integer> nums1, List<Integer> nums2) {
+        Set<Integer> used1 = new HashSet<>();
+        Set<Integer> used2 = new HashSet<>();
+        int commonCount = 0;
+        List<Integer> result = new ArrayList<>();
 
-            count[B[i]]++;
-            if (count[B[i]] == 2) common++;
+        for (int i = 0; i < nums1.size(); i++) {
+            if (!used1.contains(nums1.get(i))) {
+                used1.add(nums1.get(i));
+                if (used2.contains(nums1.get(i))) {
+                    commonCount++;
+                }
+            }
 
-            result[i] = common;
+            if (!used2.contains(nums2.get(i))) {
+                used2.add(nums2.get(i));
+                if (used1.contains(nums2.get(i))) {
+                    commonCount++;
+                }
+            }
+            result.add(commonCount);
         }
-
         return result;
     }
 }`,
 complexity:`Время: O(n), Память: O(n)`,
-complexityExpl:`Один цикл с двумя инкрементами в count — O(n). Массив count[n+1] — O(n) памяти.`,
-expl:`Массив count[v] хранит, сколько раз число v встречено (в A, в B, или в обоих). Когда count == 2 — число есть в обоих массивах. Не учитываем кратность (число входит максимум 1 раз в каждый массив). O(n).`},
+complexityExpl:`На каждом шаге константное число операций с HashSet — O(n) суммарно. Два множества — в худшем случае O(n) различных значений.`,
+expl:`В префиксе каждое число из nums1 и nums2 учитываем не более одного раза. Когда впервые видим x в одном массиве, а x уже встречался в другом — общий счётник уникальных пересечений растёт. Так получается то же, что «count == 2» для каждого значения, но без ограничения на диапазон чисел.`},
 
 {id:"pse4",t:"Общий префикс с учётом кратности",p:"Prefix Sum Ext.",d:"средне",
 desc:`Даны два массива целых чисел nums1 и nums2 одинаковой длины. Для каждого префикса нужно посчитать число общих элементов c учетом кратности.

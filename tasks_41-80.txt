@@ -1,0 +1,987 @@
+#41 Умножение длинного числа
+Число хранится как массив цифр в обратном порядке. Умножить его на цифру n (1-9). Вернуть результат в том же формате.
+Умножение столбиком: цифра × n + carry. Остаток от 10 — текущая цифра, целая часть — перенос. O(n) время.
+class Solution {
+    public List<Integer> multiplyByDigit(List<Integer> num, int n) {
+        List<Integer> result = new ArrayList<>();
+        int carry = 0;
+        for (int digit : num) {
+            int product = digit * n + carry;
+            result.add(product % 10);
+            carry = product / 10;
+        }
+        while (carry > 0) {
+            result.add(carry % 10);
+            carry /= 10;
+        }
+        return result;
+    }
+}
+#42 Сумма hex чисел
+Сложить два шестнадцатеричных числа, представленных строками. Вернуть результат как hex-строку.
+Аналогично десятичному сложению, но в системе 16. Справа налево: складываем цифры + carry. Остаток от 16 — цифра, целая часть — перенос. O(max(a,b)).
+public String addHex(String a, String b) {
+    // Сначала определяем нужную длину
+    int maxLen = Math.max(a.length(), b.length());
+    char[] result = new char[maxLen + 1];
+    int i = a.length() - 1;
+    int j = b.length() - 1;
+    int k = result.length - 1;  // начинаем с конца массива
+    int carry = 0;
+    while (i >= 0 || j >= 0 || carry > 0) {
+        int sum = carry;
+        if (i >= 0) sum += hexToInt(a.charAt(i--));
+        if (j >= 0) sum += hexToInt(b.charAt(j--));
+        result[k--] = intToHex(sum % 16);
+        carry = sum / 16;
+    }
+    // Если есть лидирующий ноль (k == 0, значит первый элемент не заполнен)
+    if (k == 0 && result[0] == 0) {
+        return new String(result, 1, result.length - 1);
+    }
+    return new String(result);
+}
+#43 Минимальное произведение
+Найти минимальное произведение двух элементов массива.
+Минимальное произведение может быть: два отрицательных (дают положительный), отрицательный × положительный (дают отрицательный), или два положительных. Проверяем все варианты за O(n).
+class Solution {
+    public long minProduct(int[] arr) {
+        int min1 = Integer.MAX_VALUE;
+        int min2 = Integer.MAX_VALUE;
+        int max1 = Integer.MIN_VALUE;
+        int max2 = Integer.MIN_VALUE;
+        for (int val : arr) {
+            if (val < min1) {
+                min2 = min1;
+                min1 = val;
+            } else if (val < min2) {
+                min2 = val;
+            }
+            if (val > max1) {
+                max2 = max1;
+                max1 = val;
+            } else if (val > max2) {
+                max2 = val;
+            }
+        }
+        long candidate1 = (long) min1 * min2;
+        long candidate2 = (long) min1 * max1;
+        long candidate3 = (long) max1 * max2;
+        return Math.min(candidate1,
+            Math.min(candidate2, candidate3));
+    }
+}
+#44 Индекс Хирша
+Дан массив цитирований. Найти h-индекс: максимальное h, при котором h статей имеют ≥ h цитирований.
+O(n) с bucket sort. Создаём buckets[0..n], где buckets[i] = количество статей с i цитированиями (или >= n). Суммируем справа налево: когда count >= i, нашли h-индекс.
+class Solution {
+    public int hIndex(int[] citations) {
+        int n = citations.length;
+        int[] buckets = new int[n + 1];
+        for (int c : citations) {
+            if (c >= n) {
+                buckets[n]++;
+            } else {
+                buckets[c]++;
+            }
+        }
+        int count = 0;
+        //Идем с конца к началу, накапливая количество статей
+        for (int i = n; i >= 0; i--) {
+            count += buckets[i];
+            if (count >= i) {
+                return i;
+            }
+        }
+        return 0;
+    }
+}
+#45 LC 560 Subarray Sum Equals K
+Дан массив целых чисел nums и число k. Найти общее количество непрерывных подмассивов, сумма элементов которых равна k.
+O(n) время, O(n) память. Один проход: для каждой позиции ищем (currentSum - k) в HashMap. Если найдено — столько подмассивов оканчиваются здесь с суммой k.
+class Solution {
+    public int subarraySum(int[] nums, int k) {
+        Map<Integer, Integer> prefixSumCount =
+            new HashMap<>();
+        prefixSumCount.put(0, 1);
+        int count = 0;
+        int currentSum = 0;
+        for (int num : nums) {
+            currentSum += num;
+            count += prefixSumCount
+                .getOrDefault(currentSum - k, 0);
+            prefixSumCount
+                .merge(currentSum, 1, Integer::sum);
+        }
+        return count;
+    }
+}
+#46 Последовательность с суммой K
+Дан неотсортированный массив nums целых чисел, необходимо определить, существует ли такая непрерывная последовательность, сумма элементов которой равна k.
+Нужно вернуть индекс последнего элемента первой встретившейся последовательности, иначе -1.
+Префиксная сумма + HashMap (сумма → первый индекс). При нахождении (currentSum - k) в карте — подмассив найден, возвращаем текущий индекс. O(n).
+class Solution {
+    public int findSubarrayEnd(int[] nums, int k) {
+        Map<Integer, Integer> prefixSumIndex = new HashMap<>();
+        prefixSumIndex.put(0, -1);
+        int currentSum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            currentSum += nums[i];
+            if (prefixSumIndex.containsKey(currentSum - k)) {
+                return i;
+            }
+            prefixSumIndex.putIfAbsent(currentSum, i);
+        }
+        return -1;
+    }
+}
+#47 Последовательность с суммой K — диапазон индексов
+Дан неотсортированный массив nums целых чисел и число k. Необходимо найти непрерывный подмассив, сумма элементов которого равна k.
+Нужно вернуть список из двух элементов — индексы начала и конца любого подходящего подмассива (включительно). Если такого подмассива не существует, вернуть [−1, −1].
+Сумма nums[l..r] = prefix[r] − prefix[l−1]. Ищем в карте prefix[r]−k = префикс до l−1. Индекс начала: сохранённый индекс + 1. putIfAbsent даёт самое раннее начало при нескольких вариантах. O(n) время и память.
+import java.util.*;
+class Solution {
+    public List<Integer> subsequenceSumK(List<Integer> nums, int k) {
+        Map<Integer, Integer> prefixIndex = new HashMap<>();
+        prefixIndex.put(0, -1);
+        int prefixSum = 0;
+        for (int idx = 0; idx < nums.size(); idx++) {
+            prefixSum += nums.get(idx);
+            int diff = prefixSum - k;
+            if (prefixIndex.containsKey(diff)) {
+                return Arrays.asList(prefixIndex.get(diff) + 1, idx);
+            }
+            prefixIndex.putIfAbsent(prefixSum, idx);
+        }
+        return Arrays.asList(-1, -1);
+    }
+}
+#48 LC 238 · Product of Array Except Self
+Дан массив nums. Вернуть массив, где каждый элемент — произведение всех кроме текущего. Без деления.
+O(n) время, O(1) дополнительная память (кроме ответа). Первый проход: prefix product слева. Второй проход: suffix product справа, умножаем на prefix.
+class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+        // первый проход: result[i] = произведение всех элементов левее i
+        // для i=0 левее ничего нет — нейтральный элемент умножения
+        result[0] = 1;
+        for (int i = 1; i < n; i++) {
+            result[i] = result[i - 1] * nums[i - 1];
+        }
+        // второй проход: suffix накапливает произведение всех элементов правее i
+        // умножаем на уже лежащий prefix — получаем произведение всех кроме i
+        int suffix = 1;
+        for (int i = n - 2; i >= 0; i--) {
+            suffix *= nums[i + 1];
+            result[i] *= suffix;
+        }
+        return result;
+    }
+}
+#49  LC 724 — Find Pivot Index
+Найти индекс, где сумма слева равна сумме справа.
+O(n) один проход (после подсчёта суммы). rightSum = totalSum - leftSum - nums[i]. Когда leftSum == rightSum — нашли pivot.
+class Solution {
+    public int pivotIndex(int[] nums) {
+        int totalSum = 0;
+        for (int num : nums) totalSum += num;
+        int leftSum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int rightSum = totalSum - leftSum - nums[i];
+            if (leftSum == rightSum) return i;
+            leftSum += nums[i];
+        }
+        return -1;
+    }
+}
+#50 Minimum Window Substring
+Даны две строки s и t. Найти минимальную по длине подстроку, которая содержит все символы строки t (включая дубликаты). Если такой подстроки нет — вернуть пустую строку "".
+Сначала нужно отдельным циклом пройти по t и записать какие в массив какие символы на нужны.
+Затем отдельным циклом пройти по s и в окне проверять сколько символов осталось покрыть через отдельную переменную.
+И если все символы покрыты, то ищем минимум и ПРОБУЕМ УМЕНЬШИТЬ ОКНО СЛЕВА
+class Solution {
+    public String minWindow(String s, String t) {
+        if (s == null || t == null
+            || s.length() < t.length()) return "";
+        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
+        int[] freq = new int[128];
+        for (char c : t.toCharArray()) freq[c]++;
+        int needCount = t.length();  // сколько символов ещё нужно
+        int left = 0;
+        int bestStart = 0;
+        int minLen = Integer.MAX_VALUE;
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+            // Добавляем правый символ
+            if (freq[rightChar] > 0) needCount--;
+            freq[rightChar]--;
+            // Пока всё покрыто — сжимаем окно слева
+            while (needCount == 0) {
+                int windowSize = right - left + 1;
+                if (windowSize < minLen) {
+                    minLen = windowSize;
+                    bestStart = left;
+                }
+                // Удаляем левый символ
+                char leftChar = s.charAt(left);
+                freq[leftChar]++;
+                if (freq[leftChar] > 0) needCount++;
+                left++;
+            }
+        }
+        return minLen == Integer.MAX_VALUE ? ""
+            : s.substring(bestStart, bestStart + minLen);
+    }
+}
+#51 Longest Repeating Char Replacement
+Дана строка s и число k. Можно заменить до k символов. Найти длину самой длинной подстроки из одинаковых символов.
+Выгоднее всего заменять символы, которые НЕ являются самыми частыми.
+САМЫЙ ЧАСТЫЙ СИМВОЛ ВЫГОДНЕЕ ОСТАВИТЬ В ОКНЕ
+class Solution {
+    public int characterReplacement(String s, int k) {
+        int[] freq = new int[26];
+        int maxFreq = 0;
+        int left = 0;
+        int result = 0;
+        for (int right = 0; right < s.length(); right++) {
+            // Расширяем окно вправо
+            char c = s.charAt(right);
+            freq[c - 'A']++;
+            maxFreq = Math.max(maxFreq, freq[c - 'A']);
+            // Проверяем, нужно ли сужать окно
+            int windowLength = right - left + 1;
+            if (windowLength - maxFreq > k) {
+                // Сужаем окно слева
+                freq[s.charAt(left) - 'A']--;
+                left++;
+                // maxFreq может уменьшиться, но мы его не обновляем вниз
+                // Это оптимизация: если maxFreq был достигнут, он остаётся
+                // Актуальное значение не нужно, так как мы проверяем только windowLength - maxFreq > k
+            }
+            // Обновляем результат
+            result = Math.max(result, right - left + 1);
+        }
+        return result;
+    }
+}
+#52 Поиск анаграмм
+Найти все стартовые индексы анаграмм строки t в строке s.
+Фиксированное окно размера |t|. Массив freq отслеживает, сколько каждого символа ещё нужно. needCount = 0 означает все символы покрыты — это анаграмма. O(n).
+class Solution {
+    public List<Integer> findAnagrams(String s, String t) {
+        List<Integer> result = new ArrayList<>();
+        if (s.length() < t.length()) return result;
+        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
+        int[] freq = new int[128];
+        for (char c : t.toCharArray()) freq[c]++;
+        int needCount = t.length();  // сколько символов ещё нужно
+        int windowSize = t.length(); // фиксированный размер окна
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+            // Добавляем правый символ
+            if (freq[rightChar] > 0) needCount--;
+            freq[rightChar]--;
+            // Удаляем левый символ (когда окно полное)
+            if (right >= windowSize) {
+                char leftChar = s.charAt(right - windowSize);
+                freq[leftChar]++;
+                if (freq[leftChar] > 0) needCount++;
+            }
+            // Проверяем анаграмму
+            if (needCount == 0) {
+                result.add(right - windowSize + 1);
+            }
+        }
+        return result;
+    }
+}
+#53 LC 674 Longest Continuous Increasing Subsequence
+Найти длину самого длинного непрерывного строго возрастающего подмассива.
+Один проход O(n). Если текущий элемент > предыдущего — увеличиваем длину. Иначе — сбрасываем до 1. Запоминаем максимум.
+class Solution {
+    public int longestIncreasing(int[] arr) {
+        if (arr.length == 0) return 0;
+        int currLength = 1;
+        int maxLength = 1;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > arr[i - 1]) {
+                currLength++;
+                maxLength = Math.max(maxLength, currLength);
+            } else {
+                currLength = 1;
+            }
+        }
+        return maxLength;
+    }
+}
+#54 Наглый подставной отчет
+Дан бинарный массив. Можно заменить до k нулей на единицы. Найти максимальную длину подмассива из единиц.
+class Solution {
+    public int longestOnes(int[] nums, int k) {
+        int left = 0;
+        int zerosCount = 0;
+        int result = 0;
+        for (int right = 0; right < nums.length; right++) {
+            if (nums[right] == 0) {
+                zerosCount++;
+            }
+            while (zerosCount > k) {
+                if (nums[left] == 0) zerosCount--;
+                left++;
+            }
+            result = Math.max(result, right - left + 1);
+        }
+        return result;
+    }
+}
+#55 LeetCode 1493 Longest Subarray of 1's After Deleting One Element.
+Дан бинарный массив. Удалить ровно один элемент. Найти максимальную длину подмассива из единиц.
+Правой границей расширяем окно. И в цикле каждый раз обновляем максимум. 
+Но если вдруг к окне оказался второй ноль, то двигаем левую границу.
+class Solution {
+    public int longestSubarray(int[] nums) {
+        int left = 0;
+        int zeroCount = 0;
+        int maxLen = 0;
+        for (int right = 0; right < nums.length; right++) {
+            // Добавляем правый элемент
+            if (nums[right] == 0) zeroCount++;
+            // Если нулей больше 1, убираем слева
+            while (zeroCount > 1) {
+                if (nums[left] == 0) zeroCount--;
+                left++;
+            }
+            // Длина подмассива после удаления одного элемента
+            maxLen = Math.max(maxLen, right - left);
+        }
+        return maxLen;
+    }
+}
+#56 Подставной отчет
+Дан бинарный массив. Можно перевернуть ОДИН ноль в единицу. Найти максимальную длину подмассива из единиц.
+prev — единицы перед последним нулём, count — единицы после. При нуле: prev + 1 + count (1 — перевёрнутый ноль). Ограничиваем длиной массива. O(n).
+public int maxOnesWithFlip(int[] nums) {
+    int prev = 0;
+    int count = 0;
+    int maxCount = 0;
+    boolean hasZero = false;  // флаг: был ли ноль
+    for (int num : nums) {
+        if (num == 1) {
+            count++;
+        } else {
+            hasZero = true;  // встретили ноль
+            maxCount = Math.max(maxCount, prev + 1 + count);
+            prev = count;
+            count = 0;
+        }
+    }
+    maxCount = Math.max(maxCount, prev + 1 + count);
+    // Если не было ни одного нуля, вычитаем лишнюю единицу
+    if (!hasZero) {
+        maxCount--;
+    }
+    return maxCount;
+}
+#57 Подстроки с полным алфавитом
+Подсчитать количество подстрок, содержащих все уникальные символы s.
+Когда окно содержит все уникальные символы, все расширения вправо (s.length() - right) тоже валидны. Сжимаем left и считаем. O(n).
+class Solution {
+    public int countComplete(String s) {
+        // target — сколько уникальных символов нужно собрать
+        int target = (int) s.chars().distinct().count();
+        // freq[c] — сколько раз символ в текущем окне
+        int[] freq = new int[128];
+        int haveCount = 0;  // сколько уникальных уже в окне
+        int left = 0;
+        int count = 0;
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+            freq[rightChar]++;
+            if (freq[rightChar] == 1) haveCount++;
+            // Пока окно "полное" — сжимаем слева
+            while (haveCount == target) {
+                // Все суффиксы от right до конца тоже валидны
+                count += s.length() - right;
+                // Удаляем левый символ
+                char leftChar = s.charAt(left);
+                freq[leftChar]--;
+                if (freq[leftChar] == 0) haveCount--;
+                left++;
+            }
+        }
+        return count;
+    }
+}
+#58 Поиск мутирующего вируса
+Проверить, содержит ли строка gene какую-либо перестановку строки virus.
+Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, freq массив, счётчик needCount. O(n).
+class Solution {
+    public boolean containsMutation(String gene,
+                                    String virus) {
+        if (gene.length() < virus.length()) return false;
+        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
+        int[] freq = new int[128];
+        for (char c : virus.toCharArray()) freq[c]++;
+        int needCount = virus.length();  // сколько символов ещё нужно
+        int windowSize = virus.length(); // фиксированный размер окна
+        for (int right = 0; right < gene.length(); right++) {
+            char rightChar = gene.charAt(right);
+            // Добавляем правый символ
+            if (freq[rightChar] > 0) needCount--;
+            freq[rightChar]--;
+            // Удаляем левый символ (когда окно полное)
+            if (right >= windowSize) {
+                char leftChar = gene.charAt(right - windowSize);
+                freq[leftChar]++;
+                if (freq[leftChar] > 0) needCount++;
+            }
+            // Проверяем мутацию
+            if (needCount == 0) return true;
+        }
+        return false;
+    }
+}
+#59 Инвестор в стране дураков
+Скользящее окно произведения k элементов. Корректно обрабатывать нули.
+O(n). Отслеживаем нули отдельно (zeroCount). Для ненулевых поддерживаем произведение, делим/умножаем при сдвиге окна. Если есть нули — результат = 0.
+class Solution {
+    public int[] slidingProduct(int[] arr, int k) {
+        int n = arr.length;
+        int[] result = new int[n - k + 1];
+        int zeroCount = 0;
+        long prod = 1;
+        for (int i = 0; i < k; i++) {
+            if (arr[i] == 0) zeroCount++;
+            else prod *= arr[i];
+        }
+        result[0] = zeroCount > 0 ? 0 : (int) prod;
+        for (int i = k; i < n; i++) {
+            int outgoing = arr[i - k];
+            int incoming = arr[i];
+            if (outgoing == 0) zeroCount--;
+            else prod /= outgoing;
+            if (incoming == 0) zeroCount++;
+            else prod *= incoming;
+            result[i - k + 1] =
+                zeroCount > 0 ? 0 : (int) prod;
+        }
+        return result;
+    }
+}
+#60 LC 20 · Valid Parentheses
+Дана строка s, содержащая только символы '(', ')', '{', '}', '[', ']'. Определить, является ли строка допустимой.
+Строка допустима если:
+- Каждая открывающая скобка закрыта соответствующей закрывающей
+- Скобки закрываются в правильном порядке
+- Каждой закрывающей скобке соответствует открывающая того же типа
+O(n) время, O(n) память в худшем случае (все открывающие). Стек хранит незакрытые скобки. При закрывающей — проверяем пару с вершиной.
+class Solution {
+    public boolean isValid(String s) {
+        // стек хранит незакрытые открывающие скобки
+        Deque<Character> stack = new ArrayDeque<>();
+        for (char c : s.toCharArray()) {
+            if (c == '(' || c == '{' || c == '[') {
+                // открывающая — кладём на стек, ждём пару
+                stack.push(c);
+            } else if (stack.isEmpty() || !isMatchingPair(stack.pop(), c)) {
+                // закрывающая, но стек пуст — нет пары
+                // или вершина стека не совпадает с текущей закрывающей
+                return false;
+            }
+        }
+        // если стек пуст — все открывающие закрыты
+        // если нет — остались незакрытые скобки
+        return stack.isEmpty();
+    }
+    private boolean isMatchingPair(char open, char close) {
+        // проверяем что открывающая и закрывающая — одного типа
+        return (open == '(' && close == ')')
+            || (open == '{' && close == '}')
+            || (open == '[' && close == ']');
+    }
+}
+#61 LeetCode 739 Daily Temperatures
+Дан массив температур. Для каждого дня найти, через сколько дней будет теплее.
+Если такого дня нет, ответ 0.
+Монотонный убывающий стек хранит индексы. Каждый индекс push/pop ровно один раз → O(n). При нахождении более тёплого дня записываем разницу.
+import java.util.ArrayDeque;
+import java.util.Deque;
+class Solution {
+    public int[] dailyTemperatures(int[] temps) {
+        int n = temps.length;
+        int[] ans = new int[n];
+        // Храним индексы дней.
+        // Температуры по этим индексам в стеке идут по убыванию.
+        Deque<Integer> stack = new ArrayDeque<>();
+        for (int i = 0; i < n; i++) {
+            // Пока текущий день теплее дня на вершине стека,
+            // мы нашли ответ для этого старого дня.
+            while (!stack.isEmpty() && temps[i] > temps[stack.peek()]) {
+                int prevDay = stack.pop();
+                ans[prevDay] = i - prevDay;
+            }
+            // Текущий день пока тоже ждёт свой более тёплый день справа.
+            stack.push(i);
+        }
+        return ans;
+    }
+}
+#62 RPN-калькулятор
+Вычислить выражение в обратной польской нотации (RPN).
+Стек для RPN-вычислений. Числа — в стек. Оператор — извлекаем два операнда, считаем, результат обратно. Порядок важен для - и /. O(n).
+class Solution {
+    public long evalRPN(String[] tokens) {
+        Deque<Long> stack = new ArrayDeque<>();
+        for (String token : tokens) {
+            switch (token) {
+                case "+": {
+                    long b = stack.pop();
+                    long a = stack.pop();
+                    stack.push(a + b);
+                    break;
+                }
+                case "-": {
+                    long b = stack.pop();
+                    long a = stack.pop();
+                    stack.push(a - b);
+                    break;
+                }
+                case "*": {
+                    long b = stack.pop();
+                    long a = stack.pop();
+                    stack.push(a * b);
+                    break;
+                }
+                case "/": {
+                    long b = stack.pop();
+                    long a = stack.pop();
+                    stack.push(a / b);
+                    break;
+                }
+                default:
+                    stack.push(Long.parseLong(token));
+            }
+        }
+        return stack.pop();
+    }
+}
+#63 Простой калькулятор
+Дан массив `s` с положительными числами и знаками `*` и `+`. Нужно вернуть результат вычислений и важно, чтобы решение было за `O(1)` по дополнительной памяти.
+Выражение — сумма произведений. prevMultiply накапливает текущее произведение. При + — добавляем его к result и начинаем новое. O(n) время, O(1) память.
+class Solution {
+    public int calculate(String[] s) {
+        int result = 0;
+        int currentProduct = 1;
+        for (int i = 0; i < s.length; i++) {
+            String token = s[i];
+            if (token.equals("*")) {
+                // просто пропускаем, умножение обработаем на числе
+                continue;
+            } else if (token.equals("+")) {
+                // закончили блок умножений
+                result += currentProduct;
+                currentProduct = 1;
+            } else {
+                // это число
+                int num = Integer.parseInt(token);
+                currentProduct *= num;
+            }
+        }
+        // добавить последний блок
+        result += currentProduct;
+        return result;
+    }
+}
+#64 Разворот слов
+Развернуть порядок слов, сохраняя пробелы на своих местах.
+Разделяем строку на блоки слов и пробелов. Слова собираем в deque в обратном порядке. При реконструкции сохраняем пробельные блоки и подставляем слова из deque. O(n).
+class Solution {
+    public String reverseWords(String s) {
+        List<String> parts = new ArrayList<>();
+        Deque<String> words = new ArrayDeque<>();
+        int i = 0;
+        while (i < s.length()) {
+            if (s.charAt(i) == ' ') {
+                int start = i;
+                while (i < s.length() && s.charAt(i) == ' ') i++;
+                parts.add(s.substring(start, i));
+            } else {
+                int start = i;
+                while (i < s.length() && s.charAt(i) != ' ') i++;
+                String word = s.substring(start, i);
+                parts.add(word);
+                words.addFirst(word);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String part : parts) {
+            if (part.charAt(0) == ' ') {
+                sb.append(part);
+            } else {
+                sb.append(words.pollFirst());
+            }
+        }
+        return sb.toString();
+    }
+}
+#65 Number of Islands
+Дана карта в виде двумерного массива grid из '1' (суша) и '0' (вода). Определить количество островов. Остров — группа клеток с сушей, соединённых по горизонтали или вертикали. По диагонали клетки не считаются соединёнными. Карта окружена водой со всех сторон.
+DFS flood fill. При нахождении 1 — затапливаем весь остров (ставим 0), +1 к счётчику. Каждая клетка посещается один раз. O(m×n) время и память.
+public class Solution {
+    private static boolean inBound(int i, int j,
+            List<List<Integer>> grid) {
+        return i >= 0 && i < grid.size()
+            && j >= 0 && j < grid.get(0).size();
+    }
+    private static void dfs(int i, int j,
+            List<List<Integer>> grid) {
+        if (!inBound(i, j, grid)
+            || grid.get(i).get(j) == 0) return;
+        grid.get(i).set(j, 0);
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+        for (int[] d : dirs) {
+            dfs(i + d[0], j + d[1], grid);
+        }
+    }
+    public static int numIslands(
+            List<List<Integer>> grid) {
+        if (grid.isEmpty()) return 0;
+        int count = 0;
+        for (int i = 0; i < grid.size(); i++)
+            for (int j = 0; j < grid.get(0).size(); j++)
+                if (grid.get(i).get(j) == 1) {
+                    dfs(i, j, grid);
+                    count++;
+                }
+        return count;
+    }
+}
+#66 LC 101 Symmetric Tree
+Дан корень бинарного дерева. Проверить, является ли дерево симметричным (зеркальным отражением самого себя).
+Рекурсивное зеркальное сравнение: left.left ↔ right.right и left.right ↔ right.left. O(n) время, O(h) стек рекурсии.
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        return isMirror(root.left, root.right);
+    }
+    private boolean isMirror(TreeNode left, TreeNode right) {
+        if (left == null && right == null) return true;
+        if (left == null || right == null) return false;
+        if (left.val != right.val) return false;
+        return isMirror(left.left, right.right) && isMirror(left.right, right.left);
+    }
+}
+#67 LC 98 · Validate Binary Search Tree
+Дан корень бинарного дерева. Проверить, является ли оно валидным деревом поиска (BST).
+Свойство BST: все значения в левом поддереве строго меньше текущего узла, все значения в правом поддереве строго больше.
+Рекурсия с границами: для левого поддерева max = node.val, для правого min = node.val. Используем long для обработки граничных значений Integer. O(n).
+class Solution {
+    public boolean isValidBST(TreeNode root) {
+        return isValid(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    private boolean isValid(TreeNode node, long low, long high) {
+        if (node == null) return true;
+        if (node.val <= low || node.val >= high) {
+            return false;
+        }
+        return isValid(node.left, low, node.val) && isValid(node.right, node.val, high);
+    }
+}
+#68 Поиск k-ого наименьшего
+Дан корень BST и число k. Найти k-й наименьший элемент в дереве (1-indexed).
+Inorder-обход BST выдаёт элементы в отсортированном порядке. Считаем посещённые узлы, при count == k — нашли ответ. O(H + k) время.
+class Solution {
+    private int count = 0;
+    private int result = 0;
+    public int kthSmallest(TreeNode root, int k) {
+        inorder(root, k);
+        return result;
+    }
+    private void inorder(TreeNode node, int k) {
+        if (node == null) return;
+        inorder(node.left, k);
+        count++;
+        if (count == k) {
+            result = node.val;
+            return;
+        }
+        inorder(node.right, k);
+    }
+}
+#69 Container With Most Water
+Дан массив heights, heights[i] — высота линии.
+Найти максимальную площадь воды между двумя линиями.
+Площадь = min(heights[i], heights[j]) × (j - i)
+O(n) время, O(1) память. Два указателя с краёв. Сдвигаем меньший — сдвиг большего уменьшит ширину без возможности увеличить высоту.
+public class Solution {
+    public int maxArea(int[] height) {
+        int l = 0;
+        int r = height.length - 1;
+        int resultArea = 0;
+        while (l < r) {
+            int currArea =
+                Math.min(height[l], height[r])
+                * (r - l);
+            resultArea =
+                Math.max(resultArea, currArea);
+            if (height[l] < height[r]) {
+                l++;
+            } else {
+                r--;
+            }
+        }
+        return resultArea;
+    }
+}
+#70 LC 125. Valid Palindrome
+Проверить, является ли строка палиндромом, игнорируя неалфавитные символы и регистр.
+Два указателя к центру. Пропускаем пунктуацию/пробелы. Сравниваем в нижнем регистре. O(n) время, O(1) память.
+class Solution {
+    public boolean isPalindrome(String s) {
+        // два указателя с двух концов, сходятся к центру
+        int l = 0;
+        int r = s.length() - 1;
+        while (l < r) {
+            // пропускаем всё что не буква и не цифра слева
+            while (l < r && !Character.isLetterOrDigit(s.charAt(l))) l++;
+            // пропускаем всё что не буква и не цифра справа
+            while (l < r && !Character.isLetterOrDigit(s.charAt(r))) r--;
+            // сравниваем символы без учёта регистра
+            if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) {
+                return false;
+            }
+            // сдвигаем оба указателя к центру
+            l++;
+            r--;
+        }
+        // все пары совпали — палиндром
+        return true;
+    }
+}
+#71 LC 283. Move Zeroes
+Дан массив целых чисел nums. Переместить все нули в конец, сохраняя относительный порядок ненулевых элементов. Изменять массив нужно in-place, не создавая копию.
+Fast/slow pointer. Быстрый проходит все элементы. Медленный (insert) — позиция записи ненулевых. После — заполняем хвост нулями. O(n).
+class Solution {
+    public void moveZeroes(int[] nums) {
+        int write = 0;
+        for (int read = 0; read < nums.length; read++) {
+            if (nums[read] != 0) {
+                // ненулевой элемент — записываем на позицию write
+                nums[write] = nums[read];
+                write++;
+            }
+            // нулевой — read идёт дальше, write стоит на месте
+        }
+        // хвост от write до конца заполняем нулями
+        while (write < nums.length) {
+            nums[write] = 0;
+            write++;
+        }
+    }
+}
+#72 Сжатие пробелов
+Дан массив символов arr. Заменить каждую последовательность из одного или более пробелов ровно одним пробелом. Изменять массив нужно in-place. Вернуть новую длину массива.
+Указатель записи w. Пробел записываем только при !prevSpace. Возвращаем новую длину. O(n) время, O(1) память.
+class Solution {
+    public int compressSpaces(char[] arr) {
+        int write = 0;
+        boolean prevSpace = false;
+        for (int read = 0; read < arr.length; read++) {
+            if (arr[read] == ' ') {
+                //если до этого был не пробел
+                if (!prevSpace) {
+                    arr[write++] = ' ';
+                    prevSpace = true;
+                }
+            } else {
+                arr[write++] = arr[read];
+                prevSpace = false;
+            }
+        }
+        return write;
+    }
+}
+#73 LC 392. Is Subsequence
+Проверить, является ли s подпоследовательностью t (символы s встречаются в t в том же порядке).
+Два указателя: p1 по s, p2 по t. При совпадении продвигаем оба, иначе только p2. Если p1 дошёл до конца — s является подпоследовательностью t. O(|t|).
+class Solution {
+    public boolean isSubsequence(String s, String t) {
+        int p1 = 0, p2 = 0;
+        while (p1 < s.length() && p2 < t.length()) {
+            if (s.charAt(p1) == t.charAt(p2)) {
+                p1++;
+            }
+            p2++;
+        }
+        return p1 == s.length();
+    }
+}
+#74 LC 167. Two Sum II - Input Array Is Sorted
+Найти два элемента в отсортированном массиве, дающих в сумме target. Вернуть их индексы (1-based). O(1) доп. памяти.
+Массив отсортирован → два указателя. Сумма < target → увеличиваем (l++). Сумма > target → уменьшаем (r--). O(n) время, O(1) память.
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        int l = 0;
+        int r = nums.length - 1;
+        while (l < r) {
+            int currSum = nums[l] + nums[r];
+            if (currSum == target) {
+                return new int[]{l + 1, r + 1};
+            } else if (currSum < target) {
+                l++;
+            } else {
+                r--;
+            }
+        }
+        return new int[]{-1, -1};
+    }
+}
+#75 LC 350. Intersection of Two Arrays II
+Найти общие элементы двух отсортированных массивов (с учётом дубликатов).
+Merge-подобная техника на отсортированных массивах. При совпадении — добавляем и двигаем оба указателя. Иначе — двигаем указатель на меньший элемент. O(n+m).
+class Solution {
+    public List<Integer> commonElements(int[] a, int[] b) {
+        List<Integer> result = new ArrayList<>();
+        int p1 = 0, p2 = 0;
+        while (p1 < a.length && p2 < b.length) {
+            if (a[p1] == b[p2]) {
+                result.add(a[p1]);
+                p1++;
+                p2++;
+            } else if (a[p1] < b[p2]) {
+                p1++;
+            } else {
+                p2++;
+            }
+        }
+        return result;
+    }
+}
+#76 LC 228. Свертка в диапазоны (Summary Ranges)
+Дан список неотрицательных целых чисел nums, повторов нет. Нужно преобразовать его в строку, сворачивая соседние по числовому ряду числа в диапазоны.
+Если числа идут подряд (разница 1), записать как "x-y". Иначе одно число ("x"). Диапазоны через запятую.
+После сортировки последовательные участки идут подряд. Проход с окном [l..r] и String.join — как LeetCode 228 Summary Ranges.
+class Solution {
+    public List<String> summaryRanges(int[] nums) {
+        Arrays.sort(nums);
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            int start = nums[i];
+            while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
+                i++;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(start);
+            if (start != nums[i]) {
+                sb.append("->").append(nums[i]);
+            }
+            list.add(sb.toString());
+        }
+        return list;
+    }
+}
+#77 Удаление смайликов
+Удалить из массива символов все вхождения смайликов :-) и :-(. После двоеточия, дефиса и первой скобки (')' или '(') нужно выкинуть и все подряд идущие такие же скобки того же типа (например ":-)))" целиком). Необходимо вернуть целое число w — новую логическую длину массива (сколько символов осталось). Если w = 0, подходящих символов нет.
+Что такое in-place
+Работать нужно в том же массиве arr, без выделения второго массива под ответ.
+Обнаруживаем паттерн :- после чего ) или (. Пропускаем смайлик и повторы скобки. Два указателя read/write сжимают массив в начало; возвращаем write. O(n).
+class Solution {
+    public int removeSmileys(char[] arr) {
+        int write = 0;
+        int read = 0;
+        int n = arr.length;
+        while (read < n) {
+            if (read + 2 < n
+                && arr[read] == ':'
+                && arr[read + 1] == '-'
+                && (arr[read + 2] == ')'
+                    || arr[read + 2] == '(')) {
+                char bracket = arr[read + 2];
+                read += 3;
+                while (read < n && arr[read] == bracket) {
+                    read++;
+                }
+            } else {
+                arr[write++] = arr[read++];
+            }
+        }
+        return write;
+    }
+}
+#78 LC 443. String Compression
+Run-length encode массива символов. Последовательные одинаковые символы заменить на символ + количество (если > 1).
+Группируем последовательные одинаковые символы. Записываем символ, затем цифры количества (если > 1). Для многозначных чисел записываем каждую цифру отдельно. O(n).
+class Solution {
+    public int encode(char[] arr) {
+        int w = 0;
+        int i = 0;
+        while (i < arr.length) {
+            char c = arr[i];
+            int j = i;
+            while (j < arr.length && arr[j] == c) {
+                j++;
+            }
+            int count = j - i;
+            arr[w++] = c;
+            if (count > 1) {
+                String countStr =
+                    String.valueOf(count);
+                for (char d : countStr.toCharArray()) {
+                    arr[w++] = d;
+                }
+            }
+            i = j;
+        }
+        return w;
+    }
+}
+#79 LC 680. Valid Palindrome II
+Можно ли удалить не более одного символа, чтобы строка стала палиндромом?
+Два указателя с краёв. При первом несовпадении проверяем оба варианта: пропустить левый или правый. Если хотя бы один даёт палиндром — true.
+Поэтому используем знак ||.
+В отдельном методе делаем обычную стандартную проверку на палиндром.
+class Solution {
+    public boolean validPalindrome(String s) {
+        int l = 0, r = s.length() - 1;
+        while (l < r) {
+            if (s.charAt(l) != s.charAt(r)) {
+                return isPalin(s, l + 1, r) || isPalin(s, l, r - 1);
+            }
+            l++;
+            r--;
+        }
+        return true;
+    }
+    private boolean isPalin(String s, int l, int r) {
+        while (l < r) {
+            if (s.charAt(l) != s.charAt(r)) return false;
+            l++;
+            r--;
+        }
+        return true;
+    }
+}
+#80 LC 977. Squares of a Sorted Array
+Дан отсортированный массив. Вернуть массив квадратов в отсортированном порядке.
+Наибольшие квадраты — на краях массива (отрицательные или положительные). Два указателя сравнивают абсолютные значения, заполняем результат справа налево. O(n).
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+        int l = 0, r = n - 1;
+        int w = n - 1;
+        while (l <= r) {
+            int leftSq = nums[l] * nums[l];
+            int rightSq = nums[r] * nums[r];
+            if (leftSq > rightSq) {
+                result[w--] = leftSq;
+                l++;
+            } else {
+                result[w--] = rightSq;
+                r--;
+            }
+        }
+        return result;
+    }
+}

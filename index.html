@@ -1618,9 +1618,10 @@ function getFiltered(){
     const q=searchQuery.toLowerCase().trim();
     const lcNumMatch=q.match(/^(?:lc\s*)?(\d{2,5})$/);
     if(lcNumMatch){
-      const num=parseInt(lcNumMatch[1]);
+      const num=parseInt(lcNumMatch[1],10);
+      const lcNumRe=new RegExp('(?:LC|LeetCode)\\s+'+num+'\\b','i');
       list=list.filter(p=>
-        (p.t&&p.t.includes('LC '+num+'.'))||
+        (p.t&&lcNumRe.test(p.t))||
         (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
       );
     }else{

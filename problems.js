@@ -1380,9 +1380,11 @@ code:`class Solution {
             }
         }
 
-        return minHeap.stream()
-            .mapToInt(Map.Entry::getKey)
-            .toArray();
+       int[] result = new int[k];
+       for (int i = k - 1; i >= 0; i--) {
+           result[i] = minHeap.poll().getKey();
+       }
+       return result;
     }
 }`,
 complexity:`Время: O(n log k), Память: O(n + k)`,

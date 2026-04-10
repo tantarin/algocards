@@ -1658,16 +1658,17 @@ code:`public int minMeetingRooms(int[][] intervals) {
     }
     Arrays.sort(starts);
     Arrays.sort(ends);
-    int rooms = 0;
-    int maxRooms = 0;
-    int p1 = 0, p2 = 0;
-    while (p1 < n) {
-        if (starts[p1] >= ends[p2]) {
-            p2++;
+
+    int rooms = 0, maxRooms = 0;
+    int start = 0, end = 0;
+    while (start < n) {
+        if (starts[start] >= ends[end]) {
+            rooms--;
+            end++;
         } else {
             rooms++;
         }
-        p1++;
+        start++;
         maxRooms = Math.max(maxRooms, rooms);
     }
     return maxRooms;

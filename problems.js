@@ -6375,29 +6375,30 @@ nums1 = [1, 2, 3], nums2 = [2, 4, 6]
 nums1 = [1, 2, 3, 3], nums2 = [1, 1, 2, 2]
 // Результат: [3]`,
 hint:`Два указателя p1 и p2. Если nums1[p1] < nums2[p2] — элемент только в nums1, добавить. Если равны или nums1[p1] > — сдвинуть нужный указатель. Дубли в nums1 пропускать.`,
-code:`class Solution {
-    public List<Integer> findDifference(List<Integer> nums1, List<Integer> nums2) {
-        List<Integer> result = new ArrayList<>();
-        int p1 = 0, p2 = 0;
-        while (p1 < nums1.size()) {
-            // nums2 кончился — всё оставшееся уникально
-            if (p2 >= nums2.size()) {
-                result.add(nums1.get(p1++));
-                continue;
-            }
-            if (nums1.get(p1) < nums2.get(p2)) {
-                // элемент есть только в nums1
-                result.add(nums1.get(p1++));
-            } else if (nums1.get(p1) > nums2.get(p2)) {
-                // догоняем p1 по nums2
-                p2++;
-            } else {
-                // равны — есть в обоих, пропускаем
-                p1++;
-            }
+code:`public List<Integer> difference(int[] nums1, int[] nums2) {
+    List<Integer> result = new ArrayList<>();
+    int i = 0, j = 0;
+
+    while (i < nums1.length) {
+        // пропускаем дубликаты в nums1
+        if (i > 0 && nums1[i] == nums1[i - 1]) {
+            i++;
+            continue;
         }
-        return result;
+
+        // догоняем j до nums1[i]
+        while (j < nums2.length && nums2[j] < nums1[i]) {
+            j++;
+        }
+
+        if (j == nums2.length || nums2[j] != nums1[i]) {
+            result.add(nums1[i]);
+        }
+
+        i++;
     }
+
+    return result;
 }`,
 complexity:`Время: O(n+m), Память: O(1) доп.`,
 complexityExpl:`Каждый указатель движется только вперёд — суммарно O(n+m) шагов. Результирующий список не считается за доп. память.`,

@@ -1764,25 +1764,23 @@ desc:`Число хранится как ==массив цифр в обратн
 Ввод: [5, 9] × 3 (число 95 × 3)
 Вывод: [5, 8, 2] (число 285)`,
 hint:`Поцифровое умножение с переносом (carry). Как умножение столбиком.`,
-code:`class Solution {
+code:`
+class Solution {
     public List<Integer> multiplyByDigit(List<Integer> num, int n) {
         List<Integer> result = new ArrayList<>();
         int carry = 0;
-
         for (int digit : num) {
             int product = digit * n + carry;
             result.add(product % 10);
             carry = product / 10;
         }
-
-        while (carry > 0) {
-            result.add(carry % 10);
-            carry /= 10;
+        if (carry > 0) {
+            result.add(carry);
         }
-
         return result;
     }
-}`,
+}
+`,
 complexity:`Время: O(m), Память: O(m)`,
 complexityExpl:`Один цикл по m цифрам с carry — O(m). Список result до m+1 цифр — O(m) памяти.`,
 expl:`Умножение столбиком: цифра × n + carry. Остаток от 10 — текущая цифра, целая часть — перенос. O(n) время.`},

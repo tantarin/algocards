@@ -546,26 +546,27 @@ class Solution {
         return sb.toString();
     }
 }
-#148 LC 2215. Find the Difference of Two Arrays
+#148 Разность отсортированных массивов
 Даны два отсортированных массива nums1 и nums2. Вернуть все уникальные элементы nums1, которых нет в nums2, в порядке неубывания.
-Два указателя по двум отсортированным массивам. Меньший элемент nums1 не встречается в nums2 — берём его. Равные — пропускаем (есть в обоих). Больший p2 — сдвигаем. O(n+m) время.
+БЕЗ ДУБЛИКАТОВ
+Для каждого первого вхождения значения в nums1 сдвигаем j в nums2 до первого элемента ≥ этого значения. Если такого нет или значение не совпало — число есть только в nums1, добавляем в ответ.
 import java.util.*;
 class Solution {
-    public List<Integer> findDifference(List<Integer> nums1, List<Integer> nums2) {
+    public List<Integer> difference(int[] nums1, int[] nums2) {
         List<Integer> result = new ArrayList<>();
-        int p1 = 0, p2 = 0;
-        while (p1 < nums1.size()) {
-            if (p2 >= nums2.size()) {
-                result.add(nums1.get(p1++));
+        int i = 0, j = 0;
+        while (i < nums1.length) {
+            if (i > 0 && nums1[i] == nums1[i - 1]) {
+                i++;
                 continue;
             }
-            if (nums1.get(p1) < nums2.get(p2)) {
-                result.add(nums1.get(p1++));
-            } else if (nums1.get(p1) > nums2.get(p2)) {
-                p2++;
-            } else {
-                p1++; // равны — пропустить дубль из nums1
+            while (j < nums2.length && nums2[j] < nums1[i]) {
+                j++;
             }
+            if (j == nums2.length || nums2[j] != nums1[i]) {
+                result.add(nums1[i]);
+            }
+            i++;
         }
         return result;
     }

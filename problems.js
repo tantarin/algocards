@@ -6374,36 +6374,38 @@ nums1 = [1, 2, 3], nums2 = [2, 4, 6]
 Пример 2:
 nums1 = [1, 2, 3, 3], nums2 = [1, 1, 2, 2]
 // Результат: [3]`,
-hint:`Два указателя p1 и p2. Если nums1[p1] < nums2[p2] — элемент только в nums1, добавить. Если равны или nums1[p1] > — сдвинуть нужный указатель. Дубли в nums1 пропускать.`,
-code:`public List<Integer> difference(int[] nums1, int[] nums2) {
-    List<Integer> result = new ArrayList<>();
-    int i = 0, j = 0;
+hint:`Дубликаты в nums1 пропускаем. Указатель j по nums2 только увеличиваем: догоняем nums2[j] ≥ nums1[i]; если j вышел за массив или nums2[j] ≠ nums1[i] — элемент только в nums1.`,
+code:`import java.util.*;
 
-    while (i < nums1.length) {
-        // пропускаем дубликаты в nums1
-        if (i > 0 && nums1[i] == nums1[i - 1]) {
+class Solution {
+    public List<Integer> difference(int[] nums1, int[] nums2) {
+        List<Integer> result = new ArrayList<>();
+        int i = 0, j = 0;
+
+        while (i < nums1.length) {
+            if (i > 0 && nums1[i] == nums1[i - 1]) {
+                i++;
+                continue;
+            }
+
+            while (j < nums2.length && nums2[j] < nums1[i]) {
+                j++;
+            }
+
+            if (j == nums2.length || nums2[j] != nums1[i]) {
+                result.add(nums1[i]);
+            }
+
             i++;
-            continue;
         }
 
-        // догоняем j до nums1[i]
-        while (j < nums2.length && nums2[j] < nums1[i]) {
-            j++;
-        }
-
-        if (j == nums2.length || nums2[j] != nums1[i]) {
-            result.add(nums1[i]);
-        }
-
-        i++;
+        return result;
     }
-
-    return result;
 }`,
 complexity:`Время: O(n+m), Память: O(1) доп.`,
-complexityExpl:`Каждый указатель движется только вперёд — суммарно O(n+m) шагов. Результирующий список не считается за доп. память.`,
-expl:`Два указателя по двум отсортированным массивам. Меньший элемент nums1 не встречается в nums2 — берём его. Равные — пропускаем (есть в обоих). Больший p2 — сдвигаем. O(n+m) время.`,
-lcSimilar:[{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
+complexityExpl:`Индекс i проходит nums1, j по nums2 только растёт — суммарно O(n+m). Результат не считаем за доп. память.`,
+expl:`Для каждого первого вхождения значения в nums1 сдвигаем j в nums2 до первого элемента ≥ этого значения. Если такого нет или значение не совпало — число есть только в nums1, добавляем в ответ.`,
+lcSimilar:[{"n":2215,"t":"Find the Difference of Two Arrays","h":"find-the-difference-of-two-arrays"},{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
 
 {id:"tp54",t:"К ближайших чисел (якорь idx)",p:"Two Pointers",d:"легко",
 desc:`Дан массив nums, отсортированный в ==неубывающем порядке==, индекс idx и число k. Нужно найти ==k ближайших к значению nums[idx]== чисел в массиве и вернуть в любом порядке. При равных расстояниях предпочтение отдаётся ==меньшим числам==.

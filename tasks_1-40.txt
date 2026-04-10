@@ -130,7 +130,7 @@ class Solution {
         return count == 0;
     }
 }
-#5 LC 33 · Search in Rotated Sorted Array
+#5 LC 33 — Search in Rotated Sorted Array
 Дан целочисленный массив nums, изначально отсортированный по возрастанию, содержащий уникальные значения. Массив мог быть повернут влево в некоторой неизвестной точке k.
 Найти заданное target значение и вернуть его индекс. Если не найдено — вернуть -1.
 O(log n) — пространство поиска уменьшается вдвое на каждой итерации. Одна из половин всегда отсортирована. Проверяем, попадает ли target в отсортированную часть.
@@ -831,10 +831,9 @@ class Solution {
         return route;
     }
 }
-#31 LC 347 · Top K Frequent Elements
-**LeetCode 347** — про **целые числа** в массиве nums (тип int), не про строки. Дан массив целых чисел nums и число k. Вернуть k наиболее часто встречающихся элементов. Гарантируется, что ответ уникален. Ответ можно вернуть в любом порядке.
+#31 LeetCode 347 Top K Frequent Elements
+Дан массив целых чисел nums и число k. Вернуть k наиболее часто встречающихся элементов. Гарантируется, что ответ уникален. Ответ можно вернуть в любом порядке.
 O(n log k) время, O(k) память для кучи. Min-heap хранит только k самых частых элементов. При переполнении удаляем наименее частый.
-import java.util.*;
 class Solution {
     public int[] topKFrequent(int[] nums, int k) {
         Map<Integer, Integer> frequencyMap = new HashMap<>();
@@ -854,8 +853,8 @@ class Solution {
             .toArray();
     }
 }
-#32 LC 692 · Top K Frequent Words
-**Другая задача** (не LC 347): дан массив **строк** words и число k. Найти k самых частых слов. При равной частоте — лексикографический порядок.
+#32 Top K Frequent Words
+Дан массив строк words и число k. Найти k самых частых слов. При равной частоте — лексикографический порядок.
 Min-heap с кастомным компаратором: частота по возрастанию, слово по убыванию (обратный лексикографический). При извлечении переворачиваем результат. O(n log k).
 class Solution {
     public List<String> topKFrequent(String[] words, int k) {
@@ -1025,26 +1024,42 @@ class Solution {
 class Solution {
     public int minMeetingRooms(int[][] intervals) {
         int n = intervals.length;
-        int[] starts = new int[n];
-        int[] ends = new int[n];
+        int[] starts = new int[n];//массив всех времен начала встреч
+        int[] ends = new int[n];//массив всех времен окончания встреч
         for (int i = 0; i < n; i++) {
             starts[i] = intervals[i][0];
             ends[i] = intervals[i][1];
         }
         Arrays.sort(starts);
         Arrays.sort(ends);
+        // текущее количество занятых комнат
         int rooms = 0;
+        // максимум одновременно занятых комнат (ответ)
         int maxRooms = 0;
-        int p1 = 0, p2 = 0;
-        while (p1 < n) {
-            if (starts[p1] >= ends[p2]) {
-                p2++;
-            } else {
+        // указатели по массивам starts и ends
+        int si = 0, ei = 0;
+        while (si < n) {
+            /**
+             * если следующая встреча начинается раньше,
+             * чем закончилась ближайшая текущая
+             */
+            if (starts[si] < ends[ei]) {
+                // нужна новая комната
                 rooms++;
+                // обновляем максимум
+                maxRooms = Math.max(maxRooms, rooms);
+                // переходим к следующему старту
+                si++;
+            } else {
+                /**
+                 * освобождаем комнату
+                 */
+                rooms--;
+                // переходим к следующему окончанию
+                ei++;
             }
-            p1++;
-            maxRooms = Math.max(maxRooms, rooms);
         }
+        // максимальное количество одновременно активных встреч
         return maxRooms;
     }
 }

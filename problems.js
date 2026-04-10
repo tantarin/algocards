@@ -1350,7 +1350,7 @@ complexityExpl:`Два прохода по билетам + цикл по цеп
 expl:`Начальный город — единственный, который не встречается как пункт назначения. Далее идём по цепочке mapping. O(n) время и память.`},
 
 // ===== HEAP / PQ =====
-{id:"hpq1",t:"LeetCode 347 Top K Frequent Elements",p:"Heap / PQ",d:"средне",
+{id:"hpq1",t:"LC 347 · Top K Frequent Elements",p:"Heap / PQ",d:"средне",
 desc:`Дан массив целых чисел nums и число k. Вернуть ==k наиболее часто встречающихся== элементов. Гарантируется, что ответ уникален. Ответ можно вернуть в любом порядке.
 
 Пример 1:
@@ -1372,7 +1372,9 @@ desc:`Дан массив целых чисел nums и число k. Верну
 - k ∈ [1, количество уникальных элементов]
 - Требуемая сложность лучше O(n log n)`,
 hint:`Считаем частоту через HashMap, затем min-heap размера k. Если размер > k — удаляем минимальный.`,
-code:`class Solution {
+code:`import java.util.*;
+
+class Solution {
     public int[] topKFrequent(int[] nums, int k) {
         Map<Integer, Integer> frequencyMap = new HashMap<>();
         for (int num : nums) {
@@ -1396,7 +1398,9 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n log k), Память: O(n + k)`,
 complexityExpl:`Подсчёт частот O(n), затем для каждого элемента push/pop в min-heap размера k — O(log k). Итого O(n log k). Карта O(n), куча O(k).`,
-expl:`O(n log k) время, O(k) память для кучи. Min-heap хранит только k самых частых элементов. При переполнении удаляем наименее частый.`},
+expl:`O(n log k) время, O(k) память для кучи. Min-heap хранит только k самых частых элементов. При переполнении удаляем наименее частый.`,
+lcSimilar:[{"n":347,"t":"Top K Frequent Elements","h":"top-k-frequent-elements"}],
+repoSimilar:["hpq2","hpq3"]},
 
 {id:"hpq2",t:"Top K Frequent Words",p:"Heap / PQ",d:"средне",
 desc:`Дан массив строк words и число k. Найти ==k самых частых слов==. При равной частоте — лексикографический порядок.

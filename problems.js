@@ -4868,17 +4868,8 @@ code:`class Solution {
     private boolean foundP = false;
     private boolean foundQ = false;
 
-    public TreeNode lowestCommonAncestor(
-            TreeNode root, TreeNode p, TreeNode q) {
-
-        // пытаемся найти LCA через DFS
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
         TreeNode lca = dfs(root, p, q);
-
-        /**
-         * важно:
-         * если хотя бы один узел отсутствует в дереве,
-         * LCA не существует → возвращаем null
-         */
         return (foundP && foundQ) ? lca : null;
     }
 

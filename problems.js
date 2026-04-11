@@ -6747,6 +6747,31 @@ code:`class Solution {
         return result;
     }
 }`,
+code2:`class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        Map<Character, Integer> lastIndex = new HashMap<>();
+        int left = 0;
+        int maxLength = 0;
+        
+        for (int right = 0; right < s.length(); right++) {
+            char c = s.charAt(right);
+            
+            // Если символ уже был в текущем окне
+            if (lastIndex.containsKey(c) && lastIndex.get(c) >= left) {
+                // Перемещаем левую границу за пределы предыдущего вхождения
+                left = lastIndex.get(c) + 1;
+            }
+            
+            // Обновляем последнюю позицию символа
+            lastIndex.put(c, right);
+            
+            // Обновляем максимальную длину
+            maxLength = Math.max(maxLength, right - left + 1);
+        }
+        
+        return maxLength;
+    }
+}`,
 complexity:`Время: O(n), Память: O(min(n, m))`,
 complexityExpl:`Каждый символ добавляется и удаляется из set не более одного раза — O(n). Set хранит символы текущего окна — O(min(n,m)), где m — размер алфавита.`,
 expl:``,

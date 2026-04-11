@@ -6749,7 +6749,7 @@ code:`class Solution {
 }`,
 complexity:`Время: O(n), Память: O(min(n, m))`,
 complexityExpl:`Каждый символ добавляется и удаляется из set не более одного раза — O(n). Set хранит символы текущего окна — O(min(n,m)), где m — размер алфавита.`,
-expl:`Переменное скользящее окно. Держим HashSet уникальных символов окна. Встретили повтор — сжимаем слева, пока дубликат не удалён. Классика двух указателей + множества.`,
+expl:``,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Longest Repeating Character Replacement","h":"longest-repeating-character-replacement"}],
 repoSimilar:["sw1","sw2","sw7","sw17"],
 diagram:{"type":"window","data":["a","b","c","a","b","c","b","b"],"steps":[{"wl":0,"wr":2,"desc":"[a,b,c] — все уникальны, len=3"},{"wl":0,"wr":3,"desc":"Добавляем 'a' — повтор! Сжимаем"},{"wl":1,"wr":3,"desc":"Удалили 'a', окно [b,c,a], len=3"},{"wl":1,"wr":4,"desc":"Добавляем 'b' — повтор! Сжимаем"},{"wl":2,"wr":4,"desc":"Окно [c,a,b], len=3"},{"wl":4,"wr":6,"desc":"Окно [a,b,c], len=3. Ответ: 3"}]}},

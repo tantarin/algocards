@@ -6773,6 +6773,22 @@ code:`class Solution {
         return cnt;
     }
 }`,
+code2:`public long countSubstrings(String s) {
+    int[] lastSeen = new int[128];
+    Arrays.fill(lastSeen, -1);
+    
+    long count = 0;
+    int left = 0;
+    
+    for (int right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        left = Math.max(left, lastSeen[c] + 1);
+        lastSeen[c] = right;
+        count += (right - left + 1);
+    }
+    
+    return count;
+}`,
 complexity:`Время: O(n), Память: O(min(n, |Σ|))`,
 complexityExpl:`Каждый индекс входит в окно и выходит из него не более одного раза — O(n) по времени. В множестве не больше уникальных символов алфавита — O(min(n, |Σ|)) памяти.`,
 expl:`Максимально расширяем окно вправо без повторов. Для фиксированного l любая подстрока s[l..k] при l ≤ k ≤ r уже уникальна по построению — ровно (r−l+1) штук. Сдвигаем l и повторяем.`,

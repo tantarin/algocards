@@ -7169,26 +7169,27 @@ T = "abcd", S = "aaa" => -1
 T = "abcd", S = "cbd" => 1
 T = "abcdda", S = "bcdd" => 1`,
 hint:`Скользящее окно длины |S| + массив/карта частот. Сравнивай частоты окна и S при сдвиге на 1.`,
-code:`
-  public int findPermutation(String t, String s) {
+code:` public int findPermutation(String t, String s) {
       if (s.length() > t.length()) return -1;
 
       int[] freq = new int[26];
       for (char c : s.toCharArray()) freq[c - 'a']++;
 
       int len = s.length();
-      int need = s.length();  // сколько символов ещё нужно закрыть
+      int need = s.length();
+      int left = 0;
 
-      for (int i = 0; i < t.length(); i++) {
+      for (int right = 0; right < t.length(); right++) {
           // правый символ входит в окно
-          if (freq[t.charAt(i) - 'a']-- > 0) need--;
+          if (freq[t.charAt(right) - 'a']-- > 0) need--;
 
-          // левый символ выходит из окна
-          if (i >= len) {
-              if (freq[t.charAt(i - len) - 'a']++ >= 0) need++;
+          // окно переросло len — левый выходит
+          if (right - left + 1 > len) {
+              if (freq[t.charAt(left) - 'a']++ >= 0) need++;
+              left++;
           }
 
-          if (need == 0) return i - len + 1;
+          if (need == 0) return left;
       }
 
       return -1;

@@ -1636,7 +1636,7 @@ function getFiltered(){
           String(p.p||'')+' '+
           (p.p2?String(p.p2)+' ':'')+
           lcTitles+' '+
-          (isYandexProblem(p)?'Яндекс ':'')
+          (isYandexProblem(p)?'Яндекс популярные ':'')
         ).toLowerCase();
         return haystack.includes(q);
       });
@@ -1710,7 +1710,7 @@ function renderFilters(){
     ?`<div class="filter-btn marked-filter${showMarkedOnly?' active':''}" onclick="setShowMarked(${!showMarkedOnly})">⭐ Отмеченные (${markedCount})</div>`
     :'';
   const yaCount=P.filter(isYandexProblem).length;
-  const yaBtn=`<div class="filter-btn${yaFilter?' active':''}" style="${yaFilter?'border-color:#fc3f1d;background:#fc3f1d22;color:#fc3f1d':'border-color:#fc3f1d44;color:#fc9d8d'}" onclick="toggleYaFilter()">🦊 Яндекс (${yaCount})</div>`;
+  const yaBtn=`<div class="filter-btn${yaFilter?' active':''}" style="${yaFilter?'border-color:#fc3f1d;background:#fc3f1d22;color:#fc3f1d':'border-color:#fc3f1d44;color:#fc9d8d'}" onclick="toggleYaFilter()">Популярные (${yaCount})</div>`;
   const diffBtns=[
     {v:'легко',   label:'Лёгкие',  color:'#22c55e'},
     {v:'средне',  label:'Средние', color:'#f59e0b'},

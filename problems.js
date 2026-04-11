@@ -5453,25 +5453,37 @@ code:`class Solution {
         return sLen + 1 == tLen;
     }
 }`,
-code2:`class Solution {
-    public boolean isOneEditDistance(String s, String t) {
-        int sLen = s.length(), tLen = t.length();
-        if (Math.abs(sLen - tLen) > 1) return false;
-        if (sLen > tLen) return isOneEditDistance(t, s);
-        for (int i = 0; i < sLen; i++) {
-            if (s.charAt(i) != t.charAt(i)) {
-                if (sLen == tLen) {
-                    for (int j = i + 1; j < sLen; j++)
-                        if (s.charAt(j) != t.charAt(j)) return false;
-                } else {
-                    for (int j = i; j < sLen; j++)
-                        if (s.charAt(j) != t.charAt(j + 1)) return false;
-                }
-                return true;
+code2:`public boolean isOneEditDistance(String s, String t) {
+    int sLen = s.length(), tLen = t.length();
+    
+    // 1. Быстрая проверка: разница длин не более 1
+    if (Math.abs(sLen - tLen) > 1) return false;
+    
+    // 2. Гарантируем, что s не длиннее t (для упрощения логики)
+    if (sLen > tLen) return isOneEditDistance(t, s);
+    
+    // 3. Ищем первое расхождение символов
+    for (int i = 0; i < sLen; i++) {
+        if (s.charAt(i) != t.charAt(i)) {
+            
+            // Случай 1: Одинаковая длина → операция ЗАМЕНЫ
+            if (sLen == tLen) {
+                // Проверяем, что все остальные символы совпадают
+                for (int j = i + 1; j < sLen; j++)
+                    if (s.charAt(j) != t.charAt(j)) return false;
+            } 
+            // Случай 2: Разная длина → операция ВСТАВКИ/УДАЛЕНИЯ
+            else {
+                // Пропускаем символ в длинной строке (t)
+                for (int j = i; j < sLen; j++)
+                    if (s.charAt(j) != t.charAt(j + 1)) return false;
             }
+            return true;
         }
-        return sLen + 1 == tLen;
     }
+    
+    // 4. Если все символы совпали, но строки разной длины
+    return sLen + 1 == tLen;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один линейный проход с ранним выходом — O(n). Несколько индексов — O(1) памяти.`,

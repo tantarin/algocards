@@ -7169,46 +7169,30 @@ T = "abcd", S = "aaa" => -1
 T = "abcd", S = "cbd" => 1
 T = "abcdda", S = "bcdd" => 1`,
 hint:`Скользящее окно длины |S| + массив/карта частот. Сравнивай частоты окна и S при сдвиге на 1.`,
-code:`public int findPermutationStart(String text, String pattern) {
-    int n = text.length();
-    int m = pattern.length();
-    if (m > n) return -1;
+code:`
+  public int findPermutation(String t, String s) {
+      if (s.length() > t.length()) return -1;
 
-    int[] need = new int[256];
-    int[] win  = new int[256];
+      int[] freq = new int[26];
+      for (char c : s.toCharArray()) freq[c - 'a']++;
 
-    for (int i = 0; i < m; i++) {
-        need[pattern.charAt(i)]++;
-        win[text.charAt(i)]++;
-    }
+      int len = s.length();
+      int need = s.length();  // сколько символов ещё нужно закрыть
 
-    // считаем сколько символов уже совпадают по частоте
-    int matched = 0;
-    for (int i = 0; i < 256; i++) {
-        if (need[i] == win[i]) matched++;
-    }
+      for (int i = 0; i < t.length(); i++) {
+          // правый символ входит в окно
+          if (freq[t.charAt(i) - 'a']-- > 0) need--;
 
-    if (matched == 256) return 0;
+          // левый символ выходит из окна
+          if (i >= len) {
+              if (freq[t.charAt(i - len) - 'a']++ >= 0) need++;
+          }
 
-    for (int r = m; r < n; r++) {
-        int in  = text.charAt(r);
-        int out = text.charAt(r - m);
+          if (need == 0) return i - len + 1;
+      }
 
-        // добавляем правый символ
-        win[in]++;
-        if (win[in] == need[in])      matched++;
-        else if (win[in] == need[in] + 1) matched--;
-
-        // убираем левый символ
-        win[out]--;
-        if (win[out] == need[out])        matched++;
-        else if (win[out] == need[out] - 1) matched--;
-
-        if (matched == 256) return r - m + 1;
-    }
-
-    return -1;
-}`,
+      return -1;
+  }`,
 complexity:`Время: O(n * A), Память: O(A), где A = 256`,
 complexityExpl:`Окно двигается O(n) раз, на каждом шаге сравниваем частоты размера A. При фиксированном алфавите это близко к O(n).`,
 expl:`Подстрока длины |S| может быть перестановкой S только при равенстве частот символов. Поддерживаем частоты в окне длины |S|, на каждом сдвиге добавляем правый символ и убираем левый. При равенстве массивов частот возвращаем старт окна.`,

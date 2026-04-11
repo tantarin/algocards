@@ -7181,11 +7181,15 @@ code:` public int findPermutation(String t, String s) {
 
       for (int right = 0; right < t.length(); right++) {
           // правый символ входит в окно
-          if (freq[t.charAt(right) - 'a']-- > 0) need--;
+          int inIdx = t.charAt(right) - 'a';
+          if (freq[inIdx] > 0) need--;
+          freq[inIdx]--;
 
           // окно переросло len — левый выходит
           if (right - left + 1 > len) {
-              if (freq[t.charAt(left) - 'a']++ >= 0) need++;
+              int outIdx = t.charAt(left) - 'a';
+              if (freq[outIdx] >= 0) need++;
+              freq[outIdx]++;
               left++;
           }
 

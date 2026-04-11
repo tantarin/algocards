@@ -7290,41 +7290,48 @@ code:`public String searchPangram(String text, String alphabet) {
 
     return bestLeft == -1 ? "" : text.substring(bestLeft, bestLeft + bestLen);
 }`,
-code2:` public String searchPangram(String text, String alphabet) {
-      int[] window = new int[128];
-      Arrays.fill(window, -1);               // -1 = не из алфавита
-
-      for (char c : alphabet.toCharArray()) window[c] = 0;  // 0 = из алфавита, пока не встречен
-
-      int required = alphabet.length();
-      int covered = 0;
-      int bestLeft = -1, bestLen = Integer.MAX_VALUE;
-      int left = 0;
-
-      for (int right = 0; right < text.length(); right++) {
-          char c = text.charAt(right);
-          if (window[c] >= 0) {              // >= 0 заменяет inAlphabet[c]
-              window[c]++;
-              if (window[c] == 1) covered++;
-          }
-
-          while (covered == required) {
-              int len = right - left + 1;
-              if (len < bestLen) {
-                  bestLen = len;
-                  bestLeft = left;
-              }
-              char leftChar = text.charAt(left);
-              if (window[leftChar] >= 0) {
-                  window[leftChar]--;
-                  if (window[leftChar] == 0) covered--;
-              }
-              left++;
-          }
-      }
-
-      return bestLeft == -1 ? "" : text.substring(bestLeft, bestLeft + bestLen);
-  }`,
+code2:`public String searchPangram(String text, String alphabet) {
+    int[] count = new int[128];
+    for (char c : alphabet.toCharArray()) {
+        count[c]++;
+    }
+    
+    int required = alphabet.length();
+    int left = 0;
+    int minLen = Integer.MAX_VALUE;
+    int bestLeft = -1;
+    
+    for (int right = 0; right < text.length(); right++) {
+        char c = text.charAt(right);
+        
+        // Уменьшаем счетчик для нужных символов
+        if (count[c] > 0) {
+            required--;
+        }
+        count[c]--;
+        
+        // Когда все символы найдены
+        while (required == 0) {
+            // Обновляем ответ
+            if (right - left + 1 < minLen) {
+                minLen = right - left + 1;
+                bestLeft = left;
+            }
+            
+            // Удаляем левый символ
+            char leftChar = text.charAt(left);
+            count[leftChar]++;
+            
+            if (count[leftChar] > 0) {
+                required++;
+            }
+            
+            left++;
+        }
+    }
+    
+    return bestLeft == -1 ? "" : text.substring(bestLeft, bestLeft + minLen);
+}`,
 complexity:`Время: O(n), Память: O(A), где A = размер алфавита (здесь 256)`,
 complexityExpl:`Каждый указатель (left/right) проходит строку не более одного раза. Доп. память — массивы частот/флагов фиксированного размера.`,
 expl:`Поддерживаем окно [left..right]. Когда окно покрывает все символы alphabet, сжимаем его слева до потери покрытия и обновляем лучший ответ. Первое найденное окно минимальной длины автоматически будет левейшим.`,

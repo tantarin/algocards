@@ -5181,6 +5181,7 @@ public class Solution {
 
         int mask = left | right | (1 << (node.value - 'A'));
 
+        //положить, если отсутствует, и вернуть предыдущее значение
         TNode prev = seen.putIfAbsent(mask, node);
         if (prev != null) {
             holder.answer = new Pair<>(prev, node);

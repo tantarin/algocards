@@ -7145,23 +7145,30 @@ desc:`Места в кинотеатре расположены в один ря
 Ввод: seats = [1,0,1,0]
 Вывод: 1`,
 hint:`Идём по блокам нулей. Для блока в начале/конце ответ равен длине блока. Для блока между единицами — (длина + 1) / 2.`,
-code:`public int maxDistToClosest(int[] seats) {
-    int n = seats.length;
-    int maxDist = 0;
-    int lastOccupied = -1;
-    for (int i = 0; i < n; i++) {
-        if (seats[i] == 1) {
-            if (lastOccupied == -1) {
-                maxDist = i;                        // левый край
-            } else {
-                maxDist = Math.max(maxDist, (i - lastOccupied) / 2); // середина
+code:`class Solution {
+    public int maxDistToClosest(int[] seats) {
+        int n = seats.length;
+        int maxDist = 0;
+        int lastOccupied = -1;
+        
+        for (int i = 0; i < n; i++) {
+            if (seats[i] == 1) {
+                if (lastOccupied == -1) {
+                    // Левый край: расстояние до первой занятой позиции
+                    maxDist = i;
+                } else {
+                    // Между двумя занятыми: расстояние до ближайшего = (i - lastOccupied) / 2
+                    maxDist = Math.max(maxDist, (i - lastOccupied) / 2);
+                }
+                lastOccupied = i;
             }
-            lastOccupied = i;
         }
+        
+        // Правый край: расстояние от последней занятой позиции до конца
+        maxDist = Math.max(maxDist, n - 1 - lastOccupied);
+        
+        return maxDist;
     }
-
-    maxDist = Math.max(maxDist, n - 1 - lastOccupied); // правый край
-    return maxDist;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при одном проходе по массиву.`,

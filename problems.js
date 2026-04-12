@@ -6944,35 +6944,29 @@ desc:`Дан массив spots, где spots[i] = 1 — ==занятое мес
 Вывод: 3
 Объяснение: лучшее место — индекс 0. Машин слева нет, справа ближайшая на индексе 3 (расстояние 3).`,
 hint:`Сгруппируй подряд идущие одинаковые значения. Для блока нулей у края массива ответ — длина блока; для блока между единицами — «половина» ширины блока: (длина + 2) / 2.`,
-code:`import java.util.*;
-
-public class Solution {
-    public int bestParkingSpot(List<Integer> spots) {
-        int l = 0;
-        int r = 0;
-        int result = 0;
-        while (l < spots.size()) {
-            while (r + 1 < spots.size() && spots.get(r) == spots.get(r + 1)) {
-                r += 1;
-            }
-
-            // обновляем ответ, только если в плавающем окне были нули
-            if (spots.get(r) == 0) {
-                if (l == 0 || r == spots.size() - 1) {
-                    // если 0 прижат к стенке слева или справа,
-                    // то свободных мест будет r - l + 1, т. к. посадим в самый край
-                    result = Math.max(result, r - l + 1);
+code:`class Solution {
+    public int maxDistToClosest(int[] spots) {
+        int n = spots.length;
+        int maxDist = 0;
+        int lastOccupied = -1;
+        
+        for (int i = 0; i < n; i++) {
+            if (spots[i] == 1) {
+                if (lastOccupied == -1) {
+                    // Левый край: расстояние от начала до первой занятой позиции
+                    maxDist = i;
                 } else {
-                    // окно располагается между 1-ами:
-                    // поэтому находим число мест по формуле (r - l + 2) // 2
-                    result = Math.max(result, (r - l + 2) / 2);
+                    // Между двумя занятыми: оптимально сесть посередине
+                    maxDist = Math.max(maxDist, (i - lastOccupied) / 2);
                 }
+                lastOccupied = i;
             }
-
-            l = r + 1;
-            r = r + 1;
         }
-        return result;
+        
+        // Правый край: расстояние от последней занятой позиции до конца
+        maxDist = Math.max(maxDist, n - 1 - lastOccupied);
+        
+        return maxDist;
     }
 }`,
 complexity:`Время: O(n), Память: O(1)`,

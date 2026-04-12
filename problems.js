@@ -2029,7 +2029,7 @@ code:`class Solution {
             currentSum += nums[i];
             
             if (prefixSums.contains(currentSum - k)) {
-                return i;  // ✅ работает! Значение не нужно
+                return i;  
             }
             
             prefixSums.add(currentSum);

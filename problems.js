@@ -1806,10 +1806,9 @@ code:`public String addHex(String a, String b) {
     StringBuilder result = new StringBuilder();
     
     while (i >= 0 || j >= 0 || carry > 0) {
-        int sum = carry;
-        if (i >= 0) sum += hexToInt(a.charAt(i--));
-        if (j >= 0) sum += hexToInt(b.charAt(j--));
-        
+        int sum = carry 
+        + (p1 >= 0 ? hexToInt(a.charAt(p1--)) : 0)
+        + (p2 >= 0 ? hexToInt(b.charAt(p2--)) : 0);
         result.append(intToHex(sum % 16));
         carry = sum / 16;
     }

@@ -828,7 +828,7 @@ complexityExpl:`Один цикл по ценам — O(n). Только totalPr
 expl:`Сумма всех маленьких ростов = максимальная прибыль`,
 lcSimilar:[{"t":"Best Time to Buy and Sell Stock II","h":"best-time-to-buy-and-sell-stock-ii"},{"t":"Best Time to Buy and Sell Stock","h":"best-time-to-buy-and-sell-stock"}]},
 
-{id:"gop2",t:"Partition Labels",p:"Greedy",d:"средне",
+{id:"gop2",t:"763 Partition Labels",p:"Greedy",d:"средне",
 desc:`==Разбить строку на максимальное количество частей== так, чтобы ==каждая буква встречалась не более чем в одной части==. Вернуть размеры частей.
 
 Пример:

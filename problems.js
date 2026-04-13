@@ -5739,6 +5739,50 @@ code:`class Solution {
         return true;
     }
 }`,
+code2:`class Solution {
+    public boolean isPalindrome(String s) {
+        int left = 0;
+        int right = s.length() - 1;
+        
+        while (left < right) {
+            // Пропускаем не-буквенно-цифровые символы слева
+            while (left < right && !isAlphaNumeric(s.charAt(left))) {
+                left++;
+            }
+            
+            // Пропускаем не-буквенно-цифровые символы справа
+            while (left < right && !isAlphaNumeric(s.charAt(right))) {
+                right--;
+            }
+            
+            // Сравниваем символы без учёта регистра
+            if (toLowerCase(s.charAt(left)) != toLowerCase(s.charAt(right))) {
+                return false;
+            }
+            
+            // Двигаем указатели к центру
+            left++;
+            right--;
+        }
+        
+        return true;
+    }
+    
+    // Проверяем, буква ли это или цифра
+    private boolean isAlphaNumeric(char c) {
+        return (c >= 'A' && c <= 'Z') ||
+               (c >= 'a' && c <= 'z') ||
+               (c >= '0' && c <= '9');
+    }
+    
+    // Приводим к нижнему регистру (только буквы, цифры не меняются)
+    private char toLowerCase(char c) {
+        if (c >= 'A' && c <= 'Z') {
+            return (char) (c + 32); // 'A' = 65, 'a' = 97, разница 32
+        }
+        return c; // уже нижний регистр или цифра
+    }
+}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход двумя указателями — O(n). Никаких дополнительных структур — O(1).`,
 expl:`Два указателя с концов, пропускаем не-алфавитные символы. Сравниваем без регистра. O(n) время, O(1) память.`,

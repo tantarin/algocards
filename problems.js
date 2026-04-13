@@ -666,41 +666,41 @@ desc:`Всего необходимо пройти numCourses курсов, об
 Ключевое наблюдение: если в графе зависимостей ==нет цикла==, то все курсы можно пройти.`,
 hint:`Алгоритм Кана: строим граф (prerequisite → course) и массив indegree. Кладём в очередь курсы с indegree = 0. Снимаем рёбра, уменьшаем indegree соседей. Если обработали все n курсов — цикла нет.`,
 code:`class Solution {
-    public boolean canFinish(int n,
-                             int[][] prerequisites) {
+    // Алгоритм Кана: можно ли выполнить все курсы (нет цикла в зависимостях)
+    public boolean canFinish(int n, int[][] prerequisites) {
         List<Integer>[] adj = new List[n];
         int[] indegree = new int[n];
-        List<Integer> ans = new ArrayList<>();
-
+        
         // 1. Строим граф
         for (int[] pair : prerequisites) {
             int course = pair[0];
-            int prereq  = pair[1];
-            if (adj[prereq] == null)
-                adj[prereq] = new ArrayList<>();
+            int prereq = pair[1];
+            if (adj[prereq] == null) adj[prereq] = new ArrayList<>();
             adj[prereq].add(course);
             indegree[course]++;
         }
-
-        // 2. Стартовые вершины (нет prerequisites)
+        
+        // 2. Находим стартовые вершины (нет prerequisite)
         Queue<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; i++) {
             if (indegree[i] == 0) queue.offer(i);
-
-        // 3. BFS (алгоритм Кана)
+        }
+        
+        // 3. Последовательно удаляем вершины с indegree = 0
+        int processed = 0;
         while (!queue.isEmpty()) {
             int cur = queue.poll();
-            ans.add(cur);
+            processed++;
             if (adj[cur] != null) {
                 for (int next : adj[cur]) {
-                    if (--indegree[next] == 0)
-                        queue.offer(next);
+                    indegree[next]--;
+                    if (indegree[next] == 0) queue.offer(next);
                 }
             }
         }
-
-        // 4. Если обработали все — цикла нет
-        return ans.size() == n;
+        
+        // 4. Если обработали все курсы — цикла нет
+        return processed == n;
     }
 }`,
 complexity:`Время: O(V + E), Память: O(V + E)`,

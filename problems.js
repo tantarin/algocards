@@ -623,8 +623,7 @@ code:`class Solution {
         while (!queue.isEmpty()) {
             String node = queue.poll();
             processed++;
-            for (String nb : graph.getOrDefault(
-                    node, new ArrayList<>())) {
+            for (String nb : graph.getOrDefault(node, new ArrayList<>())) {
                 indegree.merge(nb, -1, Integer::sum);
                 if (indegree.get(nb) == 0)
                     queue.add(nb);

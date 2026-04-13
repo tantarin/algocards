@@ -179,8 +179,7 @@ code:`class Solution {
             if (i > start && s.charAt(i) == s.charAt(i - 1))
                 continue;
             char c = s.charAt(i);
-            String next = s.substring(0, i)
-                        + s.substring(i + 1);
+            String next = s.substring(0, i) + s.substring(i + 1);
             if (c == '(' && openRem > 0)
                 backtrack(next, i, openRem - 1, closeRem);
             if (c == ')' && closeRem > 0)

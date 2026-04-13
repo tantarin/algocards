@@ -599,37 +599,48 @@ desc:`Дан список зависимостей вида [A зависит о
 Вывод: false`,
 hint:`Топологическая сортировка (алгоритм Кана): считаем in-degree, удаляем вершины с 0 входящих. Если не все обработаны — цикл.`,
 code:`class Solution {
+    // Алгоритм Кана: топологическая сортировка для обнаружения цикла
+    // O(V+E) по времени, O(V+E) по памяти
     public boolean hasCycle(List<List<String>> deps) {
+        // Граф: вершина -> список соседей (куда идут ребра)
         Map<String, List<String>> graph = new HashMap<>();
+        // Счетчик входящих ребер для каждой вершины
         Map<String, Integer> indegree = new HashMap<>();
 
+        // 1. Строим граф и считаем in-degree
         for (List<String> dep : deps) {
             String from = dep.get(0), to = dep.get(1);
             graph.putIfAbsent(from, new ArrayList<>());
             graph.putIfAbsent(to, new ArrayList<>());
             indegree.putIfAbsent(from, 0);
             indegree.putIfAbsent(to, 0);
-            graph.get(from).add(to);
-            indegree.merge(to, 1, Integer::sum);
+            
+            graph.get(from).add(to);      // ребро from -> to
+            indegree.merge(to, 1, Integer::sum); // увеличиваем in-degree для to
         }
 
+        // 2. Находим все вершины без входящих ребер (стартовые)
         Queue<String> queue = new LinkedList<>();
         for (var entry : indegree.entrySet()) {
             if (entry.getValue() == 0)
                 queue.add(entry.getKey());
         }
 
+        // 3. Последовательно удаляем вершины с in-degree = 0
         int processed = 0;
         while (!queue.isEmpty()) {
             String node = queue.poll();
             processed++;
+            
+            // Уменьшаем in-degree у всех соседей
             for (String nb : graph.getOrDefault(node, new ArrayList<>())) {
-                indegree.merge(nb, -1, Integer::sum);
+                indegree.merge(nb, -1, Integer::sum); // уменьшаем на 1
                 if (indegree.get(nb) == 0)
-                    queue.add(nb);
+                    queue.add(nb); // новый кандидат на удаление
             }
         }
 
+        // 4. Если обработали не все вершины -> есть цикл
         return processed != indegree.size();
     }
 }`,

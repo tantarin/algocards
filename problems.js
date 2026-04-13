@@ -5728,8 +5728,11 @@ code:`class Solution {
         while (left < right) {
             while (left < right && !Character.isLetterOrDigit(s.charAt(left))) left++;
             while (left < right && !Character.isLetterOrDigit(s.charAt(right))) right--;
-            if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right)))
+
+            if (Character.toLowerCase(s.charAt(left)) != Character.toLowerCase(s.charAt(right))) {
                 return false;
+            }
+
             left++;
             right--;
         }

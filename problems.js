@@ -4565,18 +4565,15 @@ desc:`Дан корень BST и вещественное число target (dou
 - Дерево является валидным BST`,
 hint:`Спускаемся по BST: если target < node.val — идём влево, иначе вправо. На каждом шаге обновляем ближайший.`,
 code:`class Solution {
-    public int closestValue(TreeNode root,
-                            double target) {
+    public int closestValue(TreeNode root, double target) {
         int closest = root.val;
 
         while (root != null) {
-            if (Math.abs(root.val - target)
-                < Math.abs(closest - target)) {
+            if (Math.abs(root.val - target) < Math.abs(closest - target)) {
                 closest = root.val;
             }
 
-            root = target < root.val
-                ? root.left : root.right;
+            root = target < root.val ? root.left : root.right;
         }
 
         return closest;

@@ -1081,10 +1081,8 @@ code:`class Solution {
             String key = x + "," + y;
             if (visited.contains(key)) {
                 while (true) {
-                    int[] last = coords.get(
-                        coords.size() - 1);
-                    String lastKey =
-                        last[0] + "," + last[1];
+                    int[] last = coords.get(coords.size() - 1);
+                    String lastKey = last[0] + "," + last[1];
                     if (lastKey.equals(key)) break;
                     visited.remove(lastKey);
                     coords.remove(coords.size() - 1);

@@ -109,8 +109,7 @@ code:`class Solution {
         return result;
     }
 
-    private void backtrack(String s, int start,
-                           List<String> parts) {
+    private void backtrack(String s, int start, List<String> parts) {
         if (parts.size() == 4) {
             if (start == s.length()) {
                 result.add(String.join(".", parts));
@@ -121,8 +120,7 @@ code:`class Solution {
         for (int len = 1; len <= 3; len++) {
             if (start + len > s.length()) break;
             String segment = s.substring(start, start + len);
-            if (segment.length() > 1
-                && segment.startsWith("0")) break;
+            if (segment.length() > 1 && segment.startsWith("0")) break;
             int val = Integer.parseInt(segment);
             if (val > 255) break;
 

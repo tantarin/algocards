@@ -4263,7 +4263,6 @@ code:`class Solution {
     public int minDifference(int[] a, int[] b) {
         int i = 0, j = 0;
         int minDiff = Integer.MAX_VALUE;
-
         while (i < a.length && j < b.length) {
             int diff = Math.abs(a[i] - b[j]);
             minDiff = Math.min(minDiff, diff);

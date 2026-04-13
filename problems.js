@@ -1053,7 +1053,7 @@ complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Arrays.sort — O(n log n), затем линейное распределение по группам. Три списка суммарно n элементов — O(n) памяти.`,
 expl:`Сортируем массив. Распределяем по группам: близкие к min, близкие к max, и промежуточные. Каждая половина отсортированного массива автоматически удовлетворяет условию разницы ≤ k.`},
 
-{id:"gop8",t:"Оптимизация маршрута",p:"Stack",d:"средне",
+{id:"gop8",t:"Оптимизация маршрута",p:"Greedy",d:"средне",
 desc:`Дан путь из команд U/D/L/R (вверх/вниз/лево/право). ==Удалить все петли== (когда возвращаемся в уже посещённую точку).
 
 Пример:
@@ -4388,8 +4388,8 @@ complexity:`Время: O(n log n), Память: O(1)`,
 complexityExpl:`Сортировка — O(n log n). Затем два указателя: right проходит массив, left только растёт — итого O(n). Итого O(n log n). Память O(1).`,
 expl:`Сортируем массив. Фиксируем указатель left = 0. Для каждого right двигаем left вправо, пока nums[right] - nums[left] >= k — left движется к первому невалидному индексу. Все элементы с индексами 0..left-1 имеют разность >= k с nums[right], поэтому count += left. Поскольку массив отсортирован и left не откатывается назад — два указателя работают корректно.`},
 
-// ===== GREEDY =====
-{id:"tp20",t:"Рост акций компании",p:"Greedy",d:"средне",
+// ===== GREEDY WITH MIN TRACKER =====
+{id:"tp20",t:"Рост акций компании",p:"Greedy with Min Tracker",d:"средне",
 desc:`Дан массив цен акций по дням. Найти ==максимальную прибыль от одной покупки и одной продажи== (купить раньше, продать позже).
 
 Пример:
@@ -5404,22 +5404,18 @@ code:`class Solution {
         Deque<Integer> deque = new ArrayDeque<>();
 
         for (int i = 0; i < n; i++) {
-            while (!deque.isEmpty()
-                && deque.peekFirst() < i - k + 1) {
+            while (!deque.isEmpty() && deque.peekFirst() < i - k + 1) {
                 deque.pollFirst();
             }
 
-            while (!deque.isEmpty()
-                && nums[deque.peekLast()]
-                    <= nums[i]) {
+            while (!deque.isEmpty() && nums[deque.peekLast()] <= nums[i]) {
                 deque.pollLast();
             }
 
             deque.addLast(i);
 
             if (i >= k - 1) {
-                result[i - k + 1] =
-                    nums[deque.peekFirst()];
+                result[i - k + 1] = nums[deque.peekFirst()];
             }
         }
 

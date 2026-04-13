@@ -4790,24 +4790,20 @@ desc:`Дан корень бинарного дерева и целое числ
 - -1000 ≤ targetSum ≤ 1000`,
 hint:`DFS с backtracking: добавляем узел в путь, при листе проверяем сумму, при возврате удаляем последний.`,
 code:`class Solution {
-    private List<List<Integer>> result =
-        new ArrayList<>();
+    private List<List<Integer>> result = new ArrayList<>();
 
-    public List<List<Integer>> pathSum(TreeNode root,
-                                       int targetSum) {
+    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
         dfs(root, targetSum, new ArrayList<>());
         return result;
     }
 
-    private void dfs(TreeNode node, int remaining,
-                     List<Integer> path) {
+    private void dfs(TreeNode node, int remaining, List<Integer> path) {
         if (node == null) return;
 
         path.add(node.val);
         remaining -= node.val;
 
-        if (node.left == null && node.right == null
-            && remaining == 0) {
+        if (node.left == null && node.right == null && remaining == 0) {
             result.add(new ArrayList<>(path));
         } else {
             dfs(node.left, remaining, path);

@@ -110,6 +110,7 @@ code:`class Solution {
     }
 
     private void backtrack(String s, int start, List<String> parts) {
+        // Набрали 4 части — проверяем, что использовали всю строку
         if (parts.size() == 4) {
             if (start == s.length()) {
                 result.add(String.join(".", parts));
@@ -117,16 +118,23 @@ code:`class Solution {
             return;
         }
 
+        // Пробуем длину октета 1, 2 или 3 символа
         for (int len = 1; len <= 3; len++) {
             if (start + len > s.length()) break;
+
             String segment = s.substring(start, start + len);
+            
+            // Запрещаем ведущие нули (например "01")
             if (segment.length() > 1 && segment.startsWith("0")) break;
+            
+            // Проверяем диапазон 0–255
             int val = Integer.parseInt(segment);
             if (val > 255) break;
 
+            // Рекурсивный перебор
             parts.add(segment);
             backtrack(s, start + len, parts);
-            parts.remove(parts.size() - 1);
+            parts.remove(parts.size() - 1); // откат
         }
     }
 }`,

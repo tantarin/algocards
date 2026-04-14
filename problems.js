@@ -3166,11 +3166,8 @@ code:`public class Solution {
         int resultArea = 0;
 
         while (l < r) {
-            int currArea =
-                Math.min(height[l], height[r])
-                * (r - l);
-            resultArea =
-                Math.max(resultArea, currArea);
+            int currArea = Math.min(height[l], height[r]) * (r - l);
+            resultArea = Math.max(resultArea, currArea);
 
             if (height[l] < height[r]) {
                 l++;

@@ -2628,28 +2628,37 @@ code:`class Solution {
         int[] result = new int[n - k + 1];
         int zeroCount = 0;
         long prod = 1;
-
+        
+        // Первое окно
         for (int i = 0; i < k; i++) {
-            if (arr[i] == 0) zeroCount++;
-            else prod *= arr[i];
+            if (arr[i] == 0) {
+                zeroCount++;
+            } else {
+                prod *= arr[i];
+            }
         }
-
+        
         result[0] = zeroCount > 0 ? 0 : (int) prod;
-
+        
+        // Сдвигаем окно - O(n)
         for (int i = k; i < n; i++) {
-            int outgoing = arr[i - k];
-            int incoming = arr[i];
-
-            if (outgoing == 0) zeroCount--;
-            else prod /= outgoing;
-
-            if (incoming == 0) zeroCount++;
-            else prod *= incoming;
-
-            result[i - k + 1] =
-                zeroCount > 0 ? 0 : (int) prod;
+            // Удаляем левый элемент
+            if (arr[i - k] == 0) {
+                zeroCount--;
+            } else {
+                prod /= arr[i - k];
+            }
+            
+            // Добавляем правый элемент
+            if (arr[i] == 0) {
+                zeroCount++;
+            } else {
+                prod *= arr[i];
+            }
+            
+            result[i - k + 1] = zeroCount > 0 ? 0 : (int) prod;
         }
-
+        
         return result;
     }
 }`,

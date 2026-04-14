@@ -2745,8 +2745,8 @@ expl:`O(n) время, O(n) память в худшем случае (все о
 lcSimilar:[{"t":"LC 20 · Valid Parentheses","h":"lc-20-valid-parentheses"}]},
 
 {id:"st2",t:"LeetCode 739 Daily Temperatures",p:"Stack",d:"средне",
-desc:`Дан массив температур. Для каждого дня найти, ==через сколько дней будет теплее==. 
-Если такого дня нет, ответ 0.
+desc:`Дан массив temperature, где temperature[i] — температура в i-й день. Нужно вернуть массив result, где result[i] — количество дней, через которое температура станет выше, чем в i-й день. Если потепления не будет, result[i] = 0.
+Дни с одинаковой температурой не считаются потеплением.
 
 Пример:
 Ввод: [5, 6, 9, 7, 5, -1, 8, 11, 2]
@@ -2763,7 +2763,6 @@ class Solution {
         // Храним индексы дней.
         // Температуры по этим индексам в стеке идут по убыванию.
         Deque<Integer> stack = new ArrayDeque<>();
-
         for (int i = 0; i < n; i++) {
             // Пока текущий день теплее дня на вершине стека,
             // мы нашли ответ для этого старого дня.
@@ -3920,51 +3919,6 @@ complexity:`Время: O(|результат|), Память: O(глубина 
 complexityExpl:`Каждый символ обрабатывается константное число раз — O(размер выхода). Стеки глубины вложенности — O(глубина) памяти.`,
 expl:`Стек строк хранит накопленные prefix-ы. При открывающей скобке — push текущего контекста и начинаем новую строку. При закрытии ] достаём prefix и повторяем текущую строку n раз. O(n × суммарная длина результата).`,
 lcSimilar:[{"t":"lc 394 “Decode String”","h":"lc-394-decode-string"}]},
-
-{id:"st7",t:"LC 341. Flatten Nested List Iterator",p:"Stack",d:"средне",
-desc:`Дан вложенный список nestedList. Каждый элемент — либо целое число, либо список, элементы которого тоже могут быть числами или списками.
-Реализовать итератор, который возвращает все целые числа в порядке слева направо.
-
-Пример 1:
-Ввод: nestedList = [[1,1],2,[1,1]]
-Вывод: [1,1,2,1,1]
-
-Пример 2:
-Ввод: nestedList = [1,[4,[6]]]
-Вывод: [1,4,6]`,
-hint:`Стек NestedInteger. В hasNext() раскрывать списки, пока на вершине не окажется число.`,
-code:`public class NestedIterator implements Iterator<Integer> {
-    private Deque<NestedInteger> stack = new ArrayDeque<>();
-
-    public NestedIterator(List<NestedInteger> nestedList) {
-        for (int i = nestedList.size() - 1; i >= 0; i--) {
-            stack.push(nestedList.get(i));
-        }
-    }
-
-    public Integer next() {
-        return stack.pop().getInteger();
-    }
-
-    public boolean hasNext() {
-        while (!stack.isEmpty() && !stack.peek().isInteger()) {
-            NestedInteger top = stack.pop();
-            List<NestedInteger> list = top.getList();
-            for (int i = list.size() - 1; i >= 0; i--) {
-                stack.push(list.get(i));
-            }
-        }
-        return !stack.isEmpty();
-    }
-}`,
-complexity:`Время: O(n) суммарно, Память: O(n)`,
-complexityExpl:`Каждый NestedInteger попадает в стек и извлекается из стека не более одного раза, поэтому суммарно по всем вызовам next/hasNext получаем O(n). Стек может хранить до O(n) элементов.`,
-expl:`Кладём стартовый список в стек в обратном порядке, чтобы сохранить левый-to-правый порядок при pop.
-Вся "тяжёлая" логика в hasNext(): пока на вершине список, раскрываем его и кладём элементы обратно в обратном порядке. Когда на вершине число, hasNext() возвращает true, а next() просто забирает его.
-Такой дизайн ленивый: не нужно флаттенить весь ввод заранее, если итератор используют частично.`,
-lcSimilar:[{"n":341,"t":"Flatten Nested List Iterator","h":"flatten-nested-list-iterator"}],
-repoSimilar:["st6","tp57"],
-p2:"Iterator / Lazy"},
 
 // ===== TWO POINTERS =====
 {id:"tp13",t:"LC 1229. Meeting Scheduler",p:"Two Pointers",d:"средне",
@@ -6808,9 +6762,9 @@ complexity:`Время: O(1) на вызов, Память: O(1)`,
 complexityExpl:`Каждый вызов next/hasNext делает константное число проверок и переходов по итераторам. Храним только два итератора и флаг turn — O(1) памяти.`,
 expl:`Идея round-robin для двух источников: берём из текущего итератора, если он не пуст, иначе из другого. После взятия переключаем turn только на реально доступный источник.
 Follow-up для k списков: вместо флага использовать Queue<Iterator<Integer>> — хранить только непустые итераторы, на next() брать из головы и, если итератор не исчерпан, возвращать его в хвост.`,
+p2:"Design / Iterator",
 lcSimilar:[{"n":281,"t":"Zigzag Iterator","h":"zigzag-iterator"}],
-repoSimilar:["tp51"],
-p2:"Design / Iterator"},
+repoSimilar:["tp51"]},
 
 // ===== INTERVALS SWEEP =====
 {id:"iss6",t:"LC 163 · Missing Ranges",p:"Intervals Sweep",d:"легко",
@@ -7824,6 +7778,7 @@ expl:`Пересечение двух текущих свободных отре
 lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}],
 repoSimilar:["ya1"]},
 
+// ===== QUEUE / DESIGN =====
 {id:"ya10",t:"LC 362. Design Hit Counter",p:"Queue / Design",d:"средне",
 desc:`Реализовать счётчик хитов за последние 5 минут (300 секунд).
 Методы:
@@ -7857,8 +7812,8 @@ complexity:`Время: O(1) hit, O(n) getHits, Память: O(n)`,
 complexityExpl:`В базовой реализации очередь хранит все хиты из окна. hit — одна вставка O(1). getHits может удалить много устаревших элементов, в худшем O(n).`,
 expl:`Храним метки времени хитов в очереди. На getHits вычищаем из головы всё, что старше окна 300 секунд, после чего размер очереди и есть ответ.
 Follow-up при очень большом количестве хитов в одну секунду: использовать 300 бакетов (times[300], hits[300]) по индексу timestamp % 300. При коллизии секунды перезаписываем бакет. Тогда hit — O(1), getHits — O(300)=O(1), память O(1).`,
+p2:"Locked / Premium",
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
-repoSimilar:["ya4"],
-p2:"Locked / Premium"},
+repoSimilar:["ya4"]}
 
 ];

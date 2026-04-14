@@ -2488,28 +2488,31 @@ desc:`Дан бинарный массив. Можно ==перевернуть 
 Ввод: [1, 1, 0, 1, 1, 1, 1, 0, 1]
 Вывод: 7 (переворачиваем ноль на позиции 2)`,
 hint:`Отслеживаем count единиц до нуля и после. Ответ = prev + 1 + count.`,
-code:`public static int longestOnes(int[] nums) {
-        int left = 0;
-        int zeroCount = 0;
-        int maxLen = 0;
-        
-        for (int right = 0; right < nums.length; right++) {
-            // Если встретили ноль, увеличиваем счетчик нулей
-            if (nums[right] == 0) {
-                zeroCount++;
-            }
-            
-            // Если нулей стало больше 1, сужаем окно слева
-            while (zeroCount > 1) {
-                if (nums[left] == 0) {
-                    zeroCount--;
-                }
-                left++;
-            }
-            
-            // Обновляем максимальную длину
-            maxLen = Math.max(maxLen, right - left + 1);
+code:`public int maxOnesWithFlip(int[] nums) {
+    int prev = 0;
+    int count = 0;
+    int maxCount = 0;
+    boolean hasZero = false;  // флаг: был ли ноль
+    
+    for (int num : nums) {
+        if (num == 1) {
+            count++;
+        } else {
+            hasZero = true;  // встретили ноль
+            maxCount = Math.max(maxCount, prev + 1 + count);
+            prev = count;
+            count = 0;
         }
+    }
+    
+    maxCount = Math.max(maxCount, prev + 1 + count);
+    
+    // Если не было ни одного нуля, вычитаем лишнюю единицу
+    if (!hasZero) {
+        maxCount--;
+    }
+    
+    return maxCount;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,
@@ -2612,7 +2615,8 @@ repoSimilar:["sw1","sw3","sw8"]},
 
 // ===== SLIDING WINDOW =====
 {id:"sw10",t:"Инвестор в стране дураков",p:"Sliding Window",d:"средне",
-desc:`==Скользящее окно== произведения k элементов. Корректно обрабатывать нули.
+desc:`В стране дураков вместо сложения используют умножение и богатый инвестор хочет этим воспользоваться, чтобы заработать и выкупить k подряд идущих домов.
+Дан массив price и число k. Найдите произведения всех подряд идущих участков длины k. Массив price — цены домов, если price[i] ≤ 0, это должник — он покроет долг и доплатит при необходимости.
 
 Пример:
 Ввод: [-2, 0, 1, 8, -9, 0, 1, 2, 3, 0], k = 3

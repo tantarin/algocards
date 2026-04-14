@@ -3233,6 +3233,29 @@ code:`class Solution {
 }
 
 `,
+code2:`class Solution {
+    public boolean isPalindrome(String s) {
+        int l = 0, r = s.length() - 1;
+        while (l < r) {
+            while (l < r && !isAlphanumeric(s.charAt(l))) l++;
+            while (l < r && !isAlphanumeric(s.charAt(r))) r--;
+            if (toLower(s.charAt(l)) != toLower(s.charAt(r))) return false;
+            l++;
+            r--;
+        }
+        return true;
+    }
+
+    private boolean isAlphanumeric(char c) {
+        return (c >= 'a' && c <= 'z')
+            || (c >= 'A' && c <= 'Z')
+            || (c >= '0' && c <= '9');
+    }
+
+    private char toLower(char c) {
+        return (c >= 'A' && c <= 'Z') ? (char)(c + 32) : c;
+    }
+}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Указатели l и r сходятся к центру — O(n). Только индексы — O(1) памяти.`,
 expl:`Два указателя к центру. Пропускаем пунктуацию/пробелы. Сравниваем в нижнем регистре. O(n) время, O(1) память.`},

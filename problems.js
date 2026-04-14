@@ -2763,6 +2763,7 @@ class Solution {
         // Храним индексы дней.
         // Температуры по этим индексам в стеке идут по убыванию.
         Deque<Integer> stack = new ArrayDeque<>();
+
         for (int i = 0; i < n; i++) {
             // Пока текущий день теплее дня на вершине стека,
             // мы нашли ответ для этого старого дня.
@@ -3919,6 +3920,51 @@ complexity:`Время: O(|результат|), Память: O(глубина 
 complexityExpl:`Каждый символ обрабатывается константное число раз — O(размер выхода). Стеки глубины вложенности — O(глубина) памяти.`,
 expl:`Стек строк хранит накопленные prefix-ы. При открывающей скобке — push текущего контекста и начинаем новую строку. При закрытии ] достаём prefix и повторяем текущую строку n раз. O(n × суммарная длина результата).`,
 lcSimilar:[{"t":"lc 394 “Decode String”","h":"lc-394-decode-string"}]},
+
+{id:"st7",t:"LC 341. Flatten Nested List Iterator",p:"Stack",d:"средне",
+desc:`Дан вложенный список nestedList. Каждый элемент — либо целое число, либо список, элементы которого тоже могут быть числами или списками.
+Реализовать итератор, который возвращает все целые числа в порядке слева направо.
+
+Пример 1:
+Ввод: nestedList = [[1,1],2,[1,1]]
+Вывод: [1,1,2,1,1]
+
+Пример 2:
+Ввод: nestedList = [1,[4,[6]]]
+Вывод: [1,4,6]`,
+hint:`Стек NestedInteger. В hasNext() раскрывать списки, пока на вершине не окажется число.`,
+code:`public class NestedIterator implements Iterator<Integer> {
+    private Deque<NestedInteger> stack = new ArrayDeque<>();
+
+    public NestedIterator(List<NestedInteger> nestedList) {
+        for (int i = nestedList.size() - 1; i >= 0; i--) {
+            stack.push(nestedList.get(i));
+        }
+    }
+
+    public Integer next() {
+        return stack.pop().getInteger();
+    }
+
+    public boolean hasNext() {
+        while (!stack.isEmpty() && !stack.peek().isInteger()) {
+            NestedInteger top = stack.pop();
+            List<NestedInteger> list = top.getList();
+            for (int i = list.size() - 1; i >= 0; i--) {
+                stack.push(list.get(i));
+            }
+        }
+        return !stack.isEmpty();
+    }
+}`,
+complexity:`Время: O(n) суммарно, Память: O(n)`,
+complexityExpl:`Каждый NestedInteger попадает в стек и извлекается из стека не более одного раза, поэтому суммарно по всем вызовам next/hasNext получаем O(n). Стек может хранить до O(n) элементов.`,
+expl:`Кладём стартовый список в стек в обратном порядке, чтобы сохранить левый-to-правый порядок при pop.
+Вся "тяжёлая" логика в hasNext(): пока на вершине список, раскрываем его и кладём элементы обратно в обратном порядке. Когда на вершине число, hasNext() возвращает true, а next() просто забирает его.
+Такой дизайн ленивый: не нужно флаттенить весь ввод заранее, если итератор используют частично.`,
+p2:"Iterator / Lazy",
+lcSimilar:[{"n":341,"t":"Flatten Nested List Iterator","h":"flatten-nested-list-iterator"}],
+repoSimilar:["st6","tp57"]},
 
 // ===== TWO POINTERS =====
 {id:"tp13",t:"LC 1229. Meeting Scheduler",p:"Two Pointers",d:"средне",

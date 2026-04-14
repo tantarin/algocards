@@ -347,8 +347,7 @@ lcSimilar:[{"t":"LeetCode 704. Binary Search","h":"leetcode-704-binary-search"}]
 repoSimilar:["bs2"]},
 
 {id:"bs4",t:"Validate BST",p:"Binary Search",d:"средне",
-desc:`Дан корень ==бинарного дерева==. Проверить, является ли оно ==валидным деревом поиска (BST)==.
-
+desc:`Дан корень ==бинарного дерева==. Проверить, является ли оно ==валидным (правильным) деревом поиска (BST)==.
 Свойства BST:
 - Все значения в левом поддереве строго меньше значения узла
 - Все значения в правом поддереве строго больше значения узла
@@ -379,16 +378,14 @@ code:`class Solution {
         return isValid(root, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
-    private boolean isValid(TreeNode node,
-                            long low, long high) {
+    private boolean isValid(TreeNode node, long low, long high) {
         if (node == null) return true;
 
         if (node.val <= low || node.val >= high) {
             return false;
         }
 
-        return isValid(node.left, low, node.val)
-            && isValid(node.right, node.val, high);
+        return isValid(node.left, low, node.val) && isValid(node.right, node.val, high);
     }
 }`,
 complexity:`Время: O(n), Память: O(h)`,

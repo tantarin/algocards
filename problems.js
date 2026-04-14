@@ -2481,38 +2481,35 @@ expl:`Задача сводится к: найти максимальное ок
 Ключевой момент: длина подмассива единиц = right − left, а не right − left + 1. Потому что один элемент нужно обязательно удалить — это или ноль внутри окна, или любая единица если нулей нет. В обоих случаях убираем один символ из окна длины (right − left + 1), получаем right − left.`,
 lcSimilar:[{"n":1493,"t":"Longest Subarray of 1's After Deleting One Element","h":"longest-subarray-of-1-s-after-deleting-one-element"}]},
 
-{id:"sw7",t:"Подставной отчет",p:"One Pass with State",d:"средне",tags:["Яндекс"],
+{id:"sw7",t:"Подставной отчет",p:"One Pass with State",d:"средне",
 desc:`Дан бинарный массив. Можно ==перевернуть ОДИН ноль в единицу==. Найти ==максимальную длину подмассива== из единиц.
 
 Пример:
 Ввод: [1, 1, 0, 1, 1, 1, 1, 0, 1]
 Вывод: 7 (переворачиваем ноль на позиции 2)`,
 hint:`Отслеживаем count единиц до нуля и после. Ответ = prev + 1 + count.`,
-code:`public int maxOnesWithFlip(int[] nums) {
-    int prev = 0;
-    int count = 0;
-    int maxCount = 0;
-    boolean hasZero = false;  // флаг: был ли ноль
-    
-    for (int num : nums) {
-        if (num == 1) {
-            count++;
-        } else {
-            hasZero = true;  // встретили ноль
-            maxCount = Math.max(maxCount, prev + 1 + count);
-            prev = count;
-            count = 0;
+code:`public static int longestOnes(int[] nums) {
+        int left = 0;
+        int zeroCount = 0;
+        int maxLen = 0;
+        
+        for (int right = 0; right < nums.length; right++) {
+            // Если встретили ноль, увеличиваем счетчик нулей
+            if (nums[right] == 0) {
+                zeroCount++;
+            }
+            
+            // Если нулей стало больше 1, сужаем окно слева
+            while (zeroCount > 1) {
+                if (nums[left] == 0) {
+                    zeroCount--;
+                }
+                left++;
+            }
+            
+            // Обновляем максимальную длину
+            maxLen = Math.max(maxLen, right - left + 1);
         }
-    }
-    
-    maxCount = Math.max(maxCount, prev + 1 + count);
-    
-    // Если не было ни одного нуля, вычитаем лишнюю единицу
-    if (!hasZero) {
-        maxCount--;
-    }
-    
-    return maxCount;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,

@@ -1585,16 +1585,13 @@ code:`class Solution {
     }
 
     public List<int[]> mergeSegments(int[][] segments) {
-        Arrays.sort(segments,
-            Comparator.comparingInt(a -> a[0]));
+        Arrays.sort(segments, Comparator.comparingInt(a -> a[0]));
 
         List<int[]> result = new ArrayList<>();
         int[] current = segments[0];
-
         for (int i = 1; i < segments.length; i++) {
             if (isOverlapping(current, segments[i])) {
-                current = mergeTwoSegments(
-                    current, segments[i]);
+                current = mergeTwoSegments(current, segments[i]);
             } else {
                 result.add(current);
                 current = segments[i];

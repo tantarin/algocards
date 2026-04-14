@@ -2779,6 +2779,32 @@ class Solution {
         return ans;
     }
 }`,
+code2:`import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+class Solution {
+    public List<Integer> predictWarming(List<Integer> temperatures) {
+        List<Integer> result = new ArrayList<>();
+        // инициализируем результат нулями
+        for (int i = 0; i < temperatures.size(); i++) {
+            result.add(0);
+        }
+        // в стеке всегда храним номер дня
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < temperatures.size(); i++) {
+            int temperature = temperatures.get(i);
+            // пока текущая температура больше, чем температура в стеке,
+            // вынимаем и удаляем из стека элементы и вычисляем для них ответ
+            while (!stack.isEmpty() && temperatures.get(stack.peek()) < temperature) {
+                int idx = stack.pop();
+                result.set(idx, i - idx);
+            }
+            stack.push(i);
+        }
+        return result;
+    }
+}`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Каждый индекс кладётся и извлекается из стека не более одного раза — O(n). Стек до n элементов — O(n) памяти.`,
 expl:`Монотонный убывающий стек хранит индексы. Каждый индекс push/pop ровно один раз → O(n). При нахождении более тёплого дня записываем разницу.`},

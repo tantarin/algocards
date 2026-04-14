@@ -1516,48 +1516,30 @@ desc:`Найти все отрезки, которые ==пересекаютс�
 Ввод: [[6,8],[1,5],[4,7]]
 Вывод: [[1,5],[4,7],[6,8]] (все три пересекаются)`,
 hint:`Сортируем по началу. Отслеживаем bestEnd — максимальный конец среди предыдущих. Если текущий start ≤ bestEnd — пересечение.`,
-code:`class Solution {
-    public List<int[]> findOverlapping(int[][] segments) {
-        int n = segments.length;
-        
-        // Сортируем индексы по началу отрезков
-        Integer[] sortedIndices = new Integer[n];
-        for (int i = 0; i < n; i++) sortedIndices[i] = i;
-        Arrays.sort(sortedIndices, Comparator.comparingInt(i -> segments[i][0]));
-        
-        // Отмечаем отрезки, которые пересекаются с другими
-        boolean[] intersectsWithAny = new boolean[n];
-        
-        // Максимальная правая граница среди просмотренных отрезков
-        int maxEnd = segments[sortedIndices[0]][1];
-        int indexOfMaxEnd = 0;  // позиция отрезка с maxEnd в sortedIndices
-        
-        for (int k = 1; k < n; k++) {
-            int currentIdx = sortedIndices[k];
-            
-            // Проверяем пересечение
-            if (segments[currentIdx][0] <= maxEnd) {
-                intersectsWithAny[currentIdx] = true;
-                intersectsWithAny[sortedIndices[indexOfMaxEnd]] = true;
-                if (k > 1) intersectsWithAny[sortedIndices[k - 1]] = true;
+code:`import java.util.*;
+
+public class Solution {
+    private static boolean isOverlapping(List<Integer> a, List<Integer> b) {
+        // Проверяет, пересекаются ли два отрезка
+        return Math.max(a.get(0), b.get(0)) <= Math.min(a.get(1), b.get(1));
+    }
+
+    public static List<List<Integer>> findOverlappings(List<List<Integer>> segments) {
+        segments.sort(Comparator.comparingInt((List<Integer> x) -> x.get(0)).thenComparingInt(x -> x.get(1)));
+        Set<List<Integer>> result = new HashSet<>();
+        int maxEndIndex = 0;
+
+        for (int i = 1; i < segments.size(); i++) {
+            if (isOverlapping(segments.get(i), segments.get(maxEndIndex))) {
+                result.add(segments.get(i));
+                result.add(segments.get(maxEndIndex));
             }
-            
-            // Обновляем максимальную правую границу
-            if (segments[currentIdx][1] > maxEnd) {
-                maxEnd = segments[currentIdx][1];
-                indexOfMaxEnd = k;
+            if (segments.get(i).get(1) > segments.get(maxEndIndex).get(1)) {
+                maxEndIndex = i;
             }
         }
-        
-        // Формируем результат
-        List<int[]> result = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            if (intersectsWithAny[i]) {
-                result.add(segments[i]);
-            }
-        }
-        
-        return result;
+
+        return new ArrayList<>(result);
     }
 }`,
 complexity:`Время: O(n log n), Память: O(n)`,

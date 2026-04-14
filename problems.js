@@ -197,8 +197,8 @@ code:`class Solution {
         return count == 0;
     }
 }`,
-complexity:`Время: O(2^n), Память: O(n)`,
-complexityExpl:`Backtrack перебирает варианты удаления скобок экспоненциально, плюс isValid — линейный проход. Рекурсия и копии строк — O(n) памяти на уровень.`,
+complexity:`Время: O(2^n · n), Память: O(n)`,
+complexityExpl:`В худшем случае backtrack перебирает O(2^n) подпоследовательностей. Для каждой из них при openRem==0 && closeRem==0 вызывается isValid — линейный проход O(n). Итого O(2^n · n). Рекурсия глубины n, строки длиной n — O(n) памяти на уровень стека.`,
 expl:`Считаем лишние открывающие и закрывающие скобки. Backtrack: пробуем удалить каждую, пропуская дубликаты (если s[i]==s[i-1]). Когда обе счётчика == 0, проверяем валидность строки.`},
 
 // ===== BINARY SEARCH =====
@@ -5342,6 +5342,39 @@ complexity:`Время: O(n + m), Память: O(min(n, m))`,
 complexityExpl:`Частоты первого массива + проход по второму — O(n+m). Карта — O(min(n,m)) памяти.`,
 expl:`HashMap хранит частоты nums1. Для каждого элемента nums2: если freq > 0 — добавляем в результат и уменьшаем freq. O(n+m) время, O(min(n,m)) память.`},
 
+{id:"hf10",t:"LC 387. Первый уникальный символ в строке",p:"HashMap",d:"легко",
+desc:`Дана строка s. Найти ==индекс первого неповторяющегося символа==. Если такого символа нет — вернуть -1.
+
+Пример:
+Ввод: s = "leetcode"
+Вывод: 0
+
+Ввод: s = "loveleetcode"
+Вывод: 2
+
+Ввод: s = "aabb"
+Вывод: -1`,
+hint:`Сначала считаем частоты символов, затем вторым проходом ищем первый индекс с частотой 1.`,
+code:`class Solution {
+    public int firstUniqChar(String s) {
+        int[] freq = new int[26];
+        for (char c : s.toCharArray()) {
+            freq[c - 'a']++;
+        }
+
+        for (int i = 0; i < s.length(); i++) {
+            if (freq[s.charAt(i) - 'a'] == 1) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}`,
+complexity:`Время: O(n), Память: O(1)`,
+complexityExpl:`Два линейных прохода по строке — O(n). Массив частот на 26 букв латиницы — O(1).`,
+expl:`Сначала накапливаем частоты каждого символа. Затем идём по строке слева направо и возвращаем первый индекс, где частота символа равна 1. Если такого индекса нет — возвращаем -1.`,
+lcSimilar:[{"n":387,"t":"First Unique Character in a String","h":"first-unique-character-in-a-string"}]},
+
 // ===== SLIDING WINDOW =====
 {id:"sw12",t:"Minimum Size Subarray Sum",p:"Sliding Window",d:"средне",
 desc:`Дан массив положительных чисел nums и число target. Найти минимальную длину непрерывного подмассива с суммой >= target. Если такого нет — вернуть 0.
@@ -6505,6 +6538,51 @@ expl:`Массив отсортирован, опорное значение ref
 lcSimilar:[{"t":"Find K Closest Elements","h":"find-k-closest-elements"}],
 repoSimilar:["tp16","tp15"]},
 
+{id:"tp55",t:"LC 234. Палиндром в связном списке",p:"Two Pointers",d:"легко",
+desc:`Дан head односвязного списка. Вернуть true, если список является ==палиндромом==, иначе false.
+
+Пример:
+Ввод: head = [1,2,2,1]
+Вывод: true
+
+Ввод: head = [1,2]
+Вывод: false`,
+hint:`slow/fast для середины, развернуть вторую половину, затем посимвольно сравнить значения узлов.`,
+code:`class Solution {
+    public boolean isPalindrome(ListNode head) {
+        // 1. Находим середину (slow/fast)
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        // 2. Разворачиваем вторую половину
+        ListNode prev = null, curr = slow;
+        while (curr != null) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        // 3. Сравниваем две половины
+        ListNode left = head, right = prev;
+        while (right != null) {
+            if (left.val != right.val) return false;
+            left = left.next;
+            right = right.next;
+        }
+
+        return true;
+    }
+}`,
+complexity:`Время: O(n), Память: O(1)`,
+complexityExpl:`Проходим список для поиска середины, затем для разворота второй половины и сравнения — суммарно O(n). Дополнительные указатели занимают O(1).`,
+expl:`Ищем середину двумя указателями. Разворачиваем вторую половину списка in-place. После этого сравниваем первую половину с развёрнутой второй узел к узлу. Если все значения совпали — это палиндром.`,
+lcSimilar:[{"n":234,"t":"Palindrome Linked List","h":"palindrome-linked-list"}],
+repoSimilar:["tp44","tp2","tp11"]},
+
 // ===== INTERVALS SWEEP =====
 {id:"iss6",t:"LC 163 · Missing Ranges",p:"Intervals Sweep",d:"легко",
 desc:`Дан отсортированный массив уникальных чисел и границы [lower, upper]. Найти все ==пропущенные диапазоны==.
@@ -6930,6 +7008,44 @@ code:`class Solution {
 complexity:`Время: O(m·n), Память: O(m+n)`,
 complexityExpl:`Вложенные циклы по парам цифр — O(m·n). Массив result[m+n] — O(m+n) памяти.`,
 expl:`Умножение столбиком: произведение цифр num1[i] и num2[j] попадает в позиции [i+j] и [i+j+1]. Обработка переноса встроена. Ведущие нули удаляются. O(m×n) время.`},
+
+{id:"ms7",t:"LC 415. Сложение строк",p:"Math / Simulation",d:"легко",
+desc:`Даны два неотрицательных целых числа num1 и num2 в виде строк. Вернуть их ==сумму в виде строки==.
+Нельзя использовать BigInteger и нельзя напрямую конвертировать строки в числа.
+
+Пример:
+Ввод: num1 = "11", num2 = "123"
+Вывод: "134"
+
+Ввод: num1 = "456", num2 = "77"
+Вывод: "533"
+
+Ввод: num1 = "0", num2 = "0"
+Вывод: "0"`,
+hint:`Идём справа налево, складываем цифры и перенос carry. Результат собираем в StringBuilder и в конце разворачиваем.`,
+code:`class Solution {
+    public String addStrings(String num1, String num2) {
+        StringBuilder sb = new StringBuilder();
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+        int carry = 0;
+
+        while (i >= 0 || j >= 0 || carry > 0) {
+            int a = i >= 0 ? num1.charAt(i--) - '0' : 0;
+            int b = j >= 0 ? num2.charAt(j--) - '0' : 0;
+            int sum = a + b + carry;
+            sb.append(sum % 10);
+            carry = sum / 10;
+        }
+
+        return sb.reverse().toString();
+    }
+}`,
+complexity:`Время: O(max(n, m)), Память: O(max(n, m))`,
+complexityExpl:`Один проход по цифрам справа налево с переносом — O(max(n,m)). StringBuilder хранит итоговую строку длины до max(n,m)+1 — O(max(n,m)).`,
+expl:`Складываем числа как в столбик: берём текущие цифры справа, прибавляем carry, пишем младший разряд в результат и обновляем carry. Так как цифры добавляются с конца, в финале разворачиваем StringBuilder.`,
+lcSimilar:[{"n":415,"t":"Add Strings","h":"add-strings"}],
+repoSimilar:["ms6"]},
 
 // ===== TWO POINTERS =====
 {id:"ya1",t:"Неточный поиск",p:"Two Pointers",d:"легко",

@@ -4738,8 +4738,14 @@ hint:`Используем BST-отсечения: если val < low — всё
 code:`class Solution {
     public int rangeSumBST(TreeNode root, int low, int high) {
         if (root == null) return 0;
+
+        //Сам узел не попадает в диапазон (он слишком маленький)
+        //Всё левое поддерево тоже меньше root.val, значит оно тоже меньше low → его можно полностью пропустить
+        //Правое поддерево может содержать узлы в диапазоне, потому что там значения больше
         if (root.val < low) return rangeSumBST(root.right, low, high);
+
         if (root.val > high) return rangeSumBST(root.left, low, high);
+
         return root.val
             + rangeSumBST(root.left, low, high)
             + rangeSumBST(root.right, low, high);

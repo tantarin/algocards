@@ -3662,7 +3662,7 @@ code:`public class Solution {
                     currentValues[gi] = newVal;
                     currentSum += (long) newVal - oldVal;
                 }
-
+                //Если у этого графика есть следующая точка, добавляем ее
                 if (pi + 1 < g.size()) {
                     heap.offer(new int[]{g.get(pi + 1).get(0), gi, pi + 1});
                 }

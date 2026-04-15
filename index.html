@@ -1696,6 +1696,20 @@ function applyProblemIdFromUrlParams(){
 
 function applySearch(){
   searchQuery=document.getElementById('search').value.trim();
+  // #96 → перейти к карточке с порядковым номером 96, стрелки двигают по всему списку
+  const ordinalMatch=searchQuery.match(/^#(\d+)$/);
+  if(ordinalMatch){
+    const num=parseInt(ordinalMatch[1],10);
+    const targetIdx=num-1; // 0-based
+    fcList=[...P];
+    fcIdx=Math.max(0,Math.min(targetIdx,fcList.length-1));
+    fcFlipped=false;
+    searchQuery='';
+    const se=document.getElementById('search');
+    if(se)se.value='';
+    renderCard();
+    return;
+  }
   // С поиском — полный список совпадений; без поиска — снова полный пул по фильтрам
   if(searchQuery)fcList=getFiltered();
   else rebuildDailyList();

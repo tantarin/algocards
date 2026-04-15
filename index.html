@@ -565,7 +565,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 </div>
 <div class="subtitle" id="info"></div>
 <button id="simLaunchBtn" class="sim-launch-btn" onclick="openInterviewSimulation()">🎯 Интервью-режим</button>
-<input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()">
+<input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()" onkeydown="if(event.key==='Enter')applySearchEnter()">
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>
 <button class="edit-toggle" id="editToggle" onclick="toggleEdit()" title="Редактирование">✏️</button>
@@ -1694,10 +1694,10 @@ function applyProblemIdFromUrlParams(){
   fcFlipped=false;
 }
 
-function applySearch(){
-  searchQuery=document.getElementById('search').value.trim();
+function applySearchEnter(){
+  const raw=document.getElementById('search').value.trim();
   // #96 → перейти к карточке с порядковым номером 96, стрелки двигают по всему списку
-  const ordinalMatch=searchQuery.match(/^#(\d+)$/);
+  const ordinalMatch=raw.match(/^#(\d+)$/);
   if(ordinalMatch){
     const num=parseInt(ordinalMatch[1],10);
     const targetIdx=num-1; // 0-based
@@ -1710,6 +1710,10 @@ function applySearch(){
     renderCard();
     return;
   }
+  applySearch();
+}
+function applySearch(){
+  searchQuery=document.getElementById('search').value.trim();
   // С поиском — полный список совпадений; без поиска — снова полный пул по фильтрам
   if(searchQuery)fcList=getFiltered();
   else rebuildDailyList();

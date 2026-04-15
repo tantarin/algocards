@@ -3992,7 +3992,8 @@ desc:`Дан вложенный список nestedList. Каждый элеме
 hint:`Стек NestedInteger. В hasNext() раскрывать списки, пока на вершине не окажется число.`,
 code:`public class NestedIterator implements Iterator<Integer> {
     private Deque<NestedInteger> stack = new ArrayDeque<>();
-
+ 
+    //инициализация
     public NestedIterator(List<NestedInteger> nestedList) {
         // Кладём всё в стек в обратном порядке (чтобы сохранить порядок при pop)
         for (int i = nestedList.size() - 1; i >= 0; i--) {

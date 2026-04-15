@@ -3922,61 +3922,54 @@ desc:`(term)[n] — повторить term n раз. ==Вложенность==
 hint:`Два стека: один для строк (StringBuilder), один для чисел. При ( — push текущую строку и начать новую. При ] — pop и повторить.`,
 code:`class Solution {
     public String decode(String s) {
-        // стек строк: хранит строки до входа в '('
         Deque<StringBuilder> strStack = new ArrayDeque<>();
-        // стек чисел повторения
-        Deque<Integer> numStack = new ArrayDeque<>();
-        // текущая собираемая строка (на текущем уровне вложенности)
         StringBuilder current = new StringBuilder();
-
         int i = 0;
+        
         while (i < s.length()) {
             char c = s.charAt(i);
-
+            
             if (c == '(') {
+                // Начинаем новую группу
                 strStack.push(current);
                 current = new StringBuilder();
                 i++;
-
+                
             } else if (c == ')') {
                 i++; // переходим после ')'
-                i++; // пропускаем '['
-
-                // парсим число n
-                int num = 0;
+                
+                // Ожидаем '['
+                if (i < s.length() && s.charAt(i) == '[') {
+                    i++; // пропускаем '['
+                }
+                
+                // Парсим число повторений
+                int repeat = 0;
                 while (i < s.length() && Character.isDigit(s.charAt(i))) {
-                    num = num * 10 + (s.charAt(i) - '0');
+                    repeat = repeat * 10 + (s.charAt(i) - '0');
                     i++;
                 }
-
-                i++; // пропускаем ']'
-
-                // кладём число в стек (хотя можно было и без него)
-                numStack.push(num);
-
-                // достаём строку до этого блока
-                StringBuilder prev = strStack.pop();
-
-                // сколько раз повторить текущую строку
-                int repeat = numStack.pop();
-
-                // текущий term, который нужно повторить
+                
+                // Пропускаем ']'
+                if (i < s.length() && s.charAt(i) == ']') {
+                    i++;
+                }
+                
+                // Повторяем текущую строку repeat раз
                 String repeated = current.toString();
-
-                // добавляем term * repeat к предыдущей строке
+                StringBuilder prev = strStack.pop();
                 for (int r = 0; r < repeat; r++) {
                     prev.append(repeated);
                 }
-
-                // возвращаемся на уровень выше
                 current = prev;
+                
             } else {
-                // обычный символ — просто добавляем
+                // Обычный символ
                 current.append(c);
                 i++;
             }
         }
-
+        
         return current.toString();
     }
 }`,

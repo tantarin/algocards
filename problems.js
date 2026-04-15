@@ -3639,8 +3639,9 @@ code:`public class Solution {
         PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
         for (int i = 0; i < k; i++) {
             var g = graphics.get(i);
-            if (g != null && !g.isEmpty())
+            if (g != null && !g.isEmpty()) {
                 heap.offer(new int[]{g.get(0).get(0), i, 0});
+            }
         }
 
         List<List<Integer>> result = new ArrayList<>();
@@ -3659,8 +3660,9 @@ code:`public class Solution {
                     currentSum += (long) newVal - oldVal;
                 }
 
-                if (pi + 1 < g.size())
+                if (pi + 1 < g.size()) {
                     heap.offer(new int[]{g.get(pi + 1).get(0), gi, pi + 1});
+                }
             }
 
             result.add(Arrays.asList(curTime, (int) currentSum));

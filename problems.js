@@ -3648,6 +3648,7 @@ code:`public class Solution {
 
         List<List<Integer>> result = new ArrayList<>();
         while (!heap.isEmpty()) {
+            //Смотрим на вершину кучи (самое раннее время)
             int curTime = heap.peek()[0];
 
             while (!heap.isEmpty() && heap.peek()[0] == curTime) {

@@ -8000,6 +8000,51 @@ expl:`Храним метки времени хитов в очереди. На 
 Follow-up при очень большом количестве хитов в одну секунду: использовать 300 бакетов (times[300], hits[300]) по индексу timestamp % 300. При коллизии секунды перезаписываем бакет. Тогда hit — O(1), getHits — O(300)=O(1), память O(1).`,
 p2:"Locked / Premium",
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
-repoSimilar:["ya4"]}
+repoSimilar:["ya4"]},
+
+// ===== SW + STRING =====
+{id:"ya11",t:"Поиск анаграммы в тексте",p:"SW + String",d:"средне",
+desc:`Даны 2 строки: текст и шаблон. Найти ==первую подстроку текста==, которая является ==анаграммой шаблона== (совпадает с ним без учёта порядка символов). Вернуть эту подстроку. Если таковой нет — вернуть пустую строку.
+
+Примеры:
+searchAnagram("XABCAD", "BACA") => "ABCA"
+searchAnagram("abcd", "aaa") => ""
+searchAnagram("abcd", "cbd") => "bcd"
+searchAnagram("abcdda", "bcdd") => "bcdd"`,
+hint:`Скользящее окно длины |pattern| + массив частот. Когда need == 0 — возвращай T.substring(left, left + len).`,
+code:`public String searchAnagram(String text, String pattern) {
+    if (pattern.length() > text.length()) return "";
+
+    int[] freq = new int[26];
+    for (char c : pattern.toCharArray()) freq[c - 'a']++;
+
+    int len = pattern.length();
+    int need = pattern.length();
+    int left = 0;
+
+    for (int right = 0; right < text.length(); right++) {
+        // правый символ входит в окно
+        int inIdx = text.charAt(right) - 'a';
+        if (freq[inIdx] > 0) need--;
+        freq[inIdx]--;
+
+        // окно переросло len — левый выходит
+        if (right - left + 1 > len) {
+            int outIdx = text.charAt(left) - 'a';
+            if (freq[outIdx] >= 0) need++;
+            freq[outIdx]++;
+            left++;
+        }
+
+        if (need == 0) return text.substring(left, left + len);
+    }
+
+    return "";
+}`,
+complexity:`Время: O(n), Память: O(1)`,
+complexityExpl:`Окно сдвигается по тексту ровно n раз, на каждом шаге — O(1) операций с массивом freq[26]. Память O(1) — только массив из 26 элементов.`,
+expl:`Поддерживаем окно фиксированной длины |pattern| и массив freq: +1 для каждого символа шаблона, −1 при добавлении символа из текста. need считает сколько символов шаблона ещё не покрыто. Когда need == 0 — все символы шаблона встретились в нужных количествах, возвращаем текущую подстроку.`,
+lcSimilar:[{"n":438,"t":"Find All Anagrams in a String","h":"find-all-anagrams-in-a-string"},{"n":567,"t":"Permutation in String","h":"permutation-in-string"}],
+repoSimilar:["ya7","ya8"]}
 
 ];

@@ -4321,7 +4321,7 @@ code:`class Solution {
         int left = 0;
         int right = arr.length - k;
         
-        // Бинарный поиск левой границы оптимального окна
+        // Бинарный поиск левой границы оптимального окна, остановка когда left==right
         while (left < right) {
             int mid = left + (right - left) / 2;
             

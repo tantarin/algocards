@@ -3635,11 +3635,13 @@ code:`public class Solution {
         int k = graphics.size();
         int[] currentValues = new int[k];
         long currentSum = 0;
-
+  
+        //Хранит массивы int[] из 3 элементов: [время, индекс_графика, индекс_точки]
         PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
         for (int i = 0; i < k; i++) {
             var g = graphics.get(i);
             if (g != null && !g.isEmpty()) {
+                //Добавляет первую точку каждого графика в кучу
                 heap.offer(new int[]{g.get(0).get(0), i, 0});
             }
         }

@@ -3922,32 +3922,23 @@ desc:`(term)[n] — повторить term n раз. ==Вложенность==
 hint:`Два стека: один для строк (StringBuilder), один для чисел. При ( — push текущую строку и начать новую. При ] — pop и повторить.`,
 code:`class Solution {
     public String decode(String s) {
-
         // стек строк: хранит строки до входа в '('
         Deque<StringBuilder> strStack = new ArrayDeque<>();
-
         // стек чисел повторения
         Deque<Integer> numStack = new ArrayDeque<>();
-
         // текущая собираемая строка (на текущем уровне вложенности)
         StringBuilder current = new StringBuilder();
 
         int i = 0;
-
-        // идём по строке слева направо
         while (i < s.length()) {
             char c = s.charAt(i);
 
             if (c == '(') {
-                // начинаем новый вложенный блок:
-                // сохраняем текущую строку и начинаем новую
                 strStack.push(current);
                 current = new StringBuilder();
                 i++;
 
             } else if (c == ')') {
-                // закрытие блока (term)[n]
-
                 i++; // переходим после ')'
                 i++; // пропускаем '['
 
@@ -3981,7 +3972,6 @@ code:`class Solution {
 
                 // возвращаемся на уровень выше
                 current = prev;
-
             } else {
                 // обычный символ — просто добавляем
                 current.append(c);
@@ -3989,7 +3979,6 @@ code:`class Solution {
             }
         }
 
-        // итоговая строка
         return current.toString();
     }
 }`,

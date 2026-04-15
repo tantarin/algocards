@@ -3652,11 +3652,11 @@ code:`public class Solution {
             int curTime = heap.peek()[0];
 
             while (!heap.isEmpty() && heap.peek()[0] == curTime) {
-                int[] ev = heap.poll();
-                int gi = ev[1], pi = ev[2];
-                var g = graphics.get(gi);
-                int newVal = g.get(pi).get(1);
-                int oldVal = currentValues[gi];
+                int[] ev = heap.poll();              // извлекаем [время, индекс_графика, индекс_точки]
+                int gi = ev[1], pi = ev[2];         // gi - номер графика, pi - номер точки
+                var g = graphics.get(gi);           // получаем график
+                int newVal = g.get(pi).get(1);      // новое значение в этой точке
+                int oldVal = currentValues[gi];     // текущее значение этого графика
 
                 if (newVal != oldVal) {
                     currentValues[gi] = newVal;

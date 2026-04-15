@@ -5853,13 +5853,19 @@ code:`class Solution {
 
         int prev = -n;
         for (int i = 0; i < n; i++) {
-            if (s.charAt(i) == c) prev = i;
+            if (s.charAt(i) == c) {
+                 prev = i;
+            }
+
             result[i] = i - prev;
         }
 
         prev = 2 * n;
         for (int i = n - 1; i >= 0; i--) {
-            if (s.charAt(i) == c) prev = i;
+            if (s.charAt(i) == c) {
+                 prev = i;
+            }
+
             result[i] = Math.min(result[i], prev - i); //проверяем какое расстояние меньше: справа или слева
         }
 

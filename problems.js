@@ -3994,19 +3994,22 @@ code:`public class NestedIterator implements Iterator<Integer> {
     private Deque<NestedInteger> stack = new ArrayDeque<>();
 
     public NestedIterator(List<NestedInteger> nestedList) {
+        // Кладём всё в стек в обратном порядке (чтобы сохранить порядок при pop)
         for (int i = nestedList.size() - 1; i >= 0; i--) {
             stack.push(nestedList.get(i));
         }
     }
 
     public Integer next() {
-        return stack.pop().getInteger();
+        return stack.pop().getInteger(); // Берём число с вершины
     }
 
     public boolean hasNext() {
+        // Пока на вершине не число - раскрываем список
         while (!stack.isEmpty() && !stack.peek().isInteger()) {
-            NestedInteger top = stack.pop();
+            NestedInteger top = stack.pop();           // Достаём список
             List<NestedInteger> list = top.getList();
+            // Кладём его элементы в обратном порядке
             for (int i = list.size() - 1; i >= 0; i--) {
                 stack.push(list.get(i));
             }

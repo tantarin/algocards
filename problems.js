@@ -5765,8 +5765,7 @@ code:`class Solution {
                     length += 2;
                     centerUsed = true;
                 }
-            } else if (w.compareTo(rev) < 0
-                && freq.containsKey(rev)) {
+            } else if (w.compareTo(rev) < 0 && freq.containsKey(rev)) {
                 int pairs = Math.min(freq.get(w), freq.get(rev));
                 length += pairs * 4;
             }

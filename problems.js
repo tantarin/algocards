@@ -3944,10 +3944,8 @@ code:`class Solution {
 
                 // парсим число n
                 int num = 0;
-                while (i < s.length()
-                    && Character.isDigit(s.charAt(i))) {
-                    num = num * 10
-                        + (s.charAt(i) - '0');
+                while (i < s.length() && Character.isDigit(s.charAt(i))) {
+                    num = num * 10 + (s.charAt(i) - '0');
                     i++;
                 }
 

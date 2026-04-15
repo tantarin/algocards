@@ -6152,6 +6152,7 @@ code:`class Solution {
             char tmp = s[left];
             s[left] = s[right];
             s[right] = tmp;
+
             left++;
             right--;
         }

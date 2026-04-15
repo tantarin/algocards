@@ -4461,6 +4461,30 @@ code:`class Solution {
         return new ArrayList<>(map.values());
     }
 }`,
+code2:`//Эта версия работает за O(n × d) без log-фактора
+public List<List<Integer>> groupAnagrams(int[] nums) {
+    Map<String, List<Integer>> map = new HashMap<>();
+    
+    for (int num : nums) {
+        // Подсчёт частоты цифр (0-9)
+        int[] freq = new int[10];
+        int n = num;
+        while (n > 0) {
+            freq[n % 10]++;
+            n /= 10;
+        }
+        
+        // Строим ключ из частот
+        StringBuilder key = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            key.append('#').append(freq[i]);
+        }
+        
+        map.computeIfAbsent(key.toString(), k -> new ArrayList<>()).add(num);
+    }
+    
+    return new ArrayList<>(map.values());
+}`,
 complexity:`Время: O(n · d log d), Память: O(n)`,
 complexityExpl:`Для каждого числа сортируем d цифр O(d log d) и кладём в HashMap — O(n·d log d). Карта и списки — O(n) памяти.`,
 expl:`Для каждого числа сортируем его цифры — это ключ в HashMap. Числа с одинаковым ключом — анаграммы. O(n × d log d), где d — кол-во цифр.`},

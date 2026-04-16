@@ -7763,33 +7763,20 @@ private void appendBlock(StringBuilder sb, char c, int count) {
 private boolean isValidChar(char c) {
     return Character.isLetter(c); // или другое условие
 }`,
-code2:`// Гипотетическое in-place решение с read/write
-public int compress(char[] chars) {
-    int write = 0;  // куда пишем
-    int read = 0;   // откуда читаем
-    
-    while (read < chars.length) {
-        char current = chars[read];
-        int count = 0;
-        
-        // считаем повторения
-        while (read < chars.length && chars[read] == current) {
-            read++;
-            count++;
+code2:`public String rle(String s) {
+    if (s.isEmpty()) return "";
+    StringBuilder out = new StringBuilder();
+    int i = 0;
+    while (i < s.length()) {
+        int j = i;
+        while (j < s.length() && s.charAt(j) == s.charAt(i)) {
+            j++;
         }
-        
-        // пишем символ
-        chars[write++] = current;
-        
-        // пишем число (если > 1)
-        if (count > 1) {
-            for (char c : String.valueOf(count).toCharArray()) {
-                chars[write++] = c;
-            }
-        }
+        out.append(s.charAt(i));
+        if (j - i > 1) out.append(j - i);
+        i = j;
     }
-    
-    return write;  // новая длина
+    return out.toString();
 }`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один линейный проход по строке. Дополнительная память — под результирующую строку.`,

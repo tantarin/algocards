@@ -3786,14 +3786,15 @@ code:`class Solution {
         Deque<Integer> minD = new ArrayDeque<>();
         int left = 0;
         int result = 0;
-
         for (int right = 0; right < nums.length; right++) {
-            while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right])
+            while (!maxD.isEmpty() && nums[maxD.peekLast()] <= nums[right]) {
                 maxD.pollLast();
+            }
             maxD.addLast(right);
 
-            while (!minD.isEmpty() && nums[minD.peekLast()] >= nums[right])
+            while (!minD.isEmpty() && nums[minD.peekLast()] >= nums[right]) {
                 minD.pollLast();
+            }
             minD.addLast(right);
 
             while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {

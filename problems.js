@@ -4159,22 +4159,24 @@ desc:`Даны два массива целых чисел nums1 и nums2 оди
 Вывод: [1,1,2,4]`,
 hint:`Два массива частот countA[], countB[]. При обновлении числа v проверяем: если min увеличился — common++.`,
 code:`class Solution {
-    public int[] commonPrefixWithMultiplicity(
-            int[] A, int[] B) {
+    public int[] commonPrefixWithMultiplicity(int[] A, int[] B) {
         int n = A.length;
         Map<Integer, Integer> countA = new HashMap<>();
         Map<Integer, Integer> countB = new HashMap<>();
         int[] result = new int[n];
         int common = 0;
-
         for (int i = 0; i < n; i++) {
             int ca = countA.merge(A[i], 1, Integer::sum);
             int cb = countB.getOrDefault(A[i], 0);
-            if (ca <= cb) common++;
+            if (ca <= cb) {
+                common++;
+            }
 
             int cb2 = countB.merge(B[i], 1, Integer::sum);
             int ca2 = countA.getOrDefault(B[i], 0);
-            if (cb2 <= ca2) common++;
+            if (cb2 <= ca2) {
+                common++;
+            }
 
             result[i] = common;
         }

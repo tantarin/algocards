@@ -7714,7 +7714,9 @@ hint:`Проверь валидность строки, затем одним п
 code:`Группируем одинаковые соседние символы в блоки. Для каждого блока добавляем символ и, если длина блока больше 1, его размер. Перед этим валидируем каждый символ и бросаем ошибку при нарушении формата.
 
 public String rle(String s) {
-    if (s.isEmpty()) return "";
+    if (s.isEmpty()) return {
+        "";
+    }
     StringBuilder out = new StringBuilder();
     int i = 0;
     while (i < s.length()) {
@@ -7723,7 +7725,9 @@ public String rle(String s) {
             j++;
         }
         out.append(s.charAt(i));
-        if (j - i > 1) out.append(j - i);
+        if (j - i > 1) {
+            out.append(j - i);
+        }
         i = j;
     }
     return out.toString();

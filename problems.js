@@ -4091,7 +4091,6 @@ code:`class Solution {
         int[] count = new int[n + 1];
         int[] result = new int[n];
         int common = 0;
-
         for (int i = 0; i < n; i++) {
             count[A[i]]++;
             if (count[A[i]] == 2) common++;

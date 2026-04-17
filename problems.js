@@ -5356,7 +5356,10 @@ import java.util.Map;
 public class Solution {
 
     public Pair<TNode, TNode> findEquivalentSubtrees(TNode root) {
-        if (root == null) return null;
+        if (root == null) {
+            return null;
+        }
+
         Map<Integer, TNode> seen = new HashMap<>();
         Holder holder = new Holder();
         dfsMask(root, seen, holder);
@@ -5366,12 +5369,19 @@ public class Solution {
     private int dfsMask(TNode node,
                         Map<Integer, TNode> seen,
                         Holder holder) {
-        if (node == null) return 0;
+        if (node == null) {
+            return 0;
+        }
 
         int left  = dfsMask(node.left,  seen, holder);
-        if (holder.answer != null) return 0;
+        if (holder.answer != null) {
+            return 0;
+        }
+
         int right = dfsMask(node.right, seen, holder);
-        if (holder.answer != null) return 0;
+        if (holder.answer != null) {
+            return 0;
+        }
 
         int mask = left | right | (1 << (node.value - 'A'));
 

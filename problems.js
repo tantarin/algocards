@@ -4326,9 +4326,9 @@ hint:`Сортируем массив. Два указателя с краёв: 
 code:`class Solution {
     public long countPairs(int[] nums, int k) {
         Arrays.sort(nums);
+
         long count = 0;
         int l = 0, r = nums.length - 1;
-
         while (l < r) {
             if (nums[l] + nums[r] >= k) {
                 count += (r - l);

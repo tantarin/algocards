@@ -4408,20 +4408,17 @@ desc:`Дан ==отсортированный массив== и число targe
 Вывод: [4, 5]`,
 hint:`Бинарный поиск ближайшего, затем два указателя расширяются влево и вправо.`,
 code:`class Solution {
-    public List<Integer> kClosest(int[] arr,
-                                  int target, int k) {
+    public List<Integer> kClosest(int[] arr, int target, int k) {
         int pos = binarySearch(arr, target);
         int left = pos - 1;
         int right = pos;
         List<Integer> result = new ArrayList<>();
-
         while (result.size() < k) {
             if (left < 0) {
                 result.add(arr[right++]);
             } else if (right >= arr.length) {
                 result.add(arr[left--]);
-            } else if (Math.abs(arr[left] - target)
-                    <= Math.abs(arr[right] - target)) {
+            } else if (Math.abs(arr[left] - target) <= Math.abs(arr[right] - target)) {
                 result.add(arr[left--]);
             } else {
                 result.add(arr[right++]);

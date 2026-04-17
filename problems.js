@@ -7720,7 +7720,7 @@ public String rle(String s) {
     StringBuilder out = new StringBuilder();
     int i = 0;
     while (i < s.length()) {
-        int j = i;
+        int j = i; //нужно ли это?
         while (j < s.length() && s.charAt(j) == s.charAt(i)) {
             j++;
         }

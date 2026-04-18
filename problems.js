@@ -6861,14 +6861,10 @@ class Solution {
             // Проверяем, какой указатель можно взять
             boolean canTakeLeft = left >= 0;
             boolean canTakeRight = right < nums.size();
-            
-            // Если правый недоступен — берём левый
             if (!canTakeRight) {
                 result.add(nums.get(left--));
                 continue;
             }
-            
-            // Если левый недоступен — берём правый
             if (!canTakeLeft) {
                 result.add(nums.get(right++));
                 continue;

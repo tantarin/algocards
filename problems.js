@@ -6834,26 +6834,56 @@ hint:`Стартуем с nums[idx]. Два указателя l = idx−1 и r 
 code:`import java.util.*;
 
 class Solution {
+    /**
+     * Находит k ближайших чисел к опорному элементу nums[idx].
+     * Массив должен быть отсортирован.
+     *
+     * @param nums отсортированный список чисел
+     * @param idx индекс опорного элемента
+     * @param k   количество ближайших элементов (включая сам опорный)
+     * @return список из k ближайших чисел в порядке возрастания расстояния
+     */
     public List<Integer> findNearestNumbers(List<Integer> nums, int idx, int k) {
         if (k == 0) {
             return new ArrayList<>();
         }
 
         List<Integer> result = new ArrayList<>();
-        result.add(nums.get(idx));
-        int l = idx - 1;
-        int r = idx + 1;
         int ref = nums.get(idx);
+        
+        // Добавляем опорный элемент первым
+        result.add(ref);
+        
+        // Два указателя: левый и правый от опоры
+        int left = idx - 1;
+        int right = idx + 1;
         for (int i = 0; i < k - 1; i++) {
-            if (r >= nums.size() || (l >= 0 && Math.abs(ref - nums.get(l)) <= Math.abs(ref - nums.get(r)))) {
-                result.add(nums.get(l));
-                l--;
+            // Проверяем, какой указатель можно взять
+            boolean canTakeLeft = left >= 0;
+            boolean canTakeRight = right < nums.size();
+            
+            // Если правый недоступен — берём левый
+            if (!canTakeRight) {
+                result.add(nums.get(left--));
+                continue;
+            }
+            
+            // Если левый недоступен — берём правый
+            if (!canTakeLeft) {
+                result.add(nums.get(right++));
+                continue;
+            }
+            
+            // Оба доступны — выбираем ближайший к ref
+            int leftDist = Math.abs(ref - nums.get(left));
+            int rightDist = Math.abs(ref - nums.get(right));
+            if (leftDist <= rightDist) {
+                result.add(nums.get(left--));   // левый ближе или равен
             } else {
-                result.add(nums.get(r));
-                r++;
+                result.add(nums.get(right++));  // правый ближе
             }
         }
-
+        
         return result;
     }
 }`,

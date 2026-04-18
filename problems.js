@@ -6838,12 +6838,12 @@ class Solution {
         if (k == 0) {
             return new ArrayList<>();
         }
+
         List<Integer> result = new ArrayList<>();
         result.add(nums.get(idx));
         int l = idx - 1;
         int r = idx + 1;
         int ref = nums.get(idx);
-
         for (int i = 0; i < k - 1; i++) {
             if (r >= nums.size() || (l >= 0 && Math.abs(ref - nums.get(l)) <= Math.abs(ref - nums.get(r)))) {
                 result.add(nums.get(l));
@@ -6853,6 +6853,7 @@ class Solution {
                 r++;
             }
         }
+
         return result;
     }
 }`,

@@ -7541,7 +7541,6 @@ code:`class Solution {
         int n = spots.length;
         int maxDist = 0;
         int lastOccupied = -1;
-        
         for (int i = 0; i < n; i++) {
             if (spots[i] == 1) {
                 if (lastOccupied == -1) {
@@ -7551,6 +7550,7 @@ code:`class Solution {
                     // Между двумя занятыми: оптимально сесть посередине
                     maxDist = Math.max(maxDist, (i - lastOccupied) / 2);
                 }
+
                 lastOccupied = i;
             }
         }

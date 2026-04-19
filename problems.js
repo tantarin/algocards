@@ -4064,7 +4064,7 @@ public class FilteringIterator<T> implements Iterator<T> {
     public T next() {
         if (!hasNext) throw new NoSuchElementException();
         T result = next;
-        advance();
+        advance(); // next теперь указывает на следующий
         return result;
     }
 }`,

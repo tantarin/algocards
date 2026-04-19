@@ -7336,6 +7336,50 @@ complexity:`Время: O(n + m), Память: O(1)`,
 complexityExpl:`Два указателя по спискам интервалов — O(n+m). Указатели — O(1) памяти.`,
 expl:`Два указателя по спискам. Пересечение = [max(starts), min(ends)], если lo <= hi. Двигаем указатель, чей интервал заканчивается раньше. O(n+m) время.`},
 
+{id:"iss9",t:"Пересечение отрезков",p:"Intervals Sweep",d:"средне",
+desc:`Даны два отсортированных массива ==непересекающихся отрезков== segments1 и segments2, где каждый отрезок — пара [начало, конец]. Нужно вернуть массив ==всех попарных пересечений== отрезков из segments1 с отрезками из segments2.
+
+Теги: #medium #ozon #yandex
+
+Пример 1:
+Ввод: segments1 = [[2,4],[5,6],[7,9],[10,12]], segments2 = [[3,7],[10,12],[13,14]]
+Вывод: [[3,4],[5,6],[7,7],[10,12]]
+
+Пример 2:
+Ввод: segments1 = [[1,3],[5,8]], segments2 = [[2,4],[6,7]]
+Вывод: [[2,3],[6,7]]
+
+Ограничения:
+len(segments1) + len(segments2) ≥ 1`,
+hint:`Два указателя i по segments1 и j по segments2. Пересечение текущих отрезков: [max(l1,l2), min(r1,r2)]; если левая граница ≤ правой — добавляем. Сдвигаем указатель у того отрезка, у которого меньший конец.`,
+code:`import java.util.*;
+
+class Solution {
+    public int[][] intersectSegments(int[][] segments1, int[][] segments2) {
+        List<int[]> out = new ArrayList<>();
+        int i = 0, j = 0;
+        while (i < segments1.length && j < segments2.length) {
+            int lo = Math.max(segments1[i][0], segments2[j][0]);
+            int hi = Math.min(segments1[i][1], segments2[j][1]);
+            if (lo <= hi) {
+                out.add(new int[]{lo, hi});
+            }
+            if (segments1[i][1] < segments2[j][1]) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+        return out.toArray(new int[0][]);
+    }
+}`,
+complexity:`Время: O(n + m), Память: O(1) доп. кроме ответа`,
+complexityExpl:`Каждый указатель двигается только вперёд — суммарно O(n+m). Константное число переменных — O(1) доп. памяти.`,
+expl:`Инвариант как у слияния двух отсортированных списков интервалов: текущая пара — единственная кандидатура на ненулевое пересечение на этом шаге. После обработки отбрасываем отрезок, который раньше заканчивается — он уже не пересечётся с «хвостом» другого.`,
+lcSimilar:[{"n":986,"t":"Interval List Intersections","h":"interval-list-intersections"}],
+repoSimilar:["iss8","tp49"],
+p2:"Ozon"},
+
 // ===== PREFIX SUM =====
 {id:"ps3",t:"Prefix Common Array",p:"Prefix Sum",d:"средне",
 desc:`Даны две перестановки A и B длины n (числа от 1 до n). Найти массив C, где C[i] = ==количество общих чисел в префиксах== A[0..i] и B[0..i].

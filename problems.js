@@ -3413,9 +3413,9 @@ code:`import java.util.*;
 public class Solution {
     public String counterRanges(List<Integer> nums) {
         Collections.sort(nums);
+
         List<String> result = new ArrayList<>();
         int l = 0, r = 0;
-        
         while (l < nums.size()) {
             while (r + 1 < nums.size() && nums.get(r) + 1 == nums.get(r + 1)) {
                 r++;

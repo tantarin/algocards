@@ -3458,7 +3458,8 @@ code:`class Solution {
         int read = 0;
         int n = arr.length;
         while (read < n) {
-            if (read + 2 < n && arr[read] == ':' && arr[read + 1] == '-' 
+            if (read + 2 < n 
+                      && arr[read] == ':' && arr[read + 1] == '-' 
                       && (arr[read + 2] == ')' || arr[read + 2] == '(')) {
 
                 char bracket = arr[read + 2];

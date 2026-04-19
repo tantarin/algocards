@@ -7358,9 +7358,9 @@ code:`class Solution {
     public int countingPairs(String s) {
         int cnt = 0;
         Set<Character> window = new HashSet<>();
+
         int l = 0;
         int r = -1;
-
         while (l < s.length()) {
             while (r + 1 < s.length() && !window.contains(s.charAt(r + 1))) {
                 window.add(s.charAt(r + 1));
@@ -7379,7 +7379,6 @@ code2:`public long countSubstrings(String s) {
     
     long count = 0;
     int left = 0;
-    
     for (int right = 0; right < s.length(); right++) {
         char c = s.charAt(right);
         left = Math.max(left, lastSeen[c] + 1);

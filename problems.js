@@ -7295,7 +7295,6 @@ code:`class Solution {
         
         int left = 0;
         int result = 0;
-        
         for (int right = 0; right < s.length(); right++) {
             char c = s.charAt(right);
             

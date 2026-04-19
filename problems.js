@@ -4075,6 +4075,38 @@ expl:`Ключевая идея — lookahead: advance() двигает внут
 p2:"Iterator / Predicate",
 repoSimilar:["st7","tp57","ya10"]},
 
+{id:"fit2",t:"Поиск Person по имени (Optional)",p:"Queue / Design",d:"легко",
+desc:`Реализовать функцию поиска Person по значению name. Функция принимает список людей и имя, возвращает ==Optional<Person>==.
+Предполагается, что у Person есть поле name (или геттер с тем же смыслом).
+
+Пример:
+Ввод: persons = [Person("Ann"), Person("Bob")], name = "Bob"
+Вывод: Optional с Person("Bob")
+
+Ввод: persons = [Person("Ann")], name = "Zoe"
+Вывод: Optional.empty()`,
+hint:`Stream API: filter по имени, затем findFirst() — даёт Optional без ручных циклов.`,
+code:`import java.util.*;
+
+class Person {
+    String name;
+    Person(String name) { this.name = name; }
+}
+
+class Solution {
+    Optional<Person> findPersonByName(List<Person> persons, String name) {
+        return persons.stream()
+                .filter(p -> p.name.equals(name))
+                .findFirst();
+    }
+}`,
+complexity:`Время: O(n) в худшем случае, Память: O(1)`,
+complexityExpl:`Линейный проход по списку до первого совпадения — O(n). Промежуточный stream не хранит все элементы в дополнительной структуре — O(1) доп. памяти кроме входного списка.`,
+expl:`findFirst() останавливается на первом подходящем элементе (для последовательного stream — это линейный поиск слева направо).
+Если нужна устойчивость к null name, вместо p.name.equals(name) обычно пишут Objects.equals(p.name, name) или проверяют аргументы.`,
+repoSimilar:["fit1","hf10"],
+p2:"Stream API"},
+
 // ===== TWO POINTERS =====
 {id:"tp13",t:"LC 1229. Meeting Scheduler",p:"Two Pointers",d:"средне",
 desc:`Два человека имеют списки ==свободных интервалов== (отсортированных). Найти ==первый общий слот== длительностью >= duration.

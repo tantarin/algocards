@@ -6581,6 +6581,23 @@ code:`class Solution {
         return slow;
     }
 }`,
+code2:`class Solution {
+    public int findDuplicate(int[] nums) {
+        int xor = 0;
+        
+        // XOR всех элементов массива
+        for (int num : nums) {
+            xor ^= num;
+        }
+        
+        // XOR с числами от 1 до n
+        for (int i = 1; i < nums.length; i++) {
+            xor ^= i;
+        }
+        
+        return xor;
+    }
+}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода по списку — O(n). Только два указателя — O(1).`,
 expl:`Массив как связный список: индекс i ведёт в nums[i]. Дубликат создаёт цикл. Алгоритм Флойда находит вход в цикл = дублирующее число. O(n), O(1).`,

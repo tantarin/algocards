@@ -7366,6 +7366,7 @@ code:`class Solution {
                 window.add(s.charAt(r + 1));
                 r++;
             }
+
             cnt += r - l + 1;
             window.remove(s.charAt(l));
             l++;
@@ -7382,6 +7383,7 @@ code2:`public long countSubstrings(String s) {
     for (int right = 0; right < s.length(); right++) {
         char c = s.charAt(right);
         left = Math.max(left, lastSeen[c] + 1);
+
         lastSeen[c] = right;
         count += (right - left + 1);
     }

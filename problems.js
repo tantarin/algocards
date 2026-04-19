@@ -3457,17 +3457,12 @@ code:`class Solution {
         int write = 0;
         int read = 0;
         int n = arr.length;
-
         while (read < n) {
-            if (read + 2 < n
-                && arr[read] == ':'
-                && arr[read + 1] == '-'
-                && (arr[read + 2] == ')'
-                    || arr[read + 2] == '(')) {
+            if (read + 2 < n && arr[read] == ':' && arr[read + 1] == '-' 
+                      && (arr[read + 2] == ')' || arr[read + 2] == '(')) {
 
                 char bracket = arr[read + 2];
                 read += 3;
-
                 while (read < n && arr[read] == bracket) {
                     read++;
                 }

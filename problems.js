@@ -3417,11 +3417,13 @@ code:`class Solution {
             while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
                 i++;
             }
+
             StringBuilder sb = new StringBuilder();
             sb.append(start);
             if (start != nums[i]) {
                 sb.append("->").append(nums[i]);
             }
+
             list.add(sb.toString());
         }
         return list;

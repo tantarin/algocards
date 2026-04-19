@@ -3784,8 +3784,13 @@ code:`class Solution {
 
             while (nums[maxD.peekFirst()] - nums[minD.peekFirst()] > limit) {
                 left++;
-                if (maxD.peekFirst() < left) maxD.pollFirst();
-                if (minD.peekFirst() < left) minD.pollFirst();
+
+                if (maxD.peekFirst() < left) {
+                    maxD.pollFirst();
+                }
+                if (minD.peekFirst() < left) {
+                    minD.pollFirst();
+                }
             }
 
             result = Math.max(result, right - left + 1);

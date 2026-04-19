@@ -2162,6 +2162,39 @@ expl:`Инвариант: common = |inA ∩ inB|. При добавлении н
 lcSimilar:[{"n":2657,"t":"Find the Prefix Common Array of Two Arrays","h":"find-the-prefix-common-array-of-two-arrays"}],
 repoSimilar:["ps3","pse5","pse3"]},
 
+{id:"ps7",t:"Пересечение двух массивов с учётом повторений",p:"HashMap",d:"легко",
+desc:`Найти ==пересечение двух массивов с учётом повторений== (intersection with duplicates).
+Если элемент встречается в первом массиве 2 раза и во втором 2 раза — в ответе он тоже 2 раза. **Порядок элементов в ответе не важен.**
+
+Пример:
+Ввод: nums1 = [1, 2, 3, 2, 0], nums2 = [5, 1, 2, 7, 3, 2]
+Вывод: [1, 2, 2, 3] (или любая перестановка этих значений)`,
+hint:`Считаем частоты в одном массиве в HashMap. Вторым проходом по второму массиву: если счётчик > 0 — добавляем число в ответ и уменьшаем счётчик.`,
+code:`import java.util.*;
+
+class Solution {
+    public int[] intersectWithDuplicates(int[] nums1, int[] nums2) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        for (int x : nums1) {
+            freq.merge(x, 1, Integer::sum);
+        }
+        List<Integer> out = new ArrayList<>();
+        for (int x : nums2) {
+            int c = freq.getOrDefault(x, 0);
+            if (c > 0) {
+                out.add(x);
+                freq.put(x, c - 1);
+            }
+        }
+        return out.stream().mapToInt(i -> i).toArray();
+    }
+}`,
+complexity:`Время: O(n + m), Память: O(min(n, m))`,
+complexityExpl:`Подсчёт частот первого массива — O(n), проход по второму — O(m). В карте не больше уникальных значений меньшего массива — O(min(n,m)) памяти.`,
+expl:`Для каждого значения v в пересечении берём min(частота в nums1, частота в nums2) вхождений. Реализация через уменьшение счётчика при совпадении из второго массива даёт ровно эту минимальную кратность.`,
+lcSimilar:[{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}],
+repoSimilar:["hf9","tp7"]},
+
 // ===== PREFIX SUM EXT. =====
 {id:"pse1",t:"LC 238 · Product of Array Except Self",p:"Prefix Sum Ext.",d:"легко",
 desc:`Дан массив nums. Вернуть массив, где каждый элемент — ==произведение всех кроме текущего==. Без деления.

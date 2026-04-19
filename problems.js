@@ -4040,7 +4040,7 @@ public class FilteringIterator<T> implements Iterator<T> {
     }
 
     private void advance() {
-    // Ищем следующий элемент, удовлетворяющий предикату
+        // Ищем следующий элемент, удовлетворяющий предикату
         while (iterator.hasNext()) {
             T candidate = iterator.next();
             if (predicate.test(candidate)) {

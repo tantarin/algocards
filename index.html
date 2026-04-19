@@ -1234,7 +1234,7 @@ const REPO='tantarin/algocards';
 const FILE_PATH='problems.js';
 const THEORY_FILE_PATH='theory.js';
 const allPatterns=[...new Set(P.flatMap(p=>[p.p,p.p2].filter(Boolean)))].sort();
-const YANDEX_IDS=new Set(['hpq1','tp10','tp11','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','sw9','sw16','sw17','tp19','tp52','tp53','sw8','gh2','sw2','sw3','pse5','pse3','pse4','ps1','ps2','ms2','ms1','tp13','iss5','gop5','gop4','gop6','tr10','tr15','tr16','swd1','tp54','tp5','ya2','ya3','ya4','ya5','ya6','ya7','ya8','ya9','hf2','hf8','hf3','tr1','tr4','fit1','fit2','dp1','ps6','ps7']);
+const YANDEX_IDS=new Set(['hpq1','tp10','tp11','tp12','tp18','ms5','tp24','tp4','tp21','tp9','tp8','sw5','sw6','sw9','sw16','sw17','tp19','tp52','tp53','sw8','gh2','sw2','sw3','pse5','pse3','pse4','ps1','ps2','ms2','ms1','tp13','iss5','gop5','gop4','gop6','tr10','tr15','tr16','swd1','tp54','tp5','ya2','ya3','ya4','ya5','ya6','ya7','ya8','ya9','hf2','hf8','hf3','tr1','tr4','fit1','fit2','dp1','ps6','ps7']);
 function isYandexProblem(p){return YANDEX_IDS.has(p.id)||p.ya===true;}
 function yandexTagHtml(p){
   return isYandexProblem(p)

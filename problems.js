@@ -3408,28 +3408,7 @@ desc:`Дан список неотрицательных целых чисел n
 Ввод: nums = [1,4,5,2,3,9,8,11,0]
 Вывод: "0-5,8-9,11"`,
 hint:`После сортировки — два индекса l и r: расширяйте r, пока nums[r+1] == nums[r] + 1. Фиксируйте сегмент и переходите к следующему.`,
-code:`class Solution {
-    public List<String> summaryRanges(int[] nums) {
-        Arrays.sort(nums);
-        List<String> list = new ArrayList<>();
-        for (int i = 0; i < nums.length; i++) {
-            int start = nums[i];
-            while (i + 1 < nums.length && nums[i + 1] == nums[i] + 1) {
-                i++;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(start);
-            if (start != nums[i]) {
-                sb.append("->").append(nums[i]);
-            }
-
-            list.add(sb.toString());
-        }
-        return list;
-    }
-}`,
-code2:`import java.util.*;
+code:`import java.util.*;
 
 public class Solution {
     public String counterRanges(List<Integer> nums) {

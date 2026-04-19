@@ -4273,7 +4273,6 @@ public class Solution {
         int i = 0, j = 0;
         int cnt1 = 0, cnt2 = 0;
         int val1 = 0, val2 = 0;
-
         while (i < vec1.size() || j < vec2.size()) {
             if (cnt1 == 0) {
                 val1 = vec1.get(i).get(0);

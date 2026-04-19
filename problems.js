@@ -4065,7 +4065,7 @@ public class FilteringIterator<T> implements Iterator<T> {
         if (!hasNext) throw new NoSuchElementException();
         T result = next;
         advance(); // next теперь указывает на следующий
-        return result;
+        return result; // возвращаем текущий, а не следующий
     }
 }`,
 complexity:`Время: O(1) амортизированно на вызов next/hasNext, Память: O(1)`,

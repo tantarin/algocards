@@ -3545,6 +3545,7 @@ code:`class Solution {
             if (s.charAt(l) != s.charAt(r)) {
                 return isPalin(s, l + 1, r) || isPalin(s, l, r - 1);
             }
+
             l++;
             r--;
         }
@@ -3553,7 +3554,10 @@ code:`class Solution {
 
     private boolean isPalin(String s, int l, int r) {
         while (l < r) {
-            if (s.charAt(l) != s.charAt(r)) return false;
+            if (s.charAt(l) != s.charAt(r)) {
+                return false;
+            }
+
             l++;
             r--;
         }

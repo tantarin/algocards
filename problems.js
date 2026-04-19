@@ -3889,6 +3889,33 @@ code:`class Solution {
         // Пространственная сложность: O(n) для расширенной строки и массива p
     }
 }`,
+code2:`//Для каждой позиции расширяем палиндром в обе стороны. Два случая: нечётный (aba) и чётный (bb) палиндром.
+public String longestPalindrome(String s) {
+    int start = 0, maxLen = 1;
+
+    for (int i = 0; i < s.length(); i++) {
+        // нечётный палиндром: центр — символ
+        int len1 = expand(s, i, i);
+        // чётный палиндром: центр — между i и i+1
+        int len2 = expand(s, i, i + 1);
+
+        int len = Math.max(len1, len2);
+        if (len > maxLen) {
+            maxLen = len;
+            start = i - (len - 1) / 2;
+        }
+    }
+
+    return s.substring(start, start + maxLen);
+}
+
+private int expand(String s, int left, int right) {
+    while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {
+        left--;
+        right++;
+    }
+    return right - left - 1;
+}`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Алгоритм Манакера: один проход, правая граница только растёт — O(n). Массив радиусов — O(n) памяти.`,
 expl:`Алгоритм Манакера. Строим расширенную строку с разделителями '#'. Для каждой позиции используем зеркальное свойство: если i внутри правой границы текущего палиндрома, начальный радиус берём из зеркала. Затем расширяем. Итого O(n) за счёт того, что правая граница сдвигается только вправо.`},
@@ -4104,8 +4131,8 @@ complexity:`Время: O(n) в худшем случае, Память: O(1)`,
 complexityExpl:`Линейный проход по списку до первого совпадения — O(n). Промежуточный stream не хранит все элементы в дополнительной структуре — O(1) доп. памяти кроме входного списка.`,
 expl:`findFirst() останавливается на первом подходящем элементе (для последовательного stream — это линейный поиск слева направо).
 Если нужна устойчивость к null name, вместо p.name.equals(name) обычно пишут Objects.equals(p.name, name) или проверяют аргументы.`,
-repoSimilar:["fit1","hf10"],
-p2:"Stream API"},
+p2:"Stream API",
+repoSimilar:["fit1","hf10"]},
 
 // ===== TWO POINTERS =====
 {id:"tp13",t:"LC 1229. Meeting Scheduler",p:"Two Pointers",d:"средне",

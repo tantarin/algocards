@@ -4014,6 +4014,63 @@ p2:"Iterator / Lazy",
 lcSimilar:[{"n":341,"t":"Flatten Nested List Iterator","h":"flatten-nested-list-iterator"}],
 repoSimilar:["st6","tp57"]},
 
+{id:"fit1",t:"FilteringIterator<T> — итератор по предикату",p:"Queue / Design",d:"средне",
+desc:`Реализовать ==FilteringIterator<T>== — итератор-обёртку, который принимает другой Iterator<T> и предикат Predicate<T>, и возвращает только те элементы, для которых предикат возвращает true.
+
+Пример (идея):
+Ввод: итератор по [1, 2, 3, 4], предикат x -> x % 2 == 0
+Вывод при обходе: 2, 4`,
+hint:`Хранить lookahead: в advance() прокручивать внутренний итератор до следующего элемента, прошедшего предикат; вызывать advance() в конструкторе и после каждого next().`,
+code:`import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Predicate;
+
+public class FilteringIterator<T> implements Iterator<T> {
+
+    private final Predicate<T> predicate;
+    private final Iterator<T> iterator;
+    private T next;
+    private boolean hasNext;
+
+    public FilteringIterator(Predicate<T> predicate, Iterator<T> iterator) {
+        this.predicate = predicate;
+        this.iterator = iterator;
+        advance();
+    }
+
+    private void advance() {
+        while (iterator.hasNext()) {
+            T candidate = iterator.next();
+            if (predicate.test(candidate)) {
+                next = candidate;
+                hasNext = true;
+                return;
+            }
+        }
+        hasNext = false;
+        next = null;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return hasNext;
+    }
+
+    @Override
+    public T next() {
+        if (!hasNext) throw new NoSuchElementException();
+        T result = next;
+        advance();
+        return result;
+    }
+}`,
+complexity:`Время: O(1) амортизированно на вызов next/hasNext, Память: O(1)`,
+complexityExpl:`Каждый элемент базового итератора рассматривается не более одного раза — суммарно O(n) на весь обход. Дополнительно храним только ссылку на следующий элемент и флаг — O(1).`,
+expl:`Ключевая идея — lookahead: advance() двигает внутренний итератор до первого подходящего значения и запоминает его. hasNext() только читает флаг; next() отдаёт сохранённое значение и снова вызывает advance().
+Контракт Iterator: hasNext() можно вызывать многократно без побочных эффектов; next() — только когда есть следующий элемент.`,
+repoSimilar:["st7","tp57","ya10"],
+p2:"Iterator / Predicate"},
+
 // ===== TWO POINTERS =====
 {id:"tp13",t:"LC 1229. Meeting Scheduler",p:"Two Pointers",d:"средне",
 desc:`Два человека имеют списки ==свободных интервалов== (отсортированных). Найти ==первый общий слот== длительностью >= duration.

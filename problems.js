@@ -394,7 +394,7 @@ expl:`Рекурсия с границами. Для левого поддере
 lcSimilar:[{"t":"Validate Binary Search Tree","h":"validate-binary-search-tree"},{"t":"Kth Smallest Element in a BST","h":"kth-smallest-element-in-a-bst"}]},
 
 // ===== GEOMETRY HASH =====
-{id:"gh1",t:"LeetCode 356: Line Reflection",p:"Geometry Hash",d:"средне",
+{id:"gh1",t:"LeetCode 356: Line Reflection",p:"Geometry Hash",d:"средне",ya:true,
 desc:`Дан массив точек (x, y). Определить, существует ли ==вертикальная прямая==, относительно которой ==все точки симметричны==.
 
 Пример:
@@ -476,7 +476,7 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Два линейных прохода: HashMap кратностей, затем проверка зеркальных пар — O(n). Карта до n ключей — O(n) памяти.`,
 expl:`Строгая биекция: количество совпадений точки и её зеркала должно совпадать. Точки на оси допустимы. O(n) время и память.`},
 
-{id:"gh3",t:"LeetCode 356 — Line Reflection",p:"Geometry Hash",d:"средне",
+{id:"gh3",t:"LeetCode 356 — Line Reflection",p:"Geometry Hash",d:"средне",ya:true,
 desc:`Дан набор точек на плоскости. Определить, существует ли прямая, параллельная оси Y, которая ==отражает все точки==.
 
 Пример:
@@ -8553,46 +8553,6 @@ code:`class Solution {
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Каждый узел посещаем один раз. Память — глубина стека рекурсии h.`,
 expl:`Когда p и q расходятся по разным поддеревьям текущего узла, именно он становится первым общим предком.`},
-
-// ===== BINARY SEARCH =====
-{id:"lc4",t:"LC 4 · Median of Two Sorted Arrays",p:"Binary Search",d:"сложно",
-desc:`Найти медиану двух отсортированных массивов за O(log(min(m,n))).
-
-Пример:
-Ввод: nums1 = [1,3], nums2 = [2]
-Вывод: 2.00000`,
-hint:`Бинарный поиск по разрезу меньшего массива: ищем корректное разбиение на левую и правую части.`,
-code:`class Solution {
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
-        int m = nums1.length, n = nums2.length;
-        int leftSize = (m + n + 1) / 2;
-        int lo = 0, hi = m;
-
-        while (lo <= hi) {
-            int cut1 = lo + (hi - lo) / 2;
-            int cut2 = leftSize - cut1;
-
-            int l1 = cut1 == 0 ? Integer.MIN_VALUE : nums1[cut1 - 1];
-            int r1 = cut1 == m ? Integer.MAX_VALUE : nums1[cut1];
-            int l2 = cut2 == 0 ? Integer.MIN_VALUE : nums2[cut2 - 1];
-            int r2 = cut2 == n ? Integer.MAX_VALUE : nums2[cut2];
-
-            if (l1 <= r2 && l2 <= r1) {
-                if (((m + n) & 1) == 1) return Math.max(l1, l2);
-                return (Math.max(l1, l2) + Math.min(r1, r2)) / 2.0;
-            } else if (l1 > r2) {
-                hi = cut1 - 1;
-            } else {
-                lo = cut1 + 1;
-            }
-        }
-        return 0.0;
-    }
-}`,
-complexity:`Время: O(log(min(m,n))), Память: O(1)`,
-complexityExpl:`Ищем позицию разреза бинарным поиском только по меньшему массиву.`,
-expl:`Правильный разрез удовлетворяет условиям l1<=r2 и l2<=r1. После этого медиана берётся из границ разрезов.`},
 
 // ===== SLIDING WINDOW =====
 {id:"lc567",t:"LC 567 · Permutation in String",p:"Sliding Window",d:"средне",

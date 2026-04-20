@@ -6041,7 +6041,9 @@ code:`class Solution {
 
         StringBuilder key = new StringBuilder();
         for (int d = 1; d <= 9; d++) {
-            if (cnt[d] > 0) key.append(d).append('#').append(cnt[d]).append('|');
+            if (cnt[d] > 0) {
+                key.append(d).append('#').append(cnt[d]).append('|');
+            }
         }
         return key.toString();
     }

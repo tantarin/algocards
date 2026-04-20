@@ -2177,6 +2177,7 @@ class Solution {
         for (int x : nums1) {
             freq.merge(x, 1, Integer::sum);
         }
+
         List<Integer> out = new ArrayList<>();
         for (int x : nums2) {
             int c = freq.getOrDefault(x, 0);
@@ -2185,6 +2186,7 @@ class Solution {
                 freq.put(x, c - 1);
             }
         }
+
         return out.stream().mapToInt(i -> i).toArray();
     }
 }`,

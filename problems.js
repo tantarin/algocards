@@ -2173,6 +2173,11 @@ code:`import java.util.*;
 
 class Solution {
     public int[] intersectWithDuplicates(int[] nums1, int[] nums2) {
+        // Всегда хешируем меньший массив
+        if (nums1.length > nums2.length) {
+            return intersectWithDuplicates(nums2, nums1);
+        }
+
         Map<Integer, Integer> freq = new HashMap<>();
         for (int x : nums1) {
             freq.merge(x, 1, Integer::sum);

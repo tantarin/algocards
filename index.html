@@ -2093,6 +2093,25 @@ function onInterviewCodeInput(el){
   if(!simState.problem)return;
   try{localStorage.setItem(simStorageKey(simState.problem.id),el.value);}catch(e){}
 }
+function extractMethodSignatureFromCode(code){
+  const src=String(code||'');
+  if(!src.trim())return '';
+  const m=src.match(/public\s+[^\n{;]*\([^\)]*\)\s*\{/);
+  if(!m)return '';
+  return m[0].replace(/\s*\{$/,'').trim();
+}
+function buildInterviewStarter(problem){
+  const starter=String(problem.starter||'').trim();
+  if(starter)return starter;
+
+  const sigFromCode=extractMethodSignatureFromCode(problem.code);
+  const sigFromCode2=extractMethodSignatureFromCode(problem.code2);
+  const sig=sigFromCode||sigFromCode2;
+  if(sig){
+    return `class Solution {\n    ${sig} {\n        \n    }\n}`;
+  }
+  return `class Solution {\n    public void solve() {\n        \n    }\n}`;
+}
 /** IDE-style Tab: 4 пробела; по выделенным строкам — отступ каждой. Shift+Tab — убрать до 4 пробелов с начала строк(и). */
 function simSelectedLinesRange(v,start,end){
   const from=v.lastIndexOf('\n',start-1)+1;
@@ -2215,8 +2234,10 @@ function renderInterviewSimulation(options){
   `;
   const ta=document.getElementById('simCodeInput');
   if(ta){
-    const saved=localStorage.getItem(simStorageKey(p.id))||'';
-    ta.value=saved;
+    const storageKey=simStorageKey(p.id);
+    const savedRaw=localStorage.getItem(storageKey);
+    const hasSaved=savedRaw!==null;
+    ta.value=hasSaved?savedRaw:buildInterviewStarter(p);
     ta.oninput=function(){onInterviewCodeInput(this);};
     ta.addEventListener('keydown',onSimEditorKeydown);
     if(focusEditor){

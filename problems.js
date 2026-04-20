@@ -1306,7 +1306,7 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Цикл по строке считает частоты за O(n), затем 26 проверок. Массив count[26] — O(1) памяти.`,
 expl:`Цикл по строке считает частоту каждого символа (массив count[26]). Затем считаем количество символов с нечётной частотой (oddCount). Палиндром допускает максимум один такой символ (центр строки нечётной длины) → если oddCount ≤ 1, вернуть true. O(n) время, O(1) память.`},
 
-{id:"hf6",t:"Маршрут туриста",p:"HashMap",d:"средне",
+{id:"hf6",t:"Маршрут туриста",p:"HashMap",d:"средне",ya:true,
 desc:`Даны авиабилеты в виде пар [откуда, куда]. ==Восстановить маршрут==.
 
 Пример:
@@ -8666,24 +8666,28 @@ lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
 repoSimilar:["ya4"]},
 
 // ===== UNION-FIND =====
-{id:"ya12",t:"Объединение пользователей по общим email",p:"Union-Find",d:"средне",ya:true,
-desc:`Дан словарь: пользователь -> список email.
-Если у двух пользователей есть хотя бы один общий email, считаем, что это один и тот же человек.
-Нужно вернуть словарь с ==уникальными пользователями== (по одному представителю на компоненту) и полным множеством email этой компоненты.
+{id:"ya12",t:"LC 721 · Accounts Merge",p:"Union-Find",d:"средне",ya:true,
+desc:`Дан список аккаунтов вида [name, email1, email2, ...].
+Аккаунты принадлежат одному человеку, если у них есть хотя бы один общий email.
+Нужно объединить такие аккаунты и вернуть результат в формате:
+[name, отсортированный список уникальных email].
 
 Пример:
-u1 -> [a]
-u2 -> [b]
-u3 -> [c]
-u4 -> [a, b, c]
-u5 -> [d]
+Ввод:
+[
+  ["John","johnsmith@mail.com","john_newyork@mail.com"],
+  ["John","johnsmith@mail.com","john00@mail.com"],
+  ["Mary","mary@mail.com"],
+  ["John","johnnybravo@mail.com"]
+]
 
-Возможный ответ:
-u1 -> [a, b, c]
-u5 -> [d]
-
-Вместо u1 можно было выбрать u2/u3/u4 — это одна компонента.`,
-hint:`DSU (Union-Find): для каждого email запоминай первого владельца и объединяй текущего пользователя с ним. Потом сгруппируй пользователей по корню и собери объединение их email.`,
+Вывод (один из вариантов):
+[
+  ["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],
+  ["Mary","mary@mail.com"],
+  ["John","johnnybravo@mail.com"]
+]`,
+hint:`Считай email вершинами графа. Через Union-Find объединяй email внутри одного аккаунта. Затем сгруппируй email по корням и добавь имя владельца.`,
 code:`class Solution {
     static class DSU {
         int[] parent, rank;
@@ -8705,43 +8709,50 @@ code:`class Solution {
         }
     }
 
-    public Map<String, Set<String>> mergeUsers(Map<String, List<String>> users) {
-        List<String> names = new ArrayList<>(users.keySet());
-        int n = names.size();
-        Map<String, Integer> idx = new HashMap<>();
-        for (int i = 0; i < n; i++) idx.put(names.get(i), i);
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        Map<String, Integer> emailToId = new HashMap<>();
+        Map<String, String> emailToName = new HashMap<>();
+        int id = 0;
 
-        DSU dsu = new DSU(n);
-        Map<String, Integer> ownerByEmail = new HashMap<>();
-
-        for (String user : names) {
-            int u = idx.get(user);
-            for (String email : users.getOrDefault(user, Collections.emptyList())) {
-                Integer prev = ownerByEmail.putIfAbsent(email, u);
-                if (prev != null) dsu.union(u, prev);
+        for (List<String> acc : accounts) {
+            String name = acc.get(0);
+            for (int i = 1; i < acc.size(); i++) {
+                String email = acc.get(i);
+                if (!emailToId.containsKey(email)) {
+                    emailToId.put(email, id++);
+                }
+                emailToName.put(email, name);
             }
         }
 
-        Map<Integer, Set<String>> emailsByRoot = new HashMap<>();
-        Map<Integer, String> representative = new HashMap<>();
-        for (String user : names) {
-            int u = idx.get(user);
-            int root = dsu.find(u);
-            representative.putIfAbsent(root, user);
-            emailsByRoot.computeIfAbsent(root, k -> new TreeSet<>())
-                        .addAll(users.getOrDefault(user, Collections.emptyList()));
+        DSU dsu = new DSU(id);
+        for (List<String> acc : accounts) {
+            int firstId = emailToId.get(acc.get(1));
+            for (int i = 2; i < acc.size(); i++) {
+                dsu.union(firstId, emailToId.get(acc.get(i)));
+            }
         }
 
-        Map<String, Set<String>> result = new LinkedHashMap<>();
-        for (Map.Entry<Integer, Set<String>> e : emailsByRoot.entrySet()) {
-            result.put(representative.get(e.getKey()), e.getValue());
+        Map<Integer, List<String>> groups = new HashMap<>();
+        for (String email : emailToId.keySet()) {
+            int root = dsu.find(emailToId.get(email));
+            groups.computeIfAbsent(root, k -> new ArrayList<>()).add(email);
+        }
+
+        List<List<String>> result = new ArrayList<>();
+        for (List<String> emails : groups.values()) {
+            Collections.sort(emails);
+            List<String> merged = new ArrayList<>();
+            merged.add(emailToName.get(emails.get(0)));
+            merged.addAll(emails);
+            result.add(merged);
         }
         return result;
     }
 }`,
-complexity:`Время: O(U + E * α(U)), Память: O(U + E)`,
-complexityExpl:`U — число пользователей, E — общее число email-упоминаний. Каждый union/find амортизированно почти O(1) за счёт path compression и rank.`,
-expl:`Пользователи образуют компоненты связности через общие email. DSU эффективно поддерживает объединение таких компонент, после чего остаётся собрать все email по корням.`},
+complexity:`Время: O(E · α(E) + E log E), Память: O(E)`,
+complexityExpl:`E — число уникальных email. Union-Find операции почти O(1) амортизированно. Сортировка email внутри компонент даёт суммарно до O(E log E).`,
+expl:`Модель «email = вершина» удобна: каждый аккаунт объединяет свои email в одну компоненту. После всех union остаётся собрать email по корням DSU, отсортировать их и приклеить имя владельца.`},
 
 // ===== GRAPH DFS =====
 {id:"lc332",t:"LC 332 · Reconstruct Itinerary",p:"Graph DFS",d:"сложно",

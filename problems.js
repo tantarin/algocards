@@ -8660,6 +8660,8 @@ hint:`Это путь Эйлера в ориентированном графе.
 code:`class Solution {
     public List<String> findItinerary(List<List<String>> tickets) {
         Map<String, PriorityQueue<String>> graph = new HashMap<>();
+     
+        // для каждого аэропорта получаем отсортированную очередь куда можно полететь
         for (List<String> t : tickets) {
             graph.computeIfAbsent(t.get(0), k -> new PriorityQueue<>()).offer(t.get(1));
         }

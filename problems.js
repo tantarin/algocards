@@ -274,7 +274,6 @@ code:`class Solution {
     // Первый индекс i, такой что nums[i] >= target
     private int lowerBound(int[] nums, int target) {
         int lo = 0, hi = nums.length;
-
         while (lo < hi) {
             int mid = lo + (hi - lo) / 2;
 
@@ -291,7 +290,6 @@ code:`class Solution {
     // Первый индекс i, такой что nums[i] > target
     private int upperBound(int[] nums, int target) {
         int lo = 0, hi = nums.length;
-
         while (lo < hi) {
             int mid = lo + (hi - lo) / 2;
 

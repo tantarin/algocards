@@ -215,7 +215,6 @@ code:`class Solution {
     public int search(int[] nums, int target) {
         int left = 0;
         int right = nums.length - 1;
-
         while (left <= right) {
             int mid = left + (right - left) / 2;
 
@@ -394,7 +393,7 @@ expl:`Рекурсия с границами. Для левого поддере
 lcSimilar:[{"t":"Validate Binary Search Tree","h":"validate-binary-search-tree"},{"t":"Kth Smallest Element in a BST","h":"kth-smallest-element-in-a-bst"}]},
 
 // ===== GEOMETRY HASH =====
-{id:"gh1",t:"LeetCode 356: Line Reflection",p:"Geometry Hash",d:"средне",ya:true,
+{id:"gh1",t:"LeetCode 356: Line Reflection",p:"Geometry Hash",d:"средне",
 desc:`Дан массив точек (x, y). Определить, существует ли ==вертикальная прямая==, относительно которой ==все точки симметричны==.
 
 Пример:
@@ -476,7 +475,7 @@ complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Два линейных прохода: HashMap кратностей, затем проверка зеркальных пар — O(n). Карта до n ключей — O(n) памяти.`,
 expl:`Строгая биекция: количество совпадений точки и её зеркала должно совпадать. Точки на оси допустимы. O(n) время и память.`},
 
-{id:"gh3",t:"LeetCode 356 — Line Reflection",p:"Geometry Hash",d:"средне",ya:true,
+{id:"gh3",t:"LeetCode 356 — Line Reflection",p:"Geometry Hash",d:"средне",
 desc:`Дан набор точек на плоскости. Определить, существует ли прямая, параллельная оси Y, которая ==отражает все точки==.
 
 Пример:
@@ -1134,7 +1133,7 @@ complexityExpl:`Один линейный проход по seats — O(n). Ко
 expl:`O(n) один проход. Три случая: начальные нули (расстояние = позиция первой 1), промежуток между двумя 1 (расстояние = gap/2), конечные нули (расстояние = n-1-lastOne).`},
 
 // ===== HASHMAP =====
-{id:"hf1",t:"LC 49. Group Anagrams",p:"HashMap",d:"средне",
+{id:"hf1",t:"Group Anagrams",p:"HashMap",d:"средне",
 desc:`Дан массив строк strs. ==Сгруппировать все анаграммы== вместе.
 Анаграммы — слова с одинаковыми символами в разном порядке.
 
@@ -7243,7 +7242,7 @@ expl:`Сканируем строку слева направо. Как толь
 lcSimilar:[{"n":557,"t":"Reverse Words in a String III","h":"reverse-words-in-a-string-iii"}],
 repoSimilar:["st5"]},
 
-{id:"tp57",t:"LC 281. Zigzag Iterator",p:"Two Pointers",d:"средне",ya:true,
+{id:"tp57",t:"LC 281. Zigzag Iterator",p:"Two Pointers",d:"средне",
 desc:`Даны два списка целых чисел v1 и v2. Нужно итерироваться по ним ==поочерёдно==: один элемент из первого, один из второго и так далее.
 Если один список закончился, продолжаем брать оставшиеся элементы из другого.
 
@@ -8554,6 +8553,46 @@ complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Каждый узел посещаем один раз. Память — глубина стека рекурсии h.`,
 expl:`Когда p и q расходятся по разным поддеревьям текущего узла, именно он становится первым общим предком.`},
 
+// ===== BINARY SEARCH =====
+{id:"lc4",t:"LC 4 · Median of Two Sorted Arrays",p:"Binary Search",d:"сложно",
+desc:`Найти медиану двух отсортированных массивов за O(log(min(m,n))).
+
+Пример:
+Ввод: nums1 = [1,3], nums2 = [2]
+Вывод: 2.00000`,
+hint:`Бинарный поиск по разрезу меньшего массива: ищем корректное разбиение на левую и правую части.`,
+code:`class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
+        int m = nums1.length, n = nums2.length;
+        int leftSize = (m + n + 1) / 2;
+        int lo = 0, hi = m;
+
+        while (lo <= hi) {
+            int cut1 = lo + (hi - lo) / 2;
+            int cut2 = leftSize - cut1;
+
+            int l1 = cut1 == 0 ? Integer.MIN_VALUE : nums1[cut1 - 1];
+            int r1 = cut1 == m ? Integer.MAX_VALUE : nums1[cut1];
+            int l2 = cut2 == 0 ? Integer.MIN_VALUE : nums2[cut2 - 1];
+            int r2 = cut2 == n ? Integer.MAX_VALUE : nums2[cut2];
+
+            if (l1 <= r2 && l2 <= r1) {
+                if (((m + n) & 1) == 1) return Math.max(l1, l2);
+                return (Math.max(l1, l2) + Math.min(r1, r2)) / 2.0;
+            } else if (l1 > r2) {
+                hi = cut1 - 1;
+            } else {
+                lo = cut1 + 1;
+            }
+        }
+        return 0.0;
+    }
+}`,
+complexity:`Время: O(log(min(m,n))), Память: O(1)`,
+complexityExpl:`Ищем позицию разреза бинарным поиском только по меньшему массиву.`,
+expl:`Правильный разрез удовлетворяет условиям l1<=r2 и l2<=r1. После этого медиана берётся из границ разрезов.`},
+
 // ===== SLIDING WINDOW =====
 {id:"lc567",t:"LC 567 · Permutation in String",p:"Sliding Window",d:"средне",
 desc:`Даны строки s1 и s2. Проверить, содержит ли s2 подстроку, являющуюся перестановкой s1.
@@ -8720,6 +8759,26 @@ code:`class Solution {
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый узел участвует в перестановке не более одного раза.`,
 expl:`Мы не меняем значения, только ссылки между узлами.`},
+
+// ===== MATH / SIMULATION =====
+{id:"lc470",t:"LC 470 · Implement Rand10() Using Rand7()",p:"Math / Simulation",d:"средне",
+desc:`Используя API rand7() (равновероятно 1..7), реализовать rand10() (равновероятно 1..10).
+
+Пример:
+Ввод: 3 вызова rand10()
+Вывод: [2,8,10] (пример возможной последовательности)`,
+hint:`Rejection sampling: из двух rand7 получаем равномерно 1..49. Берём только 1..40.`,
+code:`class Solution extends SolBase {
+    public int rand10() {
+        while (true) {
+            int num = (rand7() - 1) * 7 + rand7(); // 1..49
+            if (num <= 40) return 1 + (num - 1) % 10;
+        }
+    }
+}`,
+complexity:`Время: O(1) в среднем, Память: O(1)`,
+complexityExpl:`Отбраковка срабатывает редко: принимаем 40 из 49 исходов.`,
+expl:`Чтобы сохранить равномерность, нельзя брать модуль от 49 напрямую. Нужно отбрасывать «лишний хвост» 41..49.`},
 
 // ===== STACK =====
 {id:"lc71",t:"LC 71 · Simplify Path",p:"Stack",d:"средне",

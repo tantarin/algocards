@@ -914,6 +914,7 @@ code:`class Solution {
                 hasTarget = false;
                 continue;
             }
+
             if (arr[right] == x) hasTarget = true;
             if (hasTarget) {
                 result = Math.max(result, right - left + 1);

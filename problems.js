@@ -8933,7 +8933,9 @@ code:`class MinStack {
     public void push(int val) {
         stack.push(val);
         // добавляем в mins только если val — новый минимум
-        if (mins.isEmpty() || val <= mins.peek()) mins.push(val);
+        if (mins.isEmpty() || val <= mins.peek()) {
+            mins.push(val);
+        }
     }
 
     public void pop() {

@@ -8941,7 +8941,9 @@ code:`class MinStack {
     public void pop() {
         int x = stack.pop();
         // если удаляемый элемент был минимумом — убираем его и из mins
-        if (x == mins.peek()) mins.pop();
+        if (x == mins.peek()) {
+            mins.pop();
+        }
     }
 
     public int top() {

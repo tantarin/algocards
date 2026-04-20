@@ -1154,8 +1154,7 @@ code:`class Solution {
             }
 
             String key = buildKey(cnt);
-            map.computeIfAbsent(key,
-                k -> new ArrayList<>()).add(s);
+            map.computeIfAbsent(key, k -> new ArrayList<>()).add(s);
         }
 
         return new ArrayList<>(map.values());
@@ -1166,6 +1165,7 @@ code:`class Solution {
         for (int x : cnt) {
             sb.append('#').append(x);
         }
+
         return sb.toString();
     }
 }`,

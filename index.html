@@ -2239,6 +2239,8 @@ function buildProblemsJs(){
     out+='complexity:`'+escVal(p.complexity)+'`,\n';
     out+='complexityExpl:`'+escVal(p.complexityExpl)+'`,\n';
     out+='expl:`'+escVal(p.expl)+'`';
+    if(p.ya===true)out+=',\nya:true';
+    if(p.isNew===true)out+=',\nisNew:true';
     if(p.p2)out+=',\np2:"'+p.p2.replace(/"/g,'\\"')+'"';
     if(Array.isArray(p.lcSimilar)&&p.lcSimilar.length)out+=',\nlcSimilar:'+JSON.stringify(p.lcSimilar);
     if(Array.isArray(p.repoSimilar)&&p.repoSimilar.length)out+=',\nrepoSimilar:'+JSON.stringify(p.repoSimilar);

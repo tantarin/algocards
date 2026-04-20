@@ -4098,10 +4098,9 @@ code:`class Solution {
     public List<Integer> minSquareDecomposition(int n) {
         int[] dp = new int[n + 1];
         int[] chosen = new int[n + 1]; // chosen[i] = число x, квадрат x^2 выбран последним для суммы i
-
         Arrays.fill(dp, Integer.MAX_VALUE / 2);
-        dp[0] = 0;
 
+        dp[0] = 0;
         for (int sum = 1; sum <= n; sum++) {
             // Идём от больших квадратов к меньшим, чтобы в типовых кейсах получать "крупные" числа раньше
             for (int x = (int) Math.sqrt(sum); x >= 1; x--) {

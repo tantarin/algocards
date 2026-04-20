@@ -3019,7 +3019,6 @@ code:`class Solution {
         int num = 0;
         char operator = '+';
         int last = 0, sum = 0;
-
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
 

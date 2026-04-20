@@ -8820,20 +8820,24 @@ desc:`Слить два отсортированных связных списк
 hint:`Два указателя и dummy-узел результата.`,
 code:`class Solution {
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
-        ListNode dummy = new ListNode(0);
-        ListNode cur = dummy;
+        ListNode dummy = new ListNode(0); // фиктивная голова — чтобы не писать отдельный случай для первого узла
+        ListNode cur = dummy;             // cur — хвост уже собранного списка
+
         while (list1 != null && list2 != null) {
             if (list1.val <= list2.val) {
-                cur.next = list1;
-                list1 = list1.next;
+                cur.next = list1;        // берём узел из list1
+                list1 = list1.next;      // двигаем list1 вперёд
             } else {
-                cur.next = list2;
-                list2 = list2.next;
+                cur.next = list2;        // берём узел из list2
+                list2 = list2.next;      // двигаем list2 вперёд
             }
-            cur = cur.next;
+            cur = cur.next;              // двигаем хвост
         }
+
+        // один из списков закончился — добавляем остаток другого
         cur.next = (list1 != null) ? list1 : list2;
-        return dummy.next;
+
+        return dummy.next; // голова реального списка
     }
 }`,
 complexity:`Время: O(m+n), Память: O(1)`,

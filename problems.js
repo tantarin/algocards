@@ -8927,25 +8927,27 @@ desc:`Реализовать стек с операциями push, pop, top и 
 Вывод: [null,null,null,null,-3,null,0,-2]`,
 hint:`Храним два стека: основной и стек минимумов.`,
 code:`class MinStack {
-    private final Deque<Integer> stack = new ArrayDeque<>();
-    private final Deque<Integer> mins = new ArrayDeque<>();
+    private final Deque<Integer> stack = new ArrayDeque<>(); // основной стек
+    private final Deque<Integer> mins = new ArrayDeque<>();  // стек минимумов
 
     public void push(int val) {
         stack.push(val);
+        // добавляем в mins только если val — новый минимум
         if (mins.isEmpty() || val <= mins.peek()) mins.push(val);
     }
 
     public void pop() {
         int x = stack.pop();
+        // если удаляемый элемент был минимумом — убираем его и из mins
         if (x == mins.peek()) mins.pop();
     }
 
     public int top() {
-        return stack.peek();
+        return stack.peek(); // верхушка основного стека
     }
 
     public int getMin() {
-        return mins.peek();
+        return mins.peek(); // текущий минимум всегда на вершине mins
     }
 }`,
 complexity:`Время: O(1) на операцию, Память: O(n)`,

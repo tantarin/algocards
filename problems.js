@@ -1716,6 +1716,7 @@ code:`class Solution {
 
         ListNode fast = dummy;
         ListNode slow = dummy;
+        // Шаг 1: Создаем отставание в n+1 шагов
         for (int i = 0; i <= n; i++) {
             fast = fast.next;
         }

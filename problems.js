@@ -1749,8 +1749,7 @@ desc:`Число хранится как ==массив цифр в обратн
 Ввод: [5, 9] × 3 (число 95 × 3)
 Вывод: [5, 8, 2] (число 285)`,
 hint:`Поцифровое умножение с переносом (carry). Как умножение столбиком.`,
-code:`
-class Solution {
+code:`class Solution {
     public List<Integer> multiplyByDigit(List<Integer> num, int n) {
         List<Integer> result = new ArrayList<>();
         int carry = 0;
@@ -1759,9 +1758,11 @@ class Solution {
             result.add(product % 10);
             carry = product / 10;
         }
+
         if (carry > 0) {
             result.add(carry);
         }
+
         return result;
     }
 }

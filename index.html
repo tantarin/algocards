@@ -1810,7 +1810,8 @@ const EDIT_FIELDS=[
   {key:'code',label:'Код (Java)',rows:12},
   {key:'code2',label:'Код 2 (Java, опционально)',rows:12},
   {key:'complexityBundle',label:'Сложность и пояснение: первая строка — «Время: …, Память: …», с новой строки — текст пояснения',rows:2},
-  {key:'p2',label:'Доп. тег (паттерн, опционально)',rows:1}
+  {key:'p2',label:'Доп. тег (паттерн, опционально)',rows:1},
+  {key:'ya',label:'Яндекс (Популярные)',type:'bool'}
 ];
 
 function lcSimilarToText(arr){
@@ -1833,6 +1834,16 @@ function textToLcSimilar(text){
 function renderEditCard(){
   const p=fcList[fcIdx];
   let fields=EDIT_FIELDS.map(f=>{
+    if(f.type==='bool'){
+      const checked=p[f.key]===true?'checked':'';
+      return `
+    <div class="edit-label">${f.label}</div>
+    <label style="display:flex;align-items:center;gap:8px;color:var(--text);margin:6px 0 12px">
+      <input type="checkbox" class="edit-field-bool" data-key="${f.key}" ${checked}>
+      <span>Включить тег</span>
+    </label>
+  `;
+    }
     const val=f.key==='complexityBundle'?complexityBundleFromProblem(p):(p[f.key]||'');
     return`
     <div class="edit-label">${f.label}</div>
@@ -2279,6 +2290,10 @@ async function saveCard(){
     }else{
       p[el.dataset.key]=el.value;
     }
+  });
+  document.querySelectorAll('.edit-field-bool').forEach(el=>{
+    if(el.checked)p[el.dataset.key]=true;
+    else delete p[el.dataset.key];
   });
 
   btn.disabled=true;

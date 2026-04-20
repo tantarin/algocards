@@ -8660,11 +8660,13 @@ hint:`Это путь Эйлера в ориентированном графе.
 code:`class Solution {
     public List<String> findItinerary(List<List<String>> tickets) {
         Map<String, PriorityQueue<String>> graph = new HashMap<>();
-     
-        // для каждого аэропорта получаем отсортированную очередь куда можно полететь
+
+        // строим граф: аэропорт → min-heap куда можно полететь
+        // min-heap гарантирует лексикографический порядок
         for (List<String> t : tickets) {
             graph.computeIfAbsent(t.get(0), k -> new PriorityQueue<>()).offer(t.get(1));
         }
+
         LinkedList<String> route = new LinkedList<>();
         dfs("JFK", graph, route);
         return route;
@@ -8672,9 +8674,14 @@ code:`class Solution {
 
     private void dfs(String airport, Map<String, PriorityQueue<String>> graph, LinkedList<String> route) {
         PriorityQueue<String> next = graph.get(airport);
+
+        // пока есть неиспользованные билеты из этого аэропорта
         while (next != null && !next.isEmpty()) {
-            dfs(next.poll(), graph, route);
+            dfs(next.poll(), graph, route); // poll() удаляет билет — повторно не пройдём
         }
+
+        // все исходящие рёбра обойдены — этот аэропорт занимает своё место в маршруте
+        // addFirst потому что маршрут собирается с конца
         route.addFirst(airport);
     }
 }`,

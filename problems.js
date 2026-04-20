@@ -1710,8 +1710,7 @@ desc:`Дан связный список. ==Удалить n-й узел с ко
 Вывод: 1→2→3→5 (удалён 4)`,
 hint:`Fast указатель опережает slow на n шагов. Когда fast = null, slow стоит перед удаляемым. Dummy-узел упрощает крайние случаи.`,
 code:`class Solution {
-    public ListNode removeNthFromEnd(ListNode head,
-                                     int n) {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
         ListNode dummy = new ListNode(0);
         dummy.next = head;
         ListNode fast = dummy;

@@ -8827,7 +8827,6 @@ code:`class Solution {
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый узел участвует в перестановке не более одного раза.`,
 expl:`Мы не меняем значения, только ссылки между узлами.`,
-ya:true,
 isNew:true},
 
 // ===== MATH / SIMULATION =====

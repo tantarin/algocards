@@ -8718,6 +8718,48 @@ code:`class Solution {
         route.addFirst(airport);
     }
 }`,
+code2:`import java.util.*;
+
+public class ReconstructItinerary {
+
+    public List<String> findItinerary(List<List<String>> tickets) {
+        // Граф: из аэропорта → список доступных вылетов (отсортирован по алфавиту!)
+        Map<String, PriorityQueue<String>> graph = new HashMap<>();
+
+        // Строим граф
+        for (List<String> ticket : tickets) {
+            String from = ticket.get(0);
+            String to = ticket.get(1);
+            graph.computeIfAbsent(from, k -> new PriorityQueue<>()).add(to);
+        }
+
+        List<String> path = new ArrayList<>();
+
+        // Запускаем DFS из JFK
+        dfs("JFK", graph, path);
+
+        // Важно: мы строили путь в обратном порядке!
+        Collections.reverse(path);
+
+        return path;
+    }
+
+    private void dfs(String airport,
+                     Map<String, PriorityQueue<String>> graph,
+                     List<String> path) {
+
+        // Пока из текущего аэропорта есть непотраченные билеты
+        PriorityQueue<String> destinations = graph.get(airport);
+        while (destinations != null && !destinations.isEmpty()) {
+            // Берём ЛЕКСИКОГРАФИЧЕСКИ МАЛЕНЬКИЙ (самый первый в PriorityQueue)
+            String next = destinations.poll();
+            dfs(next, graph, path);
+        }
+
+        // Когда все вылеты из этого аэропорта исчерпаны — добавляем его в путь
+        path.add(airport);
+    }
+}`,
 complexity:`Время: O(E log D) (E — число билетов; из каждого аэропорта poll из min-heap степени исхода D; суммарно E извлечений из куч), Память: O(E) (граф из очередей + маршрут)`,
 complexityExpl:`Каждое ребро удаляется из min-heap ровно один раз, операции с кучей дают логарифм. Храним граф и маршрут из O(E) элементов.`,
 expl:`Лексикографический минимум достигается выбором следующего аэропорта из min-heap. Добавляем вершину в начало ответа после обхода её исходящих рёбер — классический алгоритм Хиерхольцера.`,

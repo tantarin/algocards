@@ -852,7 +852,7 @@ function hashString(s){
   return h>>>0;
 }
 
-/** Заполняет fcList из getFiltered() (полный список без лимита). */
+/** Заполняет fcList из getFiltered() (полный список без лимита). При фильтре «Популярные» порядок — по убыванию оценочной сложности по памяти (см. memoryComplexityRank). */
 function rebuildDailyList(){
   dailyListDateKey=todayLocalDateKey();
   fcList=[...getFiltered()];
@@ -1609,6 +1609,48 @@ function setShowMarked(val){
   fcIdx=0;fcFlipped=false;renderCard();
 }
 
+/** Текст после «Память:» в поле complexity (для упорядочивания популярных карточек). */
+function extractMemoryPart(complexity){
+  const c=String(complexity||'');
+  const mark='Память:';
+  const i=c.indexOf(mark);
+  if(i<0)return '';
+  return c.slice(i+mark.length).trim();
+}
+
+/**
+ * Числовой ранг вспомогательной памяти: больше — тяжелее по памяти (раньше при сортировке по убыванию).
+ * Опирается на формулировки в complexity; порядок проверок важен.
+ */
+function memoryComplexityRank(p){
+  const mem=extractMemoryPart(p.complexity).toLowerCase().replace(/\s+/g,' ');
+  if(!mem)return 0;
+  const has=(re)=>re.test(mem);
+
+  if(has(/o\(m\s*[·*×]\s*n\)|o\(n\s*[·*×]\s*m\)/))return 100;
+  if(has(/o\(n\s*[·*×]\s*l\)/))return 95;
+  if(has(/\bo\(t\)/))return 92;
+  if(has(/o\(n\s*\+\s*m\)|o\(m\s*\+\s*n\)|o\(n\s*\+\s*m\)/))return 88;
+  if(has(/o\(n\s*\+\s*k\)|o\(k\s*\+\s*n\)/))return 86;
+  if(has(/\bo\(e\)/))return 84;
+  if(has(/o\(max\(/))return 78;
+  if(has(/число событий|событий в окне/))return 62;
+  if(has(/\bo\(n\)\s*доп/))return 34;
+  if(has(/\bo\(1\)/))return 30;
+  if(has(/\bo\(n\)/))return 75;
+  if(has(/\bo\(m\)/)&&!has(/o\(m\s*[·*×]/))return 72;
+  if(has(/\bo\(k\)/))return 65;
+  if(has(/\bo\(p\)/))return 67;
+  if(has(/\bo\(u\)/))return 67;
+  if(has(/\bo\(q/))return 63;
+  if(has(/o\(min/))return 58;
+  if(has(/\bo\(h\)/))return 50;
+  if(has(/\bo\(w\)/))return 48;
+  if(has(/\bo\(a\)/)&&has(/256|алфавит/))return 30;
+  if(has(/o\(log/))return 40;
+  return 20;
+}
+
 function getFiltered(){
   let list=yaFilter?P.filter(isYandexProblem):[...P];
   if(activeFilter)list=list.filter(p=>p.p===activeFilter||p.p2===activeFilter);
@@ -1641,6 +1683,12 @@ function getFiltered(){
         return haystack.includes(q);
       });
     }
+  }
+  if(yaFilter){
+    list=list.slice().sort((a,b)=>{
+      const d=memoryComplexityRank(b)-memoryComplexityRank(a);
+      return d||String(a.id).localeCompare(String(b.id));
+    });
   }
   return list;
 }

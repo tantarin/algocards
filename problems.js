@@ -9067,7 +9067,7 @@ code:`class Solution {
             }
         }
         
-        ВАЖНО
+        //ВАЖНО, что возвращаем левую границу
         return nums[left];
     }
 }`,

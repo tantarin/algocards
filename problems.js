@@ -5229,30 +5229,33 @@ code:`class Solution {
         if (root == null) return result;
 
         Deque<TreeNode> queue = new ArrayDeque<>();
-        queue.offer(root);
-        boolean reverse = false;  // флаг: нужно ли разворачивать уровень
+        queue.add(root);
+        boolean leftToRight = true;  // флаг направления: true = слева направо, false = справа налево
 
         while (!queue.isEmpty()) {
-            int size = queue.size();
-            List<Integer> level = new ArrayList<>();
-            
+            int size = queue.size();           // количество узлов на текущем уровне
+            LinkedList<Integer> level = new LinkedList<>();  // список для текущего уровня
+
+            // Обрабатываем все узлы текущего уровня
             for (int i = 0; i < size; i++) {
-                TreeNode node = queue.poll();
-                level.add(node.val);
+                TreeNode node = queue.poll();   // извлекаем узел из очереди
                 
-                if (node.left != null) queue.offer(node.left);
-                if (node.right != null) queue.offer(node.right);
+                // Добавляем значение в зависимости от направления
+                if (leftToRight) {
+                    level.addLast(node.val);    // при прямом порядке — в конец
+                } else {
+                    level.addFirst(node.val);   // при обратном — в начало
+                }
+                
+                // Добавляем детей в очередь для следующего уровня (всегда слева направо)
+                if (node.left != null) queue.add(node.left);
+                if (node.right != null) queue.add(node.right);
             }
-            
-            // Если уровень чётный (считая с 0) — разворачиваем
-            if (reverse) {
-                Collections.reverse(level);
-            }
-            
-            result.add(level);
-            reverse = !reverse;  // переключаем флаг
+
+            result.add(level);          // сохраняем уровень
+            leftToRight = !leftToRight; // меняем направление для следующего уровня
         }
-        
+
         return result;
     }
 }`,

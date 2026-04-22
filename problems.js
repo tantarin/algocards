@@ -1702,26 +1702,33 @@ code:`public int minMeetingRooms(int[][] intervals) {
 code2:`public int minMeetingRooms(int[][] intervals) {
     int n = intervals.length;
     if (n == 0) return 0;
-    int[] starts = new int[n], ends = new int[n];
+    
+    int[] starts = new int[n];
+    int[] ends = new int[n];
+    
     for (int i = 0; i < n; i++) {
         starts[i] = intervals[i][0];
         ends[i] = intervals[i][1];
     }
+    
     Arrays.sort(starts);
     Arrays.sort(ends);
-
-    int rooms = 0, maxRooms = 0;
-    int j = 0;  // указатель на ends
-    for (int i = 0; i < n; i++) {  // for по starts[i]
-        // **СНАЧАЛА освобождаем ВСЕ комнаты, закончившиеся ДО starts[i]**
-        while (j < n && starts[i] >= ends[j]) {
+    
+    int rooms = 0;
+    int maxRooms = 0;
+    int endIdx = 0;  // указатель на ends
+    
+    for (int startIdx = 0; startIdx < n; startIdx++) {
+        // СНАЧАЛА освобождаем ВСЕ комнаты, закончившиеся ДО starts[startIdx]
+        while (endIdx < n && starts[startIdx] >= ends[endIdx]) {
             rooms--;
-            j++;
+            endIdx++;
         }
-        // **ПОТОМ выделяем новую для этой встречи**
+        // ПОТОМ выделяем новую для этой встречи
         rooms++;
         maxRooms = Math.max(maxRooms, rooms);
     }
+    
     return maxRooms;
 }`,
 complexity:`Время: O(n log n), Память: O(n)`,

@@ -5185,9 +5185,14 @@ code:`class Solution {
 
     private int dfs(TreeNode node) {
         if (node == null) return 0;
+        
+        // Если сумма от ребёнка отрицательная — лучше не брать его вообще
         int left = Math.max(0, dfs(node.left));
         int right = Math.max(0, dfs(node.right));
+    
         maxSum = Math.max(maxSum, node.val + left + right);
+
+        //для родителя мы можем дать ТОЛЬКО ОДНУ сторону
         return node.val + Math.max(left, right);
     }
 }`,

@@ -8742,26 +8742,24 @@ desc:`Вернуть значения узлов, которые видны пр
 Ввод: root = [1,2,3,null,5,null,4]
 Вывод: [1,3,4]`,
 hint:`BFS по уровням: на каждом уровне сохраняем последний узел очереди.`,
-code:`class Solution {
+code:`public class Solution {
     public List<Integer> rightSideView(TreeNode root) {
-        List<Integer> result = new ArrayList<>();
-        if (root == null) return result;
-
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            int size = queue.size();
-            for (int i = 0; i < size; i++) {
-                TreeNode node = queue.poll();
-                if (i == size - 1) {
-                    result.add(node.val);
-                }
-
-                if (node.left != null) queue.offer(node.left);
-                if (node.right != null) queue.offer(node.right);
-            }
-        }
+        List<Integer> result = new ArrayList<Integer>();
+        rightView(root, result, 0);
         return result;
+    }
+    
+    public void rightView(TreeNode curr, List<Integer> result, int currDepth){
+        if(curr == null){
+            return;
+        }
+        if(currDepth == result.size()){
+            result.add(curr.val);
+        }
+        
+        rightView(curr.right, result, currDepth + 1);
+        rightView(curr.left, result, currDepth + 1);
+        
     }
 }`,
 complexity:`Время: O(n) (каждый узел один раз), Память: O(w) (очередь BFS; w — максимальная ширина уровня, т.е. макс. число узлов в очереди одновременно)`,

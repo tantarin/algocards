@@ -1531,7 +1531,7 @@ code:`class Solution {
             int nextStart = intervals[i][0];
             int nextEnd   = intervals[i][1];
 
-            if (currentEnd < nextStart) {
+            if (currentEnd < nextStart) { //нет пересечения
                 merged.add(new int[]{currentStart, currentEnd});
                 currentStart = nextStart;
                 currentEnd   = nextEnd;

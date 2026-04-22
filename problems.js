@@ -6065,13 +6065,11 @@ code:`class Solution {
     }
 
     private String buildKeyIgnoringZeros(int num) {
-        int[] cnt = new int[10];
-
         if (num == 0) {
-            // У 0 нет ненулевых цифр: отдельный пустой ключ.
             return "";
         }
 
+        int[] cnt = new int[10];
         while (num > 0) {
             int d = num % 10;
             if (d != 0) cnt[d]++;

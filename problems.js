@@ -8703,6 +8703,61 @@ p2:"Locked / Premium",
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
 repoSimilar:["ya4"]},
 
+{id:"lc933",t:"LC 933 · Number of Recent Calls",p:"Queue / Design",d:"легко",
+desc:`Есть класс ==RecentCounter==, который считает количество недавних запросов.
+
+Реализуй:
+- ==RecentCounter()== — инициализирует счётчик;
+- ==int ping(int t)== — добавляет запрос в момент времени ==t== (в миллисекундах) и возвращает число запросов за последние 3000 мс, то есть в диапазоне ==[t - 3000, t]==.
+
+Гарантируется, что значения ==t== в вызовах ping строго возрастают.
+
+Пример:
+Ввод: ["RecentCounter","ping","ping","ping","ping"], [[],[1],[100],[3001],[3002]]
+Вывод: [null,1,2,3,3]`,
+hint:`Храним только события внутри окна [t-3000, t]. Можно либо держать очередь timestamp, либо массив + два указателя (head/tail).`,
+code:`class RecentCounter {
+    // По условию LeetCode максимум 10^4 вызовов ping
+    private final int[] records = new int[10000];
+    private int start;
+    private int end;
+
+    public RecentCounter() {
+        start = 0;
+        end = 0;
+    }
+
+    public int ping(int t) {
+        while (start < end && t - records[start] > 3000) {
+            start++;
+        }
+        records[end++] = t;
+        return end - start;
+    }
+}`,
+code2:`class RecentCounter {
+    private final Queue<Integer> queue;
+
+    public RecentCounter() {
+        queue = new LinkedList<>();
+    }
+
+    public int ping(int t) {
+        queue.offer(t);
+
+        while (!queue.isEmpty() && queue.peek() < t - 3000) {
+            queue.poll();
+        }
+
+        return queue.size();
+    }
+}`,
+complexity:`Решение 1 (массив+2 указателя): Время: O(1) амортизированно на ping, Память: O(n) (records хранит все добавленные времена; start/end — константное число индексов). Решение 2 (очередь): Время: O(1) амортизированно на ping, Память: O(w) (в очереди только окно [t-3000,t], где w — число запросов в окне)`,
+complexityExpl:`В обоих подходах каждый timestamp добавляется один раз и удаляется (или пропускается указателем) не более одного раза, поэтому суммарно линейно по числу вызовов, а на один ping — амортизированно O(1).`,
+expl:`Инвариант одинаковый: структура хранит только времена из актуального окна [t-3000, t]. После добавления нового t удаляем (или сдвигаем head) все значения < t-3000, затем размер структуры и есть ответ.`,
+lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
+repoSimilar:["ya10"]},
+
 // ===== GRAPH DFS =====
 {id:"lc332",t:"LC 332 · Reconstruct Itinerary",p:"Graph DFS",d:"сложно",
 desc:`Дан список авиабилетов [from, to]. Нужно восстановить маршрут, начиная с "JFK", который использует ==все билеты ровно один раз==.
@@ -9039,6 +9094,71 @@ complexity:`Время: O(p) (p — число путей; два прохода
 complexityExpl:`Один проход для источников и один для проверки назначения.`,
 expl:`Конечный город встречается только как to и ни разу как from.`,
 ya:true},
+
+// ===== STRING =====
+{id:"lc1446",t:"LC 1446 · Consecutive Characters",p:"String",d:"легко",
+desc:`==Сила строки== — это максимальная длина непустой подстроки, состоящей только из одного уникального символа.
+
+Дана строка ==s==. Нужно вернуть силу этой строки.
+
+Пример:
+Ввод: s = "leetcode"
+Вывод: 2
+Пояснение: подстрока "ee" имеет длину 2 и состоит только из символа 'e'.`,
+hint:`Иди слева направо и считай длину текущей серии одинаковых символов. При смене символа обновляй максимум и сбрасывай текущий счётчик.`,
+code:`class Solution {
+    public int maxPower(String s) {
+        int len = s.length();
+        int count = 0;
+        int curr = 1;
+
+        for (int i = 0; i < len; i++) {
+            if (i < len - 1 && s.charAt(i) == s.charAt(i + 1)) {
+                curr++;
+            } else {
+                if (curr > count) {
+                    count = curr;
+                }
+                curr = 1;
+            }
+        }
+        return count;
+    }
+}`,
+complexity:`Время: O(n) (один проход по s длины n), Память: O(1) доп. (два счётчика count/curr и индекс i — константное число переменных)`,
+complexityExpl:`Каждый символ строки обрабатывается один раз. Дополнительные структуры не используются.`,
+expl:`Поддерживаем длину текущего блока одинаковых символов (curr). Если следующий символ такой же — увеличиваем curr, иначе фиксируем максимум (count) и начинаем новый блок с 1. Ответ — наибольшая длина блока.`,
+lcSimilar:[{"n":485,"t":"Max Consecutive Ones","h":"max-consecutive-ones"}]},
+
+{id:"lc771",t:"LC 771 · Jewels and Stones",p:"String",d:"легко",
+desc:`Даны строки ==jewels== и ==stones==.
+
+- Символы в ==jewels== — это типы камней, которые считаются драгоценностями.
+- Символы в ==stones== — камни, которые у тебя есть.
+
+Нужно вернуть, сколько символов из ==stones== являются драгоценностями (то есть входят в ==jewels==).
+
+Сравнение чувствительно к регистру: 'a' и 'A' — разные символы.
+
+Пример:
+Ввод: jewels = "aA", stones = "aAAbbbb"
+Вывод: 3`,
+hint:`Проходим по stones и для каждого символа проверяем, есть ли он в jewels (через indexOf). Если есть — увеличиваем счётчик.`,
+code:`class Solution {
+    public int numJewelsInStones(String jewels, String stones) {
+        int num = 0;
+        for (int i = 0; i < stones.length(); i++) {
+            if (jewels.indexOf(stones.charAt(i)) != -1) {
+                num++;
+            }
+        }
+        return num;
+    }
+}`,
+complexity:`Время: O(n·m) в худшем (n = |stones|, m = |jewels|; на каждом из n символов stones вызывается jewels.indexOf с линейным поиском по m), Память: O(1) доп. (только счётчик и индекс цикла)`,
+complexityExpl:`Внешний цикл идёт по stones. Проверка indexOf для строки jewels — линейная по её длине. Дополнительных структур данных нет.`,
+expl:`Идея прямая: считаем только те символы stones, которые присутствуют в jewels. Так как indexOf учитывает точный символ, регистр автоматически обрабатывается корректно.`,
+lcSimilar:[{"n":383,"t":"Ransom Note","h":"ransom-note"}]},
 
 // ===== BINARY SEARCH =====
 {id:"lc153",t:"LC 153 · Find Minimum in Rotated Sorted Array",p:"Binary Search",d:"средне",

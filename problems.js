@@ -9055,7 +9055,7 @@ code:`class Solution {
         int right = nums.length - 1;
         
         while (left < right) {
-            int mid = left + (right - left) / 2;
+            int mid = left + (right - left) / 2; //НЕТУ RETURN
             
             // Если mid > right → мы в левой части, минимум справа
             if (nums[mid] > nums[right]) {
@@ -9067,6 +9067,7 @@ code:`class Solution {
             }
         }
         
+        ВАЖНО
         return nums[left];
     }
 }`,

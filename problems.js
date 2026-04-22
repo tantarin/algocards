@@ -9051,15 +9051,22 @@ desc:`Дан отсортированный массив без дубликат
 hint:`Сравниваем nums[mid] и nums[right]. Если mid больше right — минимум справа, иначе влево включая mid.`,
 code:`class Solution {
     public int findMin(int[] nums) {
-        int left = 0, right = nums.length - 1;
+        int left = 0;
+        int right = nums.length - 1;
+        
         while (left < right) {
             int mid = left + (right - left) / 2;
+            
+            // Если mid > right → мы в левой части, минимум справа
             if (nums[mid] > nums[right]) {
                 left = mid + 1;
-            } else {
+            } 
+            // Если mid <= right → мы в правой части, минимум слева (включая mid)
+            else {
                 right = mid;
             }
         }
+        
         return nums[left];
     }
 }`,

@@ -5766,42 +5766,73 @@ import java.util.Map;
 
 public class Solution {
 
+    /**
+     * Находит две идентичные подстроки в бинарном дереве.
+     * Подстроки считаются одинаковыми, если у них совпадают:
+     * - структура (левые и правые потомки)
+     * - значения узлов (буквы A-Z)
+     * 
+     * @return Pair из двух узлов — корней одинаковых поддеревьев
+     */
     public Pair<TNode, TNode> findEquivalentSubtrees(TNode root) {
         if (root == null) {
             return null;
         }
 
-        Map<Integer, TNode> seen = new HashMap<>();
-        Holder holder = new Holder();
+        Map<Integer, TNode> seen = new HashMap<>();  // mask → первый встреченный узел с такой маской
+        Holder holder = new Holder();                // контейнер для ответа (обход ограничений Java)
         dfsMask(root, seen, holder);
         return holder.answer;
     }
 
+    /**
+     * DFS обход, который для каждого узла вычисляет битовую маску,
+     * уникально кодирующую структуру и значения всего поддерева.
+     * 
+     * @return int - битовая маска поддерева
+     */
     private int dfsMask(TNode node,
                         Map<Integer, TNode> seen,
                         Holder holder) {
         if (node == null) {
-            return 0;
+            return 0;  // пустое поддерево = маска 0
         }
 
-        int left  = dfsMask(node.left,  seen, holder);
+        // РЕКУРСИВНЫЙ ОБХОД:
+        // 1. Сначала обрабатываем левое поддерево
+        int left = dfsMask(node.left, seen, holder);
+        
+        // РАННИЙ ВЫХОД: если уже нашли пару, прекращаем дальнейший поиск
+        // Это оптимизация — не тратим время на обход оставшегося дерева
+        // Ответ уже найден, можно просто возвращаться
         if (holder.answer != null) {
-            return 0;
+            return 0;  // возвращаем любое значение, оно всё равно не используется
         }
 
+        // 2. Потом обрабатываем правое поддерево
         int right = dfsMask(node.right, seen, holder);
+        
+        // Снова проверяем, не нашли ли пару при обходе правого поддерева
         if (holder.answer != null) {
             return 0;
         }
 
+        // 3. ВЫЧИСЛЯЕМ МАСКУ ТЕКУЩЕГО УЗЛА:
+        // Комбинируем маски левого и правого поддеревьев + добавляем бит текущего значения
+        // Каждая буква A-Z занимает свой бит (A=бит0, B=бит1, ... Z=бит25)
         int mask = left | right | (1 << (node.value - 'A'));
 
-        //положить, если отсутствует, и вернуть предыдущее значение
+        // 4. ПРОВЕРЯЕМ, ВСТРЕЧАЛИ ЛИ МЫ ТАКУЮ МАСКУ РАНЬШЕ:
+        // putIfAbsent — если маски нет в map, кладём и возвращаем null
+        // Если маска уже есть — возвращаем предыдущий узел
         TNode prev = seen.putIfAbsent(mask, node);
+        
         if (prev != null) {
+            // НАШЛИ ПАРУ! Два разных узла имеют одинаковые поддеревья
             holder.answer = new Pair<>(prev, node);
         }
-        return mask;
+        
+        return mask;  // возвращаем маску для родительского узла
     }
 
     private static class Holder {

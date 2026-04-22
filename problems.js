@@ -842,10 +842,8 @@ code:`class Solution {
         List<Integer> result = new ArrayList<>();
 
         //partitionStart — где начался текущий кусок
-        //maxReach — насколько далеко должен дойти текущий кусок
         int partitionStart = 0;
         int maxReach = 0;
-
         for (int i = 0; i < s.length(); i++) {
             maxReach = Math.max(maxReach, lastOccurrence[s.charAt(i) - 'a']);
             if (i == maxReach) { //все символы, которые мы встретили в текущем куске, больше не встречаются дальше

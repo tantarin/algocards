@@ -1699,6 +1699,31 @@ code:`public int minMeetingRooms(int[][] intervals) {
     }
     return maxRooms;
 }`,
+code2:`public int minMeetingRooms(int[][] intervals) {
+    int n = intervals.length;
+    if (n == 0) return 0;
+    int[] starts = new int[n], ends = new int[n];
+    for (int i = 0; i < n; i++) {
+        starts[i] = intervals[i][0];
+        ends[i] = intervals[i][1];
+    }
+    Arrays.sort(starts);
+    Arrays.sort(ends);
+
+    int rooms = 0, maxRooms = 0;
+    int j = 0;  // указатель на ends
+    for (int i = 0; i < n; i++) {  // for по starts[i]
+        // **СНАЧАЛА освобождаем ВСЕ комнаты, закончившиеся ДО starts[i]**
+        while (j < n && starts[i] >= ends[j]) {
+            rooms--;
+            j++;
+        }
+        // **ПОТОМ выделяем новую для этой встречи**
+        rooms++;
+        maxRooms = Math.max(maxRooms, rooms);
+    }
+    return maxRooms;
+}`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка двух массивов starts/ends — O(n log n). Два указателя — O(n). Два массива — O(n) памяти.`,
 expl:`Ключевой вопрос: нужна ли новая комната или можно занять освободившуюся? Нам не важно КАКАЯ встреча заканчивается — важно лишь: закончилась ли хоть одна к моменту starts[i]? Сортируем starts и ends по отдельности. Два указателя: если starts[i] >= ends[j] — одна встреча уже закончилась, комнату переиспользуем (rooms--, j++). Иначе — нужна новая (rooms++). Запоминаем максимум. O(n log n).`},

@@ -5229,30 +5229,30 @@ code:`class Solution {
         if (root == null) return result;
 
         Deque<TreeNode> queue = new ArrayDeque<>();
-        queue.add(root);
-        boolean leftToRight = true;
+        queue.offer(root);
+        boolean reverse = false;  // флаг: нужно ли разворачивать уровень
 
         while (!queue.isEmpty()) {
             int size = queue.size();
-            LinkedList<Integer> level = new LinkedList<>();
-
+            List<Integer> level = new ArrayList<>();
+            
             for (int i = 0; i < size; i++) {
                 TreeNode node = queue.poll();
-                if (leftToRight) {
-                    level.addLast(node.val);
-                } else {
-                    level.addFirst(node.val);
-                }
-                if (node.left != null)
-                    queue.add(node.left);
-                if (node.right != null)
-                    queue.add(node.right);
+                level.add(node.val);
+                
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
             }
-
+            
+            // Если уровень чётный (считая с 0) — разворачиваем
+            if (reverse) {
+                Collections.reverse(level);
+            }
+            
             result.add(level);
-            leftToRight = !leftToRight;
+            reverse = !reverse;  // переключаем флаг
         }
-
+        
         return result;
     }
 }`,

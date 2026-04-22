@@ -1732,15 +1732,14 @@ code:`class Solution {
     public ListNode reverseList(ListNode head) {
         ListNode prev = null;
         ListNode curr = head;
-
         while (curr != null) {
-            ListNode tmp = curr.next;
-            curr.next = prev;
-            prev = curr;
-            curr = tmp;
+            ListNode tmp = curr.next;  // 1. сохраняем следующий
+            curr.next = prev;          // 2. разворачиваем стрелку
+            prev = curr;               // 3. сдвигаем prev
+            curr = tmp;                // 4. сдвигаем curr
         }
-
-        return prev;
+        
+        return prev;  // новая голова
     }
 }`,
 complexity:`Время: O(n), Память: O(1)`,

@@ -7340,6 +7340,7 @@ class Solution {
         int i = 0, j = 0;
 
         while (i < nums1.length) {
+            //так как в ответ не добавлять дубликаты
             if (i > 0 && nums1[i] == nums1[i - 1]) {
                 i++;
                 continue;

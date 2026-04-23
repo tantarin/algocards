@@ -7331,7 +7331,8 @@ nums1 = [1, 2, 3], nums2 = [2, 4, 6]
 nums1 = [1, 2, 3, 3], nums2 = [1, 1, 2, 2]
 // Результат: [3]`,
 hint:`Дубликаты в nums1 пропускаем. Указатель j по nums2 только увеличиваем: догоняем nums2[j] ≥ nums1[i]; если j вышел за массив или nums2[j] ≠ nums1[i] — элемент только в nums1.`,
-code:`import java.util.*;
+code:`ЕСЛИ НУЖНЫ УНИКАЛЬНЫЕ ЭЛЕМЕНТЫ
+import java.util.*;
 
 class Solution {
     public List<Integer> difference(int[] nums1, int[] nums2) {
@@ -7356,6 +7357,23 @@ class Solution {
         }
 
         return result;
+    }
+}`,
+code2:`ЕСЛИ НУЖНЫ ВСЕ ВХОЖДЕНИЯ
+
+int j = 0;
+
+for (int i = 0; i < nums1.length; i++) {
+    if (i > 0 && nums1[i] == nums1[i - 1]) {
+        continue;
+    }
+
+    while (j < nums2.length && nums2[j] < nums1[i]) {
+        j++;
+    }
+
+    if (j == nums2.length || nums2[j] != nums1[i]) {
+        res.add(nums1[i]);
     }
 }`,
 complexity:`Время: O(n+m), Память: O(1) доп.`,

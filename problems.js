@@ -7952,19 +7952,17 @@ code:`class Solution {
     public int countingPairs(String s) {
         int cnt = 0;
         Set<Character> window = new HashSet<>();
-
         int l = 0;
-        int r = -1;
-        while (l < s.length()) {
-            while (r + 1 < s.length() && !window.contains(s.charAt(r + 1))) {
-                window.add(s.charAt(r + 1));
-                r++;
-            }
 
+        for (int r = 0; r < s.length(); r++) {
+            while (window.contains(s.charAt(r))) {
+                window.remove(s.charAt(l));
+                l++;
+            }
+            window.add(s.charAt(r));
             cnt += r - l + 1;
-            window.remove(s.charAt(l));
-            l++;
         }
+
         return cnt;
     }
 }`,

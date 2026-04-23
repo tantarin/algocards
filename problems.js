@@ -7359,21 +7359,24 @@ class Solution {
         return result;
     }
 }`,
-code2:`ЕСЛИ НУЖНЫ ВСЕ ВХОЖДЕНИЯ
+code2:`import java.util.*;
 
-int j = 0;
+class Solution {
+    public List<Integer> diff(int[] nums1, int[] nums2) {
+        List<Integer> res = new ArrayList<>();
+        int j = 0;
 
-for (int i = 0; i < nums1.length; i++) {
-    if (i > 0 && nums1[i] == nums1[i - 1]) {
-        continue;
-    }
+        for (int i = 0; i < nums1.length; i++) {
+            while (j < nums2.length && nums2[j] < nums1[i]) {
+                j++;
+            }
 
-    while (j < nums2.length && nums2[j] < nums1[i]) {
-        j++;
-    }
+            if (j == nums2.length || nums2[j] != nums1[i]) {
+                res.add(nums1[i]);
+            }
+        }
 
-    if (j == nums2.length || nums2[j] != nums1[i]) {
-        res.add(nums1[i]);
+        return res;
     }
 }`,
 complexity:`Время: O(n+m), Память: O(1) доп.`,

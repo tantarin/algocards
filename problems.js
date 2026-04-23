@@ -7955,7 +7955,7 @@ code:`class Solution {
         int l = 0;
 
         for (int r = 0; r < s.length(); r++) {
-            while (window.contains(s.charAt(r))) {
+            while (window.contains(s.charAt(r))) { //если подряд одинаковые символы
                 window.remove(s.charAt(l));
                 l++;
             }

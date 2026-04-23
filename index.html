@@ -1790,7 +1790,7 @@ function renderFilters(){
     `<div class="filter-btn${noFilters?' active':''}" onclick="clearAllFilters()">Все</div>`+
     yaBtn+
     diffBtns+
-    allPatterns.map(p=>`<div class="filter-btn${activeFilter===p&&!showMarkedOnly&&!yaFilter?' active':''}" onclick="setShowMarked(false);setFilter('${p}')">${p}</div>`).join('');
+    allPatterns.map(p=>`<div class="filter-btn${activeFilter===p&&!showMarkedOnly?' active':''}" onclick="setShowMarked(false);setFilter('${p}')">${p}</div>`).join('');
 }
 
 function setDiffFilter(val){
@@ -1811,7 +1811,6 @@ function clearAllFilters(){
 
 function toggleYaFilter(){
   yaFilter=!yaFilter;
-  if(yaFilter){activeFilter=null;showMarkedOnly=false;}
   renderFilters();
   if(searchQuery)fcList=getFiltered();
   else rebuildDailyList();
@@ -1819,7 +1818,7 @@ function toggleYaFilter(){
 }
 
 function setFilter(pat){
-  activeFilter=pat;yaFilter=false;
+  activeFilter=pat;
   renderFilters();
   // При активном поиске фильтр только сужает выдачу поиска; иначе — полный список по выбранным фильтрам
   if(searchQuery)fcList=getFiltered();

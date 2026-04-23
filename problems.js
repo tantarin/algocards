@@ -3708,7 +3708,7 @@ code:`class Solution {
 
         int w = 0;
         int i = 0;
-        while (i < arr.length) {
+        while (i < arr.length) { //так как i должен затем прыгнуть на конец группы j
             char c = arr[i];
             int j = i;
             while (j < arr.length && arr[j] == c) {

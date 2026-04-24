@@ -2349,9 +2349,9 @@ code:`class Solution {
         for (char c : t.toCharArray()) freq[c]++;
 
         int needCount = t.length();  // сколько символов ещё нужно
-        int left = 0;
         int bestStart = 0;
         int minLen = Integer.MAX_VALUE;
+        int left = 0;
         for (int right = 0; right < s.length(); right++) {
             char rightChar = s.charAt(right);
 

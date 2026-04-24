@@ -2699,6 +2699,53 @@ code:`class Solution {
         return count;
     }
 }`,
+code2:`class Solution {
+    public int countComplete(String s) {
+        // target — сколько уникальных символов нужно собрать
+        int target = (int) s.chars().distinct().count();
+
+        // needCount — сколько уникальных символов ещё не хватает в окне
+        int needCount = target;
+
+        // freq[c] — сколько раз символ встречается в текущем окне
+        int[] freq = new int[128];
+
+        int left = 0;
+        int count = 0;
+
+        for (int right = 0; right < s.length(); right++) {
+            char rightChar = s.charAt(right);
+
+            freq[rightChar]++;
+
+            // Символ впервые появился в окне —
+            // значит одним нужным уникальным символом стало меньше
+            if (freq[rightChar] == 1) {
+                needCount--;
+            }
+
+            // Пока в окне есть все уникальные символы строки
+            while (needCount == 0) {
+                // Любое расширение вправо тоже будет валидным
+                count += s.length() - right;
+
+                char leftChar = s.charAt(left);
+
+                freq[leftChar]--;
+
+                // Символ полностью исчез из окна —
+                // значит снова одного уникального символа не хватает
+                if (freq[leftChar] == 0) {
+                    needCount++;
+                }
+
+                left++;
+            }
+        }
+
+        return count;
+    }
+}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right идёт один раз, left сдвигается при валидном окне — O(n). Массив freq[128] — O(1) памяти.`,
 expl:`Шаг 1: считаем количество уникальных символов (unique). Шаг 2: расширяем right — при freq[char] == 1 → covered++. Шаг 3: когда covered == unique — все уникальные в окне; все дальнейшие расширения вправо (s.length() - right) тоже валидны, сразу прибавляем к ответу. Шаг 4: сжимаем left — при freq[char] == 0 → covered--. O(n).`,

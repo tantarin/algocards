@@ -624,6 +624,8 @@ public class Solution {
         // восстанавливаем маршрут, отмечая посещённые города
         List<String> result = new ArrayList<>();
         result.add(start);
+
+        //Если середина — у города 2 соседа, но один уже посещён, второй — нет
         Set<String> visited = new HashSet<>();
         visited.add(start);
         for (int i = 0; i < tickets.size(); i++) {

@@ -2470,7 +2470,7 @@ code:`class Solution {
                 if (freq[leftChar] > 0) needCount++;
             }
 
-            // Проверяем анаграмму
+            //ПРОВЕРЯЕМ текущее окно [right-windowSize+1, right]
             if (needCount == 0) {
                 result.add(right - windowSize + 1);
             }

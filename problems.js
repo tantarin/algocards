@@ -608,6 +608,7 @@ public class Solution {
         // для каждого города храним список городов, с которыми он связан
         Map<String, List<String>> graph = new HashMap<>();
         for (List<String> ticket : tickets) {
+            //у серединных городов по два соседа
             graph.computeIfAbsent(ticket.get(0), k -> new ArrayList<>()).add(ticket.get(1));
             graph.computeIfAbsent(ticket.get(1), k -> new ArrayList<>()).add(ticket.get(0));
         }

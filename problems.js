@@ -606,6 +606,7 @@ code:`import java.util.*;
 public class Solution {
     public List<String> route(List<List<String>> tickets) {
         // для каждого города храним список городов, с которыми он связан
+        //без графа мы не знаем соседей
         Map<String, List<String>> graph = new HashMap<>();
         for (List<String> ticket : tickets) {
             //у серединных городов по два соседа

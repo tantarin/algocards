@@ -2850,6 +2850,44 @@ code:`class Solution {
         return false;
     }
 }`,
+code2:`class Solution {
+    public boolean containsMutation(String gene, String virus) {
+        if (gene.length() < virus.length()) return false;
+
+        // Map: символ -> сколько ещё нужно в окне (>0 - нужен, 0 - покрыт, <0 - лишний)
+        Map<Character, Integer> freq = new HashMap<>();
+        for (char c : virus.toCharArray()) {
+            freq.put(c, freq.getOrDefault(c, 0) + 1);
+        }
+
+        int needCount = virus.length(); // сколько символов ещё нужно
+        int windowSize = virus.length();
+
+        for (int right = 0; right < gene.length(); right++) {
+            char rightChar = gene.charAt(right);
+
+            // Добавляем правый символ
+            if (freq.getOrDefault(rightChar, 0) > 0) {
+                needCount--;
+            }
+            freq.put(rightChar, freq.getOrDefault(rightChar, 0) - 1);
+
+            // Удаляем левый символ (когда окно полное)
+            if (right >= windowSize) {
+                char leftChar = gene.charAt(right - windowSize);
+                freq.put(leftChar, freq.getOrDefault(leftChar, 0) + 1);
+                if (freq.get(leftChar) > 0) {
+                    needCount++;
+                }
+            }
+
+            // Проверяем мутацию
+            if (needCount == 0) return true;
+        }
+
+        return false;
+    }
+}`,
 complexity:`Время: O(|gene|), Память: O(1)`,
 complexityExpl:`Скользящее окно длины |virus| по gene с O(1) обновлениями — O(|gene|). Массив freq[128] — O(1) памяти.`,
 expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Фиксированное окно, freq массив, счётчик needCount. O(n).`,

@@ -2378,8 +2378,9 @@ code:`class Solution {
         return minLen == Integer.MAX_VALUE ? "" : s.substring(bestStart, bestStart + minLen);
     }
 }`,
-complexity:`Время: O(|s|) (каждый индекс входит/выходит из окна ≤1 раз), Память: O(1) доп. (массив freq[128] под ASCII + целые left/right/best*; размер 128 не растёт с n)`,
-complexityExpl:`Левый и правый указатели двигаются только вправо — O(|s|) амортизированно. Массив частот фиксированной длины (алфавит ASCII в условии) — O(1) памяти.`,
+complexity:`В нотации Big-O: O(n + m) ≈ O(n) (так как обычно n ≥ m)`,
+complexityExpl:`n = s.length() — длина строки, в которой ищем (source)
+m = t.length() — длина строки, которую ищем (target)`,
 expl:`Шаг 1: проходим по t и заполняем freq[c] (сколько ещё «нужно» для символа c), needCount = |t|.
 Шаг 2: расширяем right — если freq[rightChar] > 0, уменьшаем needCount; всегда делаем freq[rightChar]--.
 Шаг 3: пока needCount == 0 — окно валидно; обновляем минимум длины и bestStart.

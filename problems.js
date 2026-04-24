@@ -2704,18 +2704,13 @@ code2:`class Solution {
         // target — сколько уникальных символов нужно собрать
         int target = (int) s.chars().distinct().count();
 
-        // needCount — сколько уникальных символов ещё не хватает в окне
         int needCount = target;
-
-        // freq[c] — сколько раз символ встречается в текущем окне
         int[] freq = new int[128];
 
         int left = 0;
         int count = 0;
-
         for (int right = 0; right < s.length(); right++) {
             char rightChar = s.charAt(right);
-
             freq[rightChar]++;
 
             // Символ впервые появился в окне —
@@ -2730,7 +2725,6 @@ code2:`class Solution {
                 count += s.length() - right;
 
                 char leftChar = s.charAt(left);
-
                 freq[leftChar]--;
 
                 // Символ полностью исчез из окна —

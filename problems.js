@@ -8364,7 +8364,7 @@ class UserStatistics {
     }
     
     public void event(long now, long userId) {
-        // 1. Сначала удаляем устаревшие события
+        //если не вызывать expire, то старые события будут копиться в памяти.
         expire(now);
         
         // 2. Добавляем новое событие

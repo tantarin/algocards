@@ -1303,7 +1303,12 @@ desc:`Даны авиабилеты в виде пар [откуда, куда].
 
 Пример:
 Ввод: [["Moscow","Yerevan"],["Vladivostok","Moscow"]]
-Вывод: ["Vladivostok", "Moscow", "Yerevan"]`,
+Вывод: ["Vladivostok", "Moscow", "Yerevan"]
+
+Условия:
+Билеты направленные: [from, to]
+Нужно восстановить порядок перелётов
+Гарантируется, что маршрут — цепочка (нет ветвлений)`,
 hint:`Начальный город — тот, которого нет во множестве городов назначения. Далее следуем по цепочке через HashMap.`,
 code:`class Solution {
     public List<String> reconstructRoute(String[][] tickets) {

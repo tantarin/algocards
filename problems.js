@@ -2862,7 +2862,6 @@ code2:`class Solution {
 
         int needCount = virus.length(); // сколько символов ещё нужно
         int windowSize = virus.length();
-
         for (int right = 0; right < gene.length(); right++) {
             char rightChar = gene.charAt(right);
 

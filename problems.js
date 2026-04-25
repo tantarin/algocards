@@ -6066,7 +6066,7 @@ public class Solution {
 
         // Проверяем, встречалось ли уже такое множество букв
         if (best.containsKey(currMask)) {
-            var other = best.get(currMask);
+            AbstractMap.SimpleEntry<TreeNode, Integer> other = best.get(currMask); 
             int totalSize = size + other.getValue();
             if (totalSize > resultSum) {
                 resultSum = totalSize;

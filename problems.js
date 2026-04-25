@@ -7674,15 +7674,11 @@ class Solution {
 
         List<Integer> result = new ArrayList<>();
         int ref = nums.get(idx);
-        
-        // Добавляем опорный элемент первым
         result.add(ref);
         
-        // Два указателя: левый и правый от опоры
         int left = idx - 1;
         int right = idx + 1;
         for (int i = 0; i < k - 1; i++) {
-            // Проверяем, какой указатель можно взять
             boolean canTakeLeft = left >= 0;
             boolean canTakeRight = right < nums.size();
             if (!canTakeRight) {
@@ -7698,9 +7694,9 @@ class Solution {
             int leftDist = Math.abs(ref - nums.get(left));
             int rightDist = Math.abs(ref - nums.get(right));
             if (leftDist <= rightDist) {
-                result.add(nums.get(left--));   // левый ближе или равен
+                result.add(nums.get(left--));  
             } else {
-                result.add(nums.get(right++));  // правый ближе
+                result.add(nums.get(right++)); 
             }
         }
         

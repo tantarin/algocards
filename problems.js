@@ -6521,7 +6521,7 @@ code:`public boolean isOneEditDistance(String s, String t) {
         }
     }
     
-    return sLen + 1 == tLen; //когда один не совпал символ в конце
+    return true; 
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один линейный проход с ранним выходом — O(n). Несколько индексов — O(1) памяти.`,

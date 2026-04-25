@@ -6088,6 +6088,87 @@ public class Solution {
         return 1 << (ch - 'A');
     }
 }`,
+code2:`import java.util.*;
+
+/**
+ * class TreeNode {
+ *     Character val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(Character val) { this.val = val; }
+ *     TreeNode(Character val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+
+public class Solution {
+    // record для хранения информации о поддереве (Java 14+)
+    private record NodeInfo(TreeNode node, int size) {}
+    
+    // ключ: битовая маска -> информация о поддереве
+    private Map<Integer, NodeInfo> best;
+    
+    // результат: два найденных поддерева
+    private List<TreeNode> result;
+    
+    // лучшая найденная сумма размеров поддеревьев
+    private int resultSum;
+    
+
+    private int letterMask(char ch) {
+        return 1 << (ch - 'A');
+    }
+    
+
+    public List<TreeNode> findSubtrees(TreeNode root) {
+        best = new HashMap<>();
+        result = new ArrayList<>(Arrays.asList(null, null));
+        resultSum = -1;
+        
+        dfs(root);
+        
+        return resultSum == -1 ? Collections.emptyList() : result;
+    }
+
+
+    private int[] dfs(TreeNode node) {
+        if (node == null) {
+            return new int[]{0, 0};
+        }
+        
+        // Рекурсивно получаем маски и размеры поддеревьев
+        int[] left = dfs(node.left);
+        int[] right = dfs(node.right);
+        
+        // Маска и размер для текущего узла
+        int currMask = left[0] | right[0] | letterMask(node.val);
+        int size = left[1] + right[1] + 1;
+        
+        // Проверяем, встречалось ли уже такое множество букв
+        NodeInfo other = best.get(currMask);
+        if (other != null) {
+            int totalSize = size + other.size();
+            if (totalSize > resultSum) {
+                resultSum = totalSize;
+                result.set(0, other.node());
+                result.set(1, node);
+            }
+        }
+        
+        // Сохраняем это поддерево, если оно больше предыдущего для этой маски
+        NodeInfo existing = best.get(currMask);
+        if (existing == null || size > existing.size()) {
+            best.put(currMask, new NodeInfo(node, size));
+        }
+        
+        return new int[]{currMask, size};
+    }
+   
+}`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один DFS — O(n). HashMap хранит не более n масок. Битовые операции O(1).`,
 expl:`Каждое поддерево кодируется 26-битной маской. DFS считает маску и размер снизу вверх. В HashMap храним для каждой маски узел с наибольшим поддеревом — это гарантирует максимальную сумму при совпадении. При каждом совпадении масок обновляем ответ, если сумма больше. Итог: один проход O(n), без повторного обхода.`},

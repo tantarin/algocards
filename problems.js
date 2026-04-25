@@ -6126,7 +6126,7 @@ public class Solution {
 
     public List<TreeNode> findSubtrees(TreeNode root) {
         best = new HashMap<>();
-        result = new ArrayList<>(Arrays.asList(null, null));
+        result = new ArrayList<>(Arrays.asList(null, null)); //резервация места под два значения
         resultSum = -1;
         
         dfs(root);

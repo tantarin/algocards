@@ -7547,70 +7547,65 @@ complexityExpl:`Один проход по обеим строкам — O(n+m).
 expl:`Два указателя на две строки. Поочерёдный выбор символов, затем дописываем хвост. O(n+m) время и память.`,
 lcSimilar:[{"n":392,"t":"Is Subsequence","h":"is-subsequence"}]},
 
-{id:"tp53",t:"Разность отсортированных массивов",p:"Two Pointers",d:"легко",
-desc:`Даны два отсортированных массива nums1 и nums2. Вернуть все ==уникальные элементы nums1, которых нет в nums2==, в порядке неубывания.
-БЕЗ ДУБЛИКАТОВ
+{id:"tp53",t:"Односторонняя разница",p:"Two Pointers",d:"легко",
+desc:`# желтый банк
+
+# яндекс
+Даны два массива nums1 и nums2, отсортированные по не убыванию.
+
+Необходимо вернуть все элементы из nums1, которые не встречаются в nums2, так же в порядке по не убыванию.
 
 Пример 1:
-nums1 = [1, 2, 3], nums2 = [2, 4, 6]
-// Результат: [1, 3]
+
+Ввод: nums1 = [1,2,3,4,5], nums2 = [4,5,6]
+Вывод: [1,2,3]
 
 Пример 2:
-nums1 = [1, 2, 3, 3], nums2 = [1, 1, 2, 2]
-// Результат: [3]`,
-hint:`Дубликаты в nums1 пропускаем. Указатель j по nums2 только увеличиваем: догоняем nums2[j] ≥ nums1[i]; если j вышел за массив или nums2[j] ≠ nums1[i] — элемент только в nums1.`,
-code:`ЕСЛИ НУЖНЫ УНИКАЛЬНЫЕ ЭЛЕМЕНТЫ
-import java.util.*;
 
-class Solution {
-    public List<Integer> difference(int[] nums1, int[] nums2) {
+Ввод: nums1 = [1,2,2,3,3,3,3,4], nums2 = [0,0,0,3]
+Вывод: [1,2,2,4]
+Объяснение: удаляем все тройки из nums1 даже если в nums2 встречается только 1 раз
+
+Ограничения:
+
+len(nums1) >= 0
+len(nums2) >= 0`,
+hint:`Два указателя. Если nums1[p1] < nums2[p2], элемент точно есть только в nums1 — добавляем его и двигаем p1. Если nums1[p1] > nums2[p2], двигаем p2. Если равны — пропускаем элемент из nums1.`,
+code:`import java.util.*;
+
+public class Solution {
+    public List<Integer> findDifference(List<Integer> nums1, List<Integer> nums2) {
         List<Integer> result = new ArrayList<>();
-        int i = 0, j = 0;
+        int p1 = 0;
+        int p2 = 0;
 
-        while (i < nums1.length) {
-            //так как в ответ не добавлять дубликаты
-            if (i > 0 && nums1[i] == nums1[i - 1]) {
-                i++;
+        while (p1 < nums1.size()) {
+            // если nums2 закончился — все оставшиеся из nums1 идут в результат
+            if (p2 >= nums2.size()) {
+                result.add(nums1.get(p1));
+                p1++;
                 continue;
             }
 
-            while (j < nums2.length && nums2[j] < nums1[i]) {
-                j++;
+            // если текущий элемент nums1 меньше — он есть только в nums1
+            if (nums1.get(p1) < nums2.get(p2)) {
+                result.add(nums1.get(p1));
+                p1++;
+            } else if (nums1.get(p1) > nums2.get(p2)) {
+                p2++;
+            } else {
+                // при равных элементах пропускаем в nums1
+                // для верной обработки дублей в nums1
+                p1++;
             }
-
-            if (j == nums2.length || nums2[j] != nums1[i]) {
-                result.add(nums1[i]);
-            }
-
-            i++;
         }
-
         return result;
     }
 }`,
-code2:`import java.util.*;
-
-class Solution {
-    public List<Integer> diff(int[] nums1, int[] nums2) {
-        List<Integer> res = new ArrayList<>();
-        int j = 0;
-
-        for (int i = 0; i < nums1.length; i++) {
-            while (j < nums2.length && nums2[j] < nums1[i]) {
-                j++;
-            }
-
-            if (j == nums2.length || nums2[j] != nums1[i]) {
-                res.add(nums1[i]);
-            }
-        }
-
-        return res;
-    }
-}`,
-complexity:`Время: O(n+m), Память: O(1) доп.`,
-complexityExpl:`Индекс i проходит nums1, j по nums2 только растёт — суммарно O(n+m). Результат не считаем за доп. память.`,
-expl:`Для каждого первого вхождения значения в nums1 сдвигаем j в nums2 до первого элемента ≥ этого значения. Если такого нет или значение не совпало — число есть только в nums1, добавляем в ответ.`,
+code2:``,
+complexity:`Время: O(n+m), Память: O(k)`,
+complexityExpl:`Оба указателя движутся только вперёд: p1 не более n шагов, p2 не более m шагов, значит суммарно O(n+m). Дополнительная память нужна только под ответ из k элементов.`,
+expl:`Главная идея — использовать два указателя на отсортированных массивах. Если nums1[p1] меньше nums2[p2], текущее значение из nums1 уже точно не встретится дальше в nums2, значит его надо добавить в ответ. Если nums1[p1] больше, двигаем p2 и догоняем. Если значения равны, это число нужно удалить из ответа полностью, поэтому просто пропускаем элемент в nums1. За счёт того, что p2 остаётся на том же значении, все дубли этого числа в nums1 тоже будут пропущены.`,
 lcSimilar:[{"n":2215,"t":"Find the Difference of Two Arrays","h":"find-the-difference-of-two-arrays"},{"n":349,"t":"Intersection of Two Arrays","h":"intersection-of-two-arrays"},{"n":350,"t":"Intersection of Two Arrays II","h":"intersection-of-two-arrays-ii"}]},
 
 {id:"tp54",t:"К ближайших чисел (якорь idx)",p:"Two Pointers",d:"легко",

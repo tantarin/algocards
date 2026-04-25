@@ -6517,7 +6517,6 @@ code:`public boolean isOneEditDistance(String s, String t) {
                         return false;
                     }
             }
-            return true;
         }
     }
     

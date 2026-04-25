@@ -7667,15 +7667,6 @@ hint:`Стартуем с nums[idx]. Два указателя l = idx−1 и r 
 code:`import java.util.*;
 
 class Solution {
-    /**
-     * Находит k ближайших чисел к опорному элементу nums[idx].
-     * Массив должен быть отсортирован.
-     *
-     * @param nums отсортированный список чисел
-     * @param idx индекс опорного элемента
-     * @param k   количество ближайших элементов (включая сам опорный)
-     * @return список из k ближайших чисел в порядке возрастания расстояния
-     */
     public List<Integer> findNearestNumbers(List<Integer> nums, int idx, int k) {
         if (k == 0) {
             return new ArrayList<>();

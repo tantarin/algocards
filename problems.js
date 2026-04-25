@@ -6505,7 +6505,7 @@ code:`class Solution {
         // гарантируем что s — всегда более короткая строка
         if (sLen > tLen) return isOneEditDistance(t, s);
 
-        for (int i = 0; i < sLen; i++) {
+        for (int i = 0; i < sLen; i++) {//идем по короткой строке
             if (s.charAt(i) != t.charAt(i)) {
                 if (sLen == tLen) {
                     return s.substring(i + 1).equals(t.substring(i + 1));
@@ -6525,7 +6525,7 @@ code2:`public boolean isOneEditDistance(String s, String t) {
     
     if (sLen > tLen) return isOneEditDistance(t, s);
 
-    for (int i = 0; i < sLen; i++) {
+    for (int i = 0; i < sLen; i++) {//идем по короткой строке
         if (s.charAt(i) != t.charAt(i)) {
             if (sLen == tLen) {
                 for (int j = i + 1; j < sLen; j++)

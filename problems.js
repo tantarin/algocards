@@ -990,6 +990,29 @@ code:`class Solution {
         return result;
     }
 }`,
+code2:`import java.util.*;
+
+public class Solution {
+    public Integer longestSubarrayWithMin(List<Integer> nums, Integer x) {
+        int result = -1;
+        int left = 0;
+        boolean hasTarget = false;
+        
+        for (int right = 0; right < nums.size(); right++) {
+            if (nums.get(right) < x) {
+                left = right + 1;
+                hasTarget = false;
+                continue;
+            }
+            if (nums.get(right) == x) hasTarget = true;
+            if (hasTarget) {
+                result = Math.max(result, right - left + 1);
+            }
+        }
+        
+        return result;
+    }
+}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл со скользящим окном, каждый индекс обрабатывается константное число раз — O(n). Переменные — O(1).`,
 expl:`Все элементы в окне должны быть >= x, и хотя бы один == x. Элементы < x разрывают окно. Сдвигаем left и сбрасываем hasTarget. O(n).`,

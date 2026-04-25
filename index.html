@@ -36,7 +36,13 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center}
 #search::placeholder{color:var(--dim)}
 #search:focus{border-color:var(--purple)}
 .spoiler-row{margin-top:12px}
+.card-front-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
 .hint-btn{background:var(--card2);border:none;color:var(--orange);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;display:inline-block}
+.interview-entry-btn{background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(14,165,233,.16));border:1px solid rgba(125,211,252,.28);color:#c4b5fd;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;transition:.18s}
+.interview-entry-btn:hover{border-color:rgba(125,211,252,.5);color:#e9d5ff;box-shadow:0 0 0 1px rgba(125,211,252,.12),0 8px 24px rgba(14,165,233,.08)}
+.interview-entry-btn:active{transform:scale(.98);background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(14,165,233,.24))}
+.interview-entry-btn.primary{display:block;width:100%;margin-top:14px;padding:12px 18px;border-radius:14px;font-size:14px;font-weight:700;text-align:center;background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(14,165,233,.24));border-color:rgba(125,211,252,.42);box-shadow:0 10px 28px rgba(14,165,233,.08),inset 0 1px 0 rgba(255,255,255,.06)}
+.interview-entry-btn.primary:hover{border-color:rgba(125,211,252,.62);box-shadow:0 12px 34px rgba(14,165,233,.12),0 0 0 1px rgba(125,211,252,.14)}
 .hint-text{margin-top:8px;color:var(--orange);font-size:14px;font-weight:600;-webkit-user-select:text;user-select:text;cursor:text}
 .hl{color:var(--orange);font-weight:600;background:rgba(245,158,11,0.15);padding:1px 4px;border-radius:4px}
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
@@ -1258,6 +1264,7 @@ let peekCatTimer=null;
 let simState={
   open:false,
   problem:null,
+  sourceProblemId:null,
   totalSec:30*60,
   leftSec:30*60,
   timerId:null,
@@ -1944,11 +1951,14 @@ function renderCard(){
           <button class="copy-btn copy-problem-desc" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
           <div class="desc-display">${problemDescHtml}</div>
         </div>
+        <button class="interview-entry-btn primary" onclick="event.stopPropagation();openInterviewSimulation('${p.id}')">Перейти в интервью-режим по этой задаче</button>
         ${p.starter?`<div class="code-wrap" style="margin-top:10px">
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.starter)}</code></pre>
         </div>`:''}
-        <div class="spoiler-row">
-          <button class="hint-btn" onclick="event.stopPropagation();this.nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
+        <div class="card-front-actions">
+          <button class="hint-btn" onclick="event.stopPropagation();this.closest('.card-front-actions').nextElementSibling.style.display='block';this.style.display='none'">💡 Подсказка</button>
+        </div>
+        <div class="spoiler-row" style="margin-top:8px">
           <div class="hint-text" style="display:none">${esc(p.hint)}</div>
         </div>
         ${similarProblemsHtml(p)}
@@ -2070,9 +2080,15 @@ function getRandomProblemForSimulation(){
   }
   return next;
 }
-function openInterviewSimulation(){
+function getProblemById(problemId){
+  if(problemId===undefined||problemId===null||problemId==='')return null;
+  return P.find(function(problem){return String(problem.id)===String(problemId);})||null;
+}
+function openInterviewSimulation(problemId){
   simState.open=true;
-  simState.problem=getRandomProblemForSimulation();
+  const selectedProblem=getProblemById(problemId);
+  simState.sourceProblemId=selectedProblem?selectedProblem.id:null;
+  simState.problem=selectedProblem||getRandomProblemForSimulation();
   simState.leftSec=simState.totalSec;
   simState.running=true;
   if(simState.timerId)clearInterval(simState.timerId);
@@ -2091,6 +2107,7 @@ function openInterviewSimulation(){
 function closeInterviewSimulation(){
   simState.open=false;
   simState.running=false;
+  simState.sourceProblemId=null;
   if(simState.timerId){clearInterval(simState.timerId);simState.timerId=null;}
   document.getElementById('simModal').style.display='none';
 }
@@ -2107,6 +2124,7 @@ function resetInterviewTimer(){
 }
 function nextInterviewProblem(){
   if(!simState.open)return;
+  simState.sourceProblemId=null;
   simState.problem=getRandomProblemForSimulation();
   simState.leftSec=simState.totalSec;
   simState.running=true;
@@ -2248,7 +2266,7 @@ function renderInterviewSimulation(options){
       <div class="sim-controls">
         <button class="sim-btn main" onclick="toggleInterviewTimer()">${simState.running?'Пауза':'Старт'}</button>
         <button class="sim-btn" onclick="resetInterviewTimer()">Сбросить время</button>
-        <button class="sim-btn" onclick="nextInterviewProblem()">Другая задача</button>
+        <button class="sim-btn" onclick="nextInterviewProblem()">${simState.sourceProblemId?'Случайная задача':'Другая задача'}</button>
         <button class="sim-btn" onclick="closeInterviewSimulation()">Закрыть</button>
       </div>
       <div class="sim-problem">${renderProblemDescHtml(p.desc||'')}</div>

@@ -6507,12 +6507,9 @@ code:`class Solution {
 
         for (int i = 0; i < sLen; i++) {
             if (s.charAt(i) != t.charAt(i)) {
-                boolean sameLength = sLen == tLen;
-                if (sameLength) {
-                    // замена: хвосты после позиции i должны совпасть
+                if (sLen == tLen) {
                     return s.substring(i + 1).equals(t.substring(i + 1));
                 } else {
-                    // вставка в s: сдвигаем указатель в t и сравниваем хвосты
                     return s.substring(i).equals(t.substring(i + 1));
                 }
             }

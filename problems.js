@@ -8124,23 +8124,25 @@ code:`class Solution {
         return result;
     }
 }`,
-code2:`class Solution {
+code2:`import java.util.HashSet;
+
+class Solution {
     public int lengthOfLongestSubstring(String s) {
-        Map<Character, Integer> lastIndex = new HashMap<>();
+        HashSet<Character> set = new HashSet<>();
         int left = 0;
         int maxLength = 0;
         
         for (int right = 0; right < s.length(); right++) {
-            char c = s.charAt(right);
+            char currentChar = s.charAt(right);
             
-            // Если символ уже был в текущем окне
-            if (lastIndex.containsKey(c) && lastIndex.get(c) >= left) {
-                // Перемещаем левую границу за пределы предыдущего вхождения
-                left = lastIndex.get(c) + 1;
+            // Если символ уже есть в окне, двигаем left
+            while (set.contains(currentChar)) {
+                set.remove(s.charAt(left));
+                left++;
             }
             
-            // Обновляем последнюю позицию символа
-            lastIndex.put(c, right);
+            // Добавляем текущий символ
+            set.add(currentChar);
             
             // Обновляем максимальную длину
             maxLength = Math.max(maxLength, right - left + 1);

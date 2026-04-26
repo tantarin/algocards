@@ -5905,32 +5905,43 @@ class TNode {
 Сигнатура:
 Pair<TNode, TNode> findEquivalentSubtrees(TNode root)`,
 hint:`Для каждой вершины посчитай ==битовую маску== букв в поддереве (26 бит, OR детей + бит текущей буквы). Если две вершины дали одинаковую маску — это ответ. Храни \`Map<Integer, TNode>\`.`,
-code:`public class Solution {
-    private Pair<TNode, TNode> answer;
+code:`import java.util.HashMap;
+import java.util.Map;
 
-    public Pair<TNode, TNode> findEquivalentSubtrees(TNode root) {
-        answer = null;
-        Map<Integer, TNode> seen = new HashMap<>();
-        dfsMask(root, seen);
-        return answer;
+public class Solution {
+    private Pair<TreeNode, TreeNode> result;
+
+    public Pair<TreeNode, TreeNode> findSubTrees(TreeNode root) {
+        result = null;
+
+        Map<Integer, TreeNode> seen = new HashMap<>();
+        dfs(root, seen);
+
+        return result;
     }
 
-    private int dfsMask(TNode node, Map<Integer, TNode> seen) {
-        if (node == null || answer != null) {
+    private int dfs(TreeNode node, Map<Integer, TreeNode> seen) {
+        if (node == null || result != null) {
             return 0;
         }
 
-        int left = dfsMask(node.left, seen);
-        if (answer != null) return 0;
+        int left = dfs(node.left, seen);
+        if (result != null) {
+            return 0;
+        }
 
-        int right = dfsMask(node.right, seen);
-        if (answer != null) return 0;
+        int right = dfs(node.right, seen);
+        if (result != null) {
+            return 0;
+        }
 
         int mask = left | right | (1 << (node.value - 'A'));
 
-        TNode prev = seen.putIfAbsent(mask, node);
+        TreeNode prev = seen.get(mask);
         if (prev != null) {
-            answer = new Pair<>(prev, node);
+            result = new Pair<>(prev, node);
+        } else {
+            seen.put(mask, node);
         }
 
         return mask;

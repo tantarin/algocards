@@ -8124,7 +8124,9 @@ code:`class Solution {
         return result;
     }
 }`,
-code2:`import java.util.HashSet;
+code2:`//Общая сложность: O(n + n + n) = O(3n) = O(n)
+
+import java.util.HashSet;
 
 class Solution {
     public int lengthOfLongestSubstring(String s) {

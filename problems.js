@@ -2645,7 +2645,7 @@ diagram:{"type":"window","data":[1,0,1,1,0,1,1,0],"steps":[{"wl":0,"wr":0,"desc"
 
 // ===== ONE PASS WITH STATE =====
 {id:"sw6",t:"LeetCode 1493 Longest Subarray of 1's After Deleting One Element.",p:"One Pass with State",d:"средне",
-desc:`Дан бинарный массив. ==Удалить ровно один элемент==. Найти ==максимальную длину подмассива из единиц==.
+desc:`Дан бинарный массив. ==УДАЛИТЬ ровно один элемент==. Найти ==максимальную длину подмассива из единиц==.
 
 Пример:
 Ввод: [1, 1, 0, 1]
@@ -2677,30 +2677,6 @@ code:`class Solution {
         return maxLen;
     }
 }`,
-code2:`import java.util.*;
-
-public class Solution {
-    public int maxOnesAfterDeletions(List<Integer> nums) {
-        int prev = 0;      // количество единиц до последнего нуля
-        int curr = 0;      // текущее количество подряд идущих единиц
-        int maxLen = 0;
-        boolean hasZero = false;
-        
-        for (int num : nums) {
-            if (num == 1) {
-                curr++;
-            } else {
-                hasZero = true;
-                prev = curr;
-                curr = 0;
-            }
-            // обновляем ответ
-            maxLen = Math.max(maxLen, prev + curr);
-        }
-        // если нулей не было, удаляем одну единицу
-        return hasZero ? maxLen : maxLen - 1;
-    }
-}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением prev и curr при нулях — O(n). Константные переменные — O(1) памяти.`,
 expl:`Задача сводится к: найти максимальное окно с не более чем одним нулём, удалить из него ровно один элемент. Скользящее окно: расширяем right, считаем нули. Когда нулей > 1 — сжимаем left.
@@ -2708,32 +2684,37 @@ expl:`Задача сводится к: найти максимальное ок
 lcSimilar:[{"n":1493,"t":"Longest Subarray of 1's After Deleting One Element","h":"longest-subarray-of-1-s-after-deleting-one-element"}]},
 
 {id:"sw7",t:"Подставной отчет",p:"One Pass with State",d:"средне",
-desc:`Дан бинарный массив. Можно ==перевернуть ОДИН ноль в единицу==. Найти ==максимальную длину подмассива== из единиц.
+desc:`Дан бинарный массив. Можно ==перевернуть или ЗАМЕНИТЬ ОДИН ноль в единицу==. Найти ==максимальную длину подмассива== из единиц.
 
 Пример:
 Ввод: [1, 1, 0, 1, 1, 1, 1, 0, 1]
 Вывод: 7 (переворачиваем ноль на позиции 2)`,
 hint:`Отслеживаем count единиц до нуля и после. Ответ = prev + 1 + count.`,
-code:`class Solution {
-    public int longestSubarray(int[] nums) {
-        int left = 0;
-        int zeroCount = 0;
-        int maxLen = 0;
-        
-        for (int right = 0; right < nums.length; right++) {
-            if (nums[right] == 0) zeroCount++;
-            
-            while (zeroCount > 1) {
-                if (nums[left] == 0) zeroCount--;
-                left++;
-            }
-            
-            // Исправление: +1, потому что считаем всю длину окна
-            maxLen = Math.max(maxLen, right - left + 1);
+code:`public int maxOnesWithFlip(int[] nums) {
+    int prev = 0;
+    int count = 0;
+    int maxCount = 0;
+    boolean hasZero = false;  // флаг: был ли ноль
+    
+    for (int num : nums) {
+        if (num == 1) {
+            count++;
+        } else {
+            hasZero = true;  // встретили ноль
+            maxCount = Math.max(maxCount, prev + 1 + count);
+            prev = count;
+            count = 0;
         }
-        
-        return maxLen;
     }
+    
+    maxCount = Math.max(maxCount, prev + 1 + count);
+    
+    // Если не было ни одного нуля, вычитаем лишнюю единицу
+    if (!hasZero) {
+        maxCount--;
+    }
+    
+    return maxCount;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,
@@ -5112,10 +5093,8 @@ code:`class Solution {
         Arrays.sort(nums);
         
         long count = 0;
-        int left = 0;
-        
+        int left = 0; 
         for (int right = 0; right < n; right++) {
-            // Находим первый индекс, где nums[right] - nums[left] < k
             while (left < right && nums[right] - nums[left] >= k) {
                 left++;
             }

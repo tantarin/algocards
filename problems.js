@@ -5083,9 +5083,8 @@ hint:`Сортируем. Для каждого right двигаем left впр
 code:`class Solution {
     public long countPairs(int[] nums, int k) {
         int n = nums.length;
-        if (n < 2) return 0;
         
-        // Если k <= 0, любая пара подходит
+        //любая пара подходит
         if (k <= 0) {
             return (long) n * (n - 1) / 2;
         }

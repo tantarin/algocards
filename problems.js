@@ -5071,7 +5071,7 @@ lcSimilar:[{"t":"K-diff Pairs in an Array","h":"k-diff-pairs-in-an-array"},{"t":
 
 // ===== TWO POINTERS =====
 {id:"tp19",t:"Подсчёт пар с разницей >= К",p:"Two Pointers",d:"средне",
-desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i < j и |nums[i] - nums[j]| >= k.
+desc:`Дан массив nums и число k. Посчитать ==количество пар== (i, j), где i <= j и |nums[i] - nums[j]| >= k.
 
 Пример:
 Ввод: nums = [1, 3, 7, 2], k = 4
@@ -5085,8 +5085,8 @@ code:`class Solution {
         int n = nums.length;
         
         //любая пара подходит
-        if (k <= 0) {
-            return (long) n * (n - 1) / 2;
+        if (k == 0) {
+            return (long) n * (n + 1) / 2;
         }
         
         Arrays.sort(nums);

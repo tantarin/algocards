@@ -2696,14 +2696,14 @@ code:`class Solution {
         int left = 0;
         int zeroCount = 0;
         int maxLen = 0;
+        boolean hasZero = false;
 
         for (int right = 0; right < nums.length; right++) {
-            // добавили правый элемент в окно
             if (nums[right] == 0) {
                 zeroCount++;
+                hasZero = true;
             }
 
-            // если в окне больше одного нуля — сужаем слева
             while (zeroCount > 1) {
                 if (nums[left] == 0) {
                     zeroCount--;
@@ -2711,8 +2711,12 @@ code:`class Solution {
                 left++;
             }
 
-            // сейчас в окне максимум один ноль
             maxLen = Math.max(maxLen, right - left + 1);
+        }
+
+        // если нулей не было — обязаны "сломать" одну единицу
+        if (!hasZero) {
+            return nums.length - 1;
         }
 
         return maxLen;

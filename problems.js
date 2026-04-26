@@ -2719,6 +2719,7 @@ code:`public int maxOnesWithFlip(int[] nums) {
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,
 expl:`prev — единицы перед последним нулём, count — единицы после. При нуле: prev + 1 + count (1 — перевёрнутый ноль). Ограничиваем длиной массива. O(n).`,
+ya:true,
 lcSimilar:[{"t":"Minimum Window Substring","h":"minimum-window-substring"},{"t":"Permutation in String","h":"permutation-in-string"}],
 diagram:{"type":"window","data":["a","b","c","a","b","c","b","b"],"steps":[{"wl":0,"wr":0,"desc":"Окно [a], все уникальны"},{"wl":0,"wr":2,"desc":"Окно [a,b,c], 3 уникальных"},{"wl":0,"wr":3,"desc":"Добавили a — повтор! Сжимаем"},{"wl":1,"wr":3,"desc":"Окно [b,c,a], снова ОК"},{"wl":4,"wr":7,"desc":"Сжали до [c,b,b] — финал"}]}},
 

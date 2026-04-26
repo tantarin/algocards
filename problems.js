@@ -2685,37 +2685,37 @@ lcSimilar:[{"n":1493,"t":"Longest Subarray of 1's After Deleting One Element","h
 
 {id:"sw7",t:"Подставной отчет",p:"One Pass with State",d:"средне",
 desc:`Дан бинарный массив. Можно ==перевернуть или ЗАМЕНИТЬ ОДИН ноль в единицу==. Найти ==максимальную длину подмассива== из единиц.
-Замена обязательная.
 
 Пример:
 Ввод: [1, 1, 0, 1, 1, 1, 1, 0, 1]
 Вывод: 7 (переворачиваем ноль на позиции 2)`,
 hint:`Отслеживаем count единиц до нуля и после. Ответ = prev + 1 + count.`,
-code:`public int maxOnesWithFlip(int[] nums) {
-    int prev = 0;
-    int count = 0;
-    int maxCount = 0;
-    boolean hasZero = false;  // флаг: был ли ноль
-    
-    for (int num : nums) {
-        if (num == 1) {
-            count++;
-        } else {
-            hasZero = true;  // встретили ноль
-            maxCount = Math.max(maxCount, prev + 1 + count);
-            prev = count;
-            count = 0;
+code:`class Solution {
+    public int longestOnesAfterFlip(int[] nums) {
+        int left = 0;
+        int zeroCount = 0;
+        int maxLen = 0;
+
+        for (int right = 0; right < nums.length; right++) {
+            // добавили правый элемент в окно
+            if (nums[right] == 0) {
+                zeroCount++;
+            }
+
+            // если в окне больше одного нуля — сужаем слева
+            while (zeroCount > 1) {
+                if (nums[left] == 0) {
+                    zeroCount--;
+                }
+                left++;
+            }
+
+            // сейчас в окне максимум один ноль
+            maxLen = Math.max(maxLen, right - left + 1);
         }
+
+        return maxLen;
     }
-    
-    maxCount = Math.max(maxCount, prev + 1 + count);
-    
-    // Если не было ни одного нуля, вычитаем лишнюю единицу
-    if (!hasZero) {
-        maxCount--;
-    }
-    
-    return maxCount;
 }`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,

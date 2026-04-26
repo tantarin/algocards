@@ -3808,6 +3808,28 @@ public class Solution {
         return String.join(",", result);
     }
 }`,
+code2:`class Solution {
+    public List<String> summaryRanges(int[] nums) {  // стандартное название метода
+        List<String> result = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return result;
+        }
+        
+        int left = 0;
+        for (int right = 0; right < nums.length; right++) {
+            // если следующий элемент не последовательный или это конец массива
+            if (right == nums.length - 1 || nums[right] + 1 != nums[right + 1]) {
+                if (left == right) {
+                    result.add(String.valueOf(nums[left]));
+                } else {
+                    result.add(nums[left] + "-" + nums[right]);
+                }
+                left = right + 1;  // начало нового диапазона
+            }
+        }
+        return result;
+    }
+}`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка O(n log n), один проход группировки O(n). Список строк результата — O(n) памяти.`,
 expl:`Сортируем — тогда числа, идущие подряд по числовому ряду, окажутся рядом в массиве. Далее один проход: запоминаем start = nums[i], затем двигаем i вперёд пока nums[i+1] == nums[i] + 1. Когда последовательность прерывается — оформляем диапазон: если start == nums[i] — одиночное число, иначе "start->nums[i]". Добавляем в список и переходим к следующему.`,

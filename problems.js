@@ -5905,58 +5905,35 @@ class TNode {
 Сигнатура:
 Pair<TNode, TNode> findEquivalentSubtrees(TNode root)`,
 hint:`Для каждой вершины посчитай ==битовую маску== букв в поддереве (26 бит, OR детей + бит текущей буквы). Если две вершины дали одинаковую маску — это ответ. Храни \`Map<Integer, TNode>\`.`,
-code:`import java.util.HashMap;
-import java.util.Map;
-
-public class Solution {
+code:`public class Solution {
+    private Pair<TNode, TNode> answer;
 
     public Pair<TNode, TNode> findEquivalentSubtrees(TNode root) {
-        if (root == null) {
-            return null;
-        }
-
-        Map<Integer, TNode> seen = new HashMap<>();  // mask → первый встреченный узел с такой маской
-        Holder holder = new Holder();                // контейнер для ответа (обход ограничений Java)
-        dfsMask(root, seen, holder);
-        return holder.answer;
+        answer = null;
+        Map<Integer, TNode> seen = new HashMap<>();
+        dfsMask(root, seen);
+        return answer;
     }
 
-    private int dfsMask(TNode node,
-                        Map<Integer, TNode> seen,
-                        Holder holder) {
-        if (node == null) {
-            return 0;  // пустое поддерево = маска 0
-        }
-
-        int left = dfsMask(node.left, seen, holder);
-        
-        // РАННИЙ ВЫХОД: если уже нашли пару, прекращаем дальнейший поиск
-        if (holder.answer != null) {
-            return 0;  // возвращаем любое значение, оно всё равно не используется
-        }
-
-        int right = dfsMask(node.right, seen, holder);
-        if (holder.answer != null) {
+    private int dfsMask(TNode node, Map<Integer, TNode> seen) {
+        if (node == null || answer != null) {
             return 0;
         }
 
-        // 3. ВЫЧИСЛЯЕМ МАСКУ ТЕКУЩЕГО УЗЛА:
-        // Комбинируем маски левого и правого поддеревьев + добавляем бит текущего значения
+        int left = dfsMask(node.left, seen);
+        if (answer != null) return 0;
+
+        int right = dfsMask(node.right, seen);
+        if (answer != null) return 0;
+
         int mask = left | right | (1 << (node.value - 'A'));
 
-        // 4. ПРОВЕРЯЕМ, ВСТРЕЧАЛИ ЛИ МЫ ТАКУЮ МАСКУ РАНЬШЕ:
-        // putIfAbsent — если маски нет в map, кладём и возвращаем null
-        // Если маска уже есть — возвращаем предыдущий узел
         TNode prev = seen.putIfAbsent(mask, node);
         if (prev != null) {
-            holder.answer = new Pair<>(prev, node);
+            answer = new Pair<>(prev, node);
         }
-        
-        return mask;  // возвращаем маску для родительского узла
-    }
 
-    private static class Holder {
-        Pair<TNode, TNode> answer = null;
+        return mask;
     }
 }`,
 complexity:`Время: O(n), Память: O(n)`,

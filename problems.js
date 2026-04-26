@@ -2677,30 +2677,6 @@ code:`class Solution {
         return maxLen;
     }
 }`,
-code2:`import java.util.*;
-
-public class Solution {
-    public int maxOnesAfterDeletions(List<Integer> nums) {
-        int prev = 0;      // количество единиц до последнего нуля
-        int curr = 0;      // текущее количество подряд идущих единиц
-        int maxLen = 0;
-        boolean hasZero = false;
-        
-        for (int num : nums) {
-            if (num == 1) {
-                curr++;
-            } else {
-                hasZero = true;
-                prev = curr;
-                curr = 0;
-            }
-            // обновляем ответ
-            maxLen = Math.max(maxLen, prev + curr);
-        }
-        // если нулей не было, удаляем одну единицу
-        return hasZero ? maxLen : maxLen - 1;
-    }
-}`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением prev и curr при нулях — O(n). Константные переменные — O(1) памяти.`,
 expl:`Задача сводится к: найти максимальное окно с не более чем одним нулём, удалить из него ровно один элемент. Скользящее окно: расширяем right, считаем нули. Когда нулей > 1 — сжимаем left.

@@ -5099,9 +5099,7 @@ public class Solution {
             while (left < right && nums.get(right) - nums.get(left) >= k) {
                 left++;
             }
-            // Теперь left указывает на первый элемент с разницей < k
-            // Количество подходящих пар с текущим right = left + 1
-            // (включая пару (right, right))
+
             count += left;
         }
         

@@ -2203,6 +2203,29 @@ class Solution {
         return Arrays.asList(-1, -1);
     }
 }`,
+code2:`class Solution {
+    public int[] subarraySum(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, -1); // база: сумма 0 до начала массива
+
+        int sum = 0;
+
+        for (int r = 0; r < nums.length; r++) {
+            sum += nums[r];
+
+            // ищем prefix[l-1] = sum - k
+            if (map.containsKey(sum - k)) {
+                int l = map.get(sum - k) + 1;
+                return new int[]{l, r};
+            }
+
+            // сохраняем первый индекс для этой суммы
+            map.putIfAbsent(sum, r);
+        }
+
+        return new int[]{-1, -1};
+    }
+}`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход с обновлением prefixSum и проверкой HashMap — O(n) в среднем. Карта хранит до O(n) различных префиксных сумм — O(n) памяти.`,
 expl:`Сумма nums[l..r] = prefix[r] − prefix[l−1]. Ищем в карте prefix[r]−k = префикс до l−1. Индекс начала: сохранённый индекс + 1. putIfAbsent даёт самое раннее начало при нескольких вариантах. O(n) время и память.`,

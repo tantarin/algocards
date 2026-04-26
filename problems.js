@@ -3782,25 +3782,35 @@ desc:`Дан список неотрицательных целых чисел n
 Ввод: nums = [1,4,5,2,3,9,8,11,0]
 Вывод: "0-5,8-9,11"`,
 hint:`После сортировки — два индекса l и r: расширяйте r, пока nums[r+1] == nums[r] + 1. Фиксируйте сегмент и переходите к следующему.`,
-code:`class Solution {
-    public List<String> summaryRanges(int[] nums) {
-       Arrays.sort(nums);
+code:`import java.util.*;
 
-       ArrayList<String> al=new ArrayList<>();
+class Solution {
+    public String summaryRanges(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return "";
+        }
         
-        for(int i=0;i<nums.length;i++){
-            int start=nums[i];
-            while(i+1<nums.length && nums[i]+1==nums[i+1])
+        Arrays.sort(nums);
+        
+        StringBuilder result = new StringBuilder();
+        
+        for (int i = 0; i < nums.length; i++) {
+            int start = nums[i];
+            while (i + 1 < nums.length && nums[i] + 1 == nums[i + 1])
                 i++;
             
-            if(start!=nums[i]){
-                al.add(""+start+"->"+nums[i]);
+            // Добавляем разделитель (кроме первого элемента)
+            if (result.length() > 0) {
+                result.append(",");
             }
-            else{
-                al.add(""+start);
+            
+            if (start != nums[i]) {
+                result.append(start).append("->").append(nums[i]);
+            } else {
+                result.append(start);
             }
         }
-        return al;
+        return result.toString();
     }
 }`,
 complexity:`Время: O(n log n), Память: O(n)`,

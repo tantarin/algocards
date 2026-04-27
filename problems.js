@@ -9048,16 +9048,45 @@ hint:`Фиксированное окно длины s1.length(). Сравнив
 code:`class Solution {
     public boolean checkInclusion(String s1, String s2) {
         if (s1.length() > s2.length()) return false;
-        int[] need = new int[26];
-        int[] win = new int[26];
-        for (char c : s1.toCharArray()) need[c - 'a']++;
 
-        int k = s1.length();
-        for (int i = 0; i < s2.length(); i++) {
-            win[s2.charAt(i) - 'a']++;
-            if (i >= k) win[s2.charAt(i - k) - 'a']--;
-            if (Arrays.equals(need, win)) return true;
+        int[] freq = new int[26];
+
+        for (char c : s1.toCharArray()) {
+            freq[c - 'a']++;
         }
+
+        int needCount = s1.length();
+        int k = s1.length();
+        int left = 0;
+
+        for (int right = 0; right < s2.length(); right++) {
+            int in = s2.charAt(right) - 'a';
+
+            // Если этот символ ещё был нужен — закрыли одну потребность
+            if (freq[in] > 0) {
+                needCount--;
+            }
+
+            freq[in]--;
+
+            // Если окно стало длиннее k — убираем левый символ
+            if (right - left + 1 > k) {
+                int out = s2.charAt(left) - 'a';
+
+                // Если после удаления символ снова становится нужным
+                if (freq[out] >= 0) {
+                    needCount++;
+                }
+
+                freq[out]++;
+                left++;
+            }
+
+            if (needCount == 0) {
+                return true;
+            }
+        }
+
         return false;
     }
 }`,

@@ -5235,7 +5235,7 @@ code:`class Solution {
             maxWater = Math.max(maxWater, water);
 
             if (height[left] < height[right]) {
-                left++;
+                left++; //отбросили низкую стенку
             } else {
                 right--;
             }

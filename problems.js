@@ -202,6 +202,51 @@ complexity:`Время: O(2^n · n), Память: O(n)`,
 complexityExpl:`В худшем случае backtrack перебирает O(2^n) подпоследовательностей. Для каждой из них при openRem==0 && closeRem==0 вызывается isValid — линейный проход O(n). Итого O(2^n · n). Рекурсия глубины n, строки длиной n — O(n) памяти на уровень стека.`,
 expl:`Считаем лишние открывающие и закрывающие скобки. Backtrack: пробуем удалить каждую, пропуская дубликаты (если s[i]==s[i-1]). Когда обе счётчика == 0, проверяем валидность строки.`},
 
+{id:"bt5",t:"Letter Combinations of a Phone Number",p:"Backtracking",d:"средне",
+desc:`Дана строка ==s==, содержащая цифры от 2 до 9. Нужно вернуть ==все возможные комбинации букв==, которые могли получиться при нажатии на эти цифры на телефоне, в порядке, соответствующем цифрам в строке s. Ответ можно вернуть в любом порядке.
+
+Пример:
+Ввод: s = "24"
+Вывод: ["ag","ah","ai","bg","bh","bi","cg","ch","ci"]
+
+Если строка пустая — вернуть пустой список.`,
+hint:`У каждой цифры есть набор букв. Идём по строке слева направо: на позиции idx перебираем все буквы для s[idx], добавляем одну букву в текущую комбинацию и рекурсивно строим хвост.`,
+code:`class Solution {
+    private static final String[] PHONE = {
+        "", "", "abc", "def", "ghi", "jkl",
+        "mno", "pqrs", "tuv", "wxyz"
+    };
+
+    public List<String> letterCombinations(String s) {
+        List<String> result = new ArrayList<>();
+        if (s == null || s.isEmpty()) return result;
+
+        backtrack(s, 0, new StringBuilder(), result);
+        return result;
+    }
+
+    private void backtrack(String s, int idx,
+                           StringBuilder current,
+                           List<String> result) {
+        if (idx == s.length()) {
+            result.add(current.toString());
+            return;
+        }
+
+        String letters = PHONE[s.charAt(idx) - '0'];
+        for (int i = 0; i < letters.length(); i++) {
+            current.append(letters.charAt(i));
+            backtrack(s, idx + 1, current, result);
+            current.deleteCharAt(current.length() - 1);
+        }
+    }
+}`,
+complexity:`Время: O(4^n · n), Память: O(n)`,
+complexityExpl:`Для каждой позиции перебираем 3 или 4 буквы; в худшем случае все цифры дают по 4 варианта, значит число комбинаций O(4^n). Построение строки результата длины n для каждой готовой комбинации даёт множитель n. Глубина рекурсии и текущий StringBuilder — O(n) памяти, не считая списка ответа.`,
+expl:`Это дерево перебора: каждая цифра задаёт следующий слой, а её буквы — ветви. На уровне idx выбираем одну букву для s[idx], добавляем её в текущую строку и рекурсивно строим комбинации для оставшихся цифр. Когда дошли до конца строки, текущая комбинация готова.`,
+lcSimilar:[{"n":17,"t":"Letter Combinations of a Phone Number","h":"letter-combinations-of-a-phone-number"}],
+repoSimilar:["bt2"]},
+
 // ===== BINARY SEARCH =====
 {id:"bs1",t:"LC 33 — Search in Rotated Sorted Array",p:"Binary Search",d:"средне",
 desc:`Дан целочисленный массив nums, изначально ==отсортированный по возрастанию==, содержащий уникальные значения. Массив мог быть ==повернут влево== в некоторой неизвестной точке k.

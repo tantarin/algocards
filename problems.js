@@ -2771,7 +2771,6 @@ code:`class Solution {
         int haveCount = 0;  // сколько уникальных уже в окне
         int left = 0;
         int count = 0;
-
         for (int right = 0; right < s.length(); right++) {
             char rightChar = s.charAt(right);
             freq[rightChar]++;

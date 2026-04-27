@@ -1679,47 +1679,6 @@ complexityExpl:`Сортировка индексов — O(n log n), линей
 expl:`Задача про пересечение отрезков естественно решается после СОРТИРОВКИ по началу.
 После сортировки проверяем: если текущий start ≤ предыдущий bestEnd, оба отрезка пересекаются. Помечаем флагами.`},
 
-{id:"iss3",t:"Слияние отрезков",p:"Intervals Sweep",d:"средне",
-desc:`==Объединить пересекающиеся отрезки== (аналог Merge Intervals, но с вспомогательными функциями isOverlapping и mergeTwoSegments).
-
-Пример:
-Ввод: [[1,3],[2,6],[8,10]]
-Вывод: [[1,6],[8,10]]`,
-hint:`Сортируем по началу + линейный проход с проверкой пересечения.`,
-code:`class Solution {
-    private boolean isOverlapping(int[] a, int[] b) {
-        return a[0] <= b[1] && b[0] <= a[1];
-    }
-
-    private int[] mergeTwoSegments(int[] a, int[] b) {
-        return new int[]{
-            Math.min(a[0], b[0]),
-            Math.max(a[1], b[1])
-        };
-    }
-
-    public List<int[]> mergeSegments(int[][] segments) {
-        Arrays.sort(segments, Comparator.comparingInt(a -> a[0]));
-
-        List<int[]> result = new ArrayList<>();
-        int[] current = segments[0];
-        for (int i = 1; i < segments.length; i++) {
-            if (isOverlapping(current, segments[i])) {
-                current = mergeTwoSegments(current, segments[i]);
-            } else {
-                result.add(current);
-                current = segments[i];
-            }
-        }
-
-        result.add(current);
-        return result;
-    }
-}`,
-complexity:`Время: O(n log n), Память: O(n)`,
-complexityExpl:`Сортировка — O(n log n), один проход слияния — O(n). Результат до n отрезков — O(n) памяти.`,
-expl:`Сортируем по началу. Для каждого следующего отрезка проверяем пересечение с текущим. Если пересекаются — объединяем, иначе — начинаем новый. O(n log n).`},
-
 {id:"iss4",t:"Car Pooling",p:"Intervals Sweep",d:"средне",
 desc:`Автомобиль с ==вместимостью capacity==. Список поездок ==[passengers, from, to]==. Можно ли выполнить все поездки?
 

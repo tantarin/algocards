@@ -8349,20 +8349,58 @@ lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}]},
 desc:`Есть последовательность запросов пользователей, каждый запрос — это пара (time, userId), запросы всегда приходят в отсортированном по времени порядке.
 Нужно быстро отвечать: сколько за последние k мс было пользователей, которые сделали >= limit запросов.
 k > 0, limit > 0.`,
-starter:`class UserStatistics {
-    private long limit = 0;
-    private long k = 0;
+starter:`import java.util.*;
 
-    public UserStatistics(int k, int limit) {
+class UserStatistics {
+    private final long k;
+    private final long limit;
+    private final Deque<Event> queue = new ArrayDeque<>();
+    private final Map<Long, Integer> freq = new HashMap<>();
+    private int hotCount = 0;
 
+    private record Event(long time, long userId) {}
+
+    public UserStatistics(long k, long limit) {
+        this.k = k;
+        this.limit = limit;
     }
 
     public void event(long now, long userId) {
-        // place your code here
+        expire(now);
+
+        queue.addLast(new Event(now, userId));
+
+        int count = freq.merge(userId, 1, Integer::sum);
+
+        if (count == limit) {
+            hotCount++;
+        }
     }
 
     public int robotCount(long now) {
-        // place your code here
+        expire(now);
+        return hotCount;
+    }
+
+    private void expire(long now) {
+        long windowStart = now - k;
+
+        while (!queue.isEmpty() && queue.peekFirst().time() < windowStart) {
+            Event oldest = queue.pollFirst();
+
+            long userId = oldest.userId();
+            int count = freq.get(userId);
+
+            if (count == limit) {
+                hotCount--;
+            }
+
+            if (count == 1) {
+                freq.remove(userId);
+            } else {
+                freq.put(userId, count - 1);
+            }
+        }
     }
 }`,
 hint:`Скользящее окно по времени + карта частот userId. Для интервью сначала удобно заполнить шаблон методов из условия, затем добавить очередь событий и удаление устаревших элементов.`,

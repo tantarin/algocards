@@ -2954,7 +2954,7 @@ code:`class Solution {
         }
         result[0] = zeroCount > 0 ? 0 : prod;  
         
-        for (int right = k; right < n; right++) {
+        for (int right = k; right < n; right++) { //начинается свдиг окна
             int left = right - k;
             
             // Удаляем левый элемент

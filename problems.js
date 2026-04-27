@@ -8544,7 +8544,6 @@ code:`public String rle(String s) {
 
     StringBuilder out = new StringBuilder();
     int i = 0;
-
     while (i < s.length()) {
         char c = s.charAt(i);
         validateUppercaseLetter(c);

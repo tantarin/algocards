@@ -5164,8 +5164,10 @@ code:`class Solution {
         int maxProfit = 0;
         for (int price : prices) {
             if (price < minPrice) {
+                // минимальная среди прошедших дней
                 minPrice = price;
             } else {
+                // Проверяем, выгодно ли продать сегодня
                 maxProfit = Math.max(maxProfit, price - minPrice);
             }
         }

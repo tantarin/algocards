@@ -5215,7 +5215,7 @@ lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{
 diagram:{"type":"twoptr","data":["M","r"," ","S","m","i","t","h"," "," "," "," "],"steps":[{"l":7,"r":11,"desc":"Mr Smith → заполняем с конца"},{"l":2,"r":7,"desc":"Пробел → %20"},{"l":0,"r":4,"found":[0,1,2,3,4],"desc":"Итог: Mr%20Smith"}]}},
 
 {id:"tp22",t:"LC 11. Container With Most Water (Самый большой контейнер)",p:"Two Pointers",d:"средне",
-desc:`Дан массив heights. Найти ==два столбца==, которые вместе с осью X образуют ==контейнер с наибольшим количеством воды==.
+desc:`Дан массив heights. Нужно найти максимальную площадь, которую может заполнить вода между двумя линиями.
 Вода = min(height[l], height[r]) × (r - l)
 
 Пример:

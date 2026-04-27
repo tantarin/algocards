@@ -8543,30 +8543,25 @@ code:`public String rle(String s) {
     }
 
     StringBuilder out = new StringBuilder();
-    int n = s.length();
     int i = 0;
-    while (i < n) {
+
+    while (i < s.length()) {
         char c = s.charAt(i);
         validateUppercaseLetter(c);
 
         int count = 1;
-        int j = i + 1;
-        while (j < n) {
-            char next = s.charAt(j);
-            validateUppercaseLetter(next);
+        i++;
 
-            if (next != c) break;
-
+        while (i < s.length() && s.charAt(i) == c) {
+            validateUppercaseLetter(s.charAt(i));
             count++;
-            j++;
+            i++;
         }
 
         out.append(c);
         if (count > 1) {
             out.append(count);
         }
-
-        i = j;
     }
 
     return out.toString();

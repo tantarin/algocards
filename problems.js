@@ -8652,44 +8652,6 @@ searchPangram("abbc", "ac") => "abbc"
 searchPangram("abacaba", "bcd") => ""`,
 hint:`Скользящее окно: расширяем right, считаем покрытые символы alphabet, затем сжимаем left пока покрытие полное. Поддерживаем лучший (минимальный) отрезок.`,
 code:`public String searchPangram(String text, String alphabet) {
-    // Словарь для подсчёта символов алфавита в текущем окне
-    Map<Character, Integer> window = new HashMap<>();
-    for (char c : alphabet.toCharArray()) window.put(c, 0);
-
-    int required = alphabet.length();      // сколько уникальных символов нужно покрыть
-    int covered = 0;                       // сколько уже покрыто
-    int bestLeft = -1, bestLen = Integer.MAX_VALUE;  // лучший найденный отрезок
-    int left = 0;                          // левая граница окна
-
-    for (int right = 0; right < text.length(); right++) {
-        // Расширяем окно вправо
-        char c = text.charAt(right);
-        if (window.containsKey(c)) {
-            window.put(c, window.get(c) + 1);
-            if (window.get(c) == 1) covered++;  // новый символ полностью покрыт
-        }
-
-        // Пока окно покрывает все символы — пробуем сжать его слева
-        while (covered == required) {
-            // Обновляем лучший ответ
-            int len = right - left + 1;
-            if (len < bestLen) {
-                bestLen = len;
-                bestLeft = left;
-            }
-            // Удаляем левый символ
-            char leftChar = text.charAt(left);
-            if (window.containsKey(leftChar)) {
-                window.put(leftChar, window.get(leftChar) - 1);
-                if (window.get(leftChar) == 0) covered--;  // потеряли покрытие
-            }
-            left++;
-        }
-    }
-
-    return bestLeft == -1 ? "" : text.substring(bestLeft, bestLeft + bestLen);
-}`,
-code2:`public String searchPangram(String text, String alphabet) {
     int[] count = new int[128];
     for (char c : alphabet.toCharArray()) {
         count[c]++;

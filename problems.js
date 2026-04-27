@@ -2971,7 +2971,7 @@ code:`class Solution {
                 prod *= arr[right];
             }
             
-            result[left + 1] = zeroCount > 0 ? 0 : prod;  // без приведения
+            result[left + 1] = zeroCount > 0 ? 0 : prod;  
         }
         
         return result;

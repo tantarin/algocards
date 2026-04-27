@@ -8551,7 +8551,6 @@ code:`public String rle(String s) {
 
         int count = 1;
         int j = i + 1;
-
         while (j < n) {
             char next = s.charAt(j);
             validateUppercaseLetter(next);

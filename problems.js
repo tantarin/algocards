@@ -1628,7 +1628,7 @@ code:`class Solution {
                 currentStart = nextStart;
                 currentEnd   = nextEnd;
             } else {
-                currentEnd = Math.max(currentEnd, nextEnd);
+                currentEnd = Math.max(currentEnd, nextEnd); //если след интервал весь внутри предыдущего
             }
         }
 

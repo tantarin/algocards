@@ -5176,7 +5176,7 @@ public class Solution {
         
         int n = nums.size();
         
-        if (k <= 0) {
+        if (k == 0) {
             return n * (n + 1) / 2;
         }
         

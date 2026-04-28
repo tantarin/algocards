@@ -3751,18 +3751,23 @@ desc:`Даны две строки s и t. Необходимо определи
 Ввод: s = "axc", t = "ahbgdc"
 Вывод: false`,
 hint:`Два указателя. Продвигаем указатель s при совпадении символов.`,
-code:`class Solution {
-    public boolean isSubsequence(String s, String t) {
-        int p1 = 0, p2 = 0;
+code:`import java.util.*;
 
-        while (p1 < s.length() && p2 < t.length()) {
-            if (s.charAt(p1) == t.charAt(p2)) {
-                p1++;
+public class Solution {
+    public boolean fuzzyMatch(String s, String t) {
+        int matchedCount = 0;
+        
+        for (char currentChar : t.toCharArray()) {
+            if (currentChar == s.charAt(matchedCount)) {
+                matchedCount++;
             }
-            p2++;
+            
+            if (matchedCount == s.length()) {
+                return true;
+            }
         }
-
-        return p1 == s.length();
+        
+        return false;
     }
 }`,
 complexity:`Время: O(|t|), Память: O(1)`,

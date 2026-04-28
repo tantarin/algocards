@@ -2609,35 +2609,36 @@ desc:`Даны строки s и t. Нужно найти все индексы 
 
 "cba" (индекс 0) и "bac" (индекс 6) — анаграммы "abc".`,
 hint:`Фиксированное окно длины len(t). Частотный массив + счётчик несовпадений.`,
-code:`class Solution {
+code:`import java.util.*;
+
+class Solution {
     public List<Integer> findAnagrams(String s, String t) {
         List<Integer> result = new ArrayList<>();
         if (s.length() < t.length()) return result;
 
-        // freq[c] > 0 — нужен, = 0 — покрыт, < 0 — лишний
         int[] freq = new int[128];
         for (char c : t.toCharArray()) freq[c]++;
 
-        int needCount = t.length();  // сколько символов ещё нужно
-        int windowSize = t.length(); // фиксированный размер окна
+        int needCount = t.length();
+        int left = 0;
 
         for (int right = 0; right < s.length(); right++) {
             char rightChar = s.charAt(right);
-
-            // Добавляем правый символ
+            
             if (freq[rightChar] > 0) needCount--;
             freq[rightChar]--;
 
-            // Удаляем левый символ (когда окно полное)
-            if (right >= windowSize) {
-                char leftChar = s.charAt(right - windowSize);
+            // Если окно превысило размер, сдвигаем left
+            if (right - left + 1 > t.length()) {
+                char leftChar = s.charAt(left);
                 freq[leftChar]++;
                 if (freq[leftChar] > 0) needCount++;
+                left++;
             }
 
-            //ПРОВЕРЯЕМ текущее окно [right-windowSize+1, right]
+            // Проверяем, нашли ли анаграмму
             if (needCount == 0) {
-                result.add(right - windowSize + 1);
+                result.add(left);
             }
         }
 

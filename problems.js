@@ -436,48 +436,6 @@ expl:`Рекурсия с границами. Для левого поддере
 lcSimilar:[{"t":"Validate Binary Search Tree","h":"validate-binary-search-tree"},{"t":"Kth Smallest Element in a BST","h":"kth-smallest-element-in-a-bst"}]},
 
 // ===== GEOMETRY HASH =====
-{id:"gh1",t:"LeetCode 356: Line Reflection",p:"Geometry Hash",d:"средне",
-desc:`Дан массив точек (x, y). Определить, существует ли ==вертикальная прямая==, относительно которой ==все точки симметричны==.
-
-Пример:
-Ввод: [[1,1],[3,1],[2,2]]
-Вывод: true (ось x = 2)
-
-Ввод: [[1,1],[3,1],[2,3]]
-Вывод: false`,
-hint:`c = (minX + maxX) / 2. Для каждой точки (x, y) проверяем существование зеркальной (2c - x, y) через HashSet.`,
-code:`class Solution {
-    public boolean isSymmetric(int[][] points) {
-        int minX = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE;
-        Set<String> pointSet = new HashSet<>();
-
-        for (int[] p : points) {
-            minX = Math.min(minX, p[0]);
-            maxX = Math.max(maxX, p[0]);
-            pointSet.add(p[0] + "," + p[1]);
-        }
-
-        // axis = (minX + maxX) / 2, но умножаем на 2 чтобы не работать с double
-        // mirrorX = 2*axis - x = (minX + maxX) - x
-        int axisDouble = minX + maxX;
-
-        for (int[] p : points) {
-            int mirrorX = axisDouble - p[0];
-            if (!pointSet.contains(mirrorX + "," + p[1])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-}`,
-complexity:`Время: O(n) (два прохода по точкам), Память: O(n) (HashSet строк-ключей «x,y», до одной на точку)`,
-complexityExpl:`Первый проход: min/max и вставка ключей. Второй: contains за O(1) в среднем на ключ фиксированной длины (координаты). Память — множество из ≤ n ключей.`,
-expl:`Сначала хочется как-то угадывать ось симметрии, но код опирается на более жёсткое наблюдение: если симметрия есть, то крайние точки по x уже фиксируют эту ось как середину между minX и maxX. После этого задача сводится к простой проверке пар: для каждой точки (x, y) должна существовать зеркальная (minX + maxX - x, y). Поэтому точки складываются в HashSet, чтобы каждую такую проверку делать быстро.`,
-ya:true,
-lcSimilar:[{"t":"LeetCode 356","h":"leetcode-356"}]},
-
 {id:"gh2",t:"Строгая симметрия по оси Y",p:"Geometry Hash",d:"средне",
 desc:`Дан массив точек points. Нужно вернуть true, если существует такая прямая, параллельная оси Y, которая симметрично отражает все данные точки и false, если такой прямой нет.
 ВАЖНО: При этом каждая точка должна иметь симметричную ей точку в массиве с таким же числом вхождений. Если же точка имеет координату X равную оси симметрии, то она симметрична сама себе в любом случае.

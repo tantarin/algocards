@@ -5506,7 +5506,6 @@ code:`class Solution {
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Рекурсивное сравнение: каждый узел один раз — O(n). Стек рекурсии — O(h) памяти.`,
 expl:`Рекурсия: базовые случаи — оба null (true), один null (false), значения разные (false). Иначе рекурсивно проверяем левые и правые поддеревья. O(n) время, O(h) стек.`,
-p2:"Preorder",
 lcSimilar:[{"n":100,"t":"Same Tree","h":"same-tree"}]},
 
 {id:"tr8",t:"LC 110 Balanced Binary Tree",p:"Trees / DFS",d:"легко",

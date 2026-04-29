@@ -4058,64 +4058,6 @@ complexity:`Время: O(N log k), Память: O(k)`,
 complexityExpl:`В куче O(k) элементов, всего N извлечений по O(log k) — O(N log k). Куча и currentValues — O(k) памяти.`,
 expl:`Min-heap обрабатывает события по времени. Все события одного момента — за раз. Поддерживаем текущие значения каждого графика и их сумму. O(N log k) где N — суммарное число точек.`},
 
-{id:"uf2",t:"Объединение нескольких графиков",p:"Union-Find",d:"средне",
-desc:`Дан массив графиков [время, значение]. ==Объединить в один суммарный==.
-
-Пример:
-Ввод: [[[0,1],[2,3]], [[1,2],[3,4]]]
-Вывод: [[0,1],[1,3],[2,5],[3,5]]`,
-hint:`Тот же подход с min-heap: обрабатываем события хронологически.`,
-code:`public class Solution {
-    public List<int[]> mergeCharts(
-            List<List<int[]>> charts) {
-        int k = charts.size();
-        int[] vals = new int[k];
-        long sum = 0;
-
-        PriorityQueue<int[]> pq =
-            new PriorityQueue<>(
-                Comparator.comparingInt(a -> a[0]));
-
-        for (int i = 0; i < k; i++) {
-            if (!charts.get(i).isEmpty()) {
-                int[] first = charts.get(i).get(0);
-                pq.offer(new int[]{first[0], i, 0});
-            }
-        }
-
-        List<int[]> result = new ArrayList<>();
-
-        while (!pq.isEmpty()) {
-            int time = pq.peek()[0];
-
-            while (!pq.isEmpty()
-                   && pq.peek()[0] == time) {
-                int[] ev = pq.poll();
-                int ci = ev[1], pi = ev[2];
-                var chart = charts.get(ci);
-                int newVal = chart.get(pi)[1];
-
-                sum += (long) newVal - vals[ci];
-                vals[ci] = newVal;
-
-                if (pi + 1 < chart.size()) {
-                    int[] next = chart.get(pi + 1);
-                    pq.offer(new int[]{
-                        next[0], ci, pi + 1});
-                }
-            }
-
-            result.add(new int[]{time, (int) sum});
-        }
-
-        return result;
-    }
-}`,
-complexity:`Время: O(N log k), Память: O(k)`,
-complexityExpl:`Тот же паттерн: N операций с кучей размера k — O(N log k). Куча и vals — O(k) памяти.`,
-expl:`Идентичный подход: min-heap обрабатывает события хронологически. Поддерживаем текущую сумму, обновляя при каждом событии. O(N log k).`},
-
-// ===== STRINGS PREFIX =====
 {id:"sp1",t:"LC 14 Longest Common Prefix",p:"Strings Prefix",d:"легко",
 desc:`Найти самый длинный ==общий префикс== массива строк.
 

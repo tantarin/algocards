@@ -4493,7 +4493,7 @@ lcSimilar:[{"n":341,"t":"Flatten Nested List Iterator","h":"flatten-nested-list-
 repoSimilar:["st6","tp57"]},
 
 // ===== QUEUE / DESIGN =====
-{id:"fit1",t:"FilteringIterator<T> — итератор по предикату",p:"Queue / Design",d:"средне",
+{id:"fit1",t:"FilteringIterator<T> — итератор по предикату",p:"Design",d:"средне",
 desc:`Реализовать ==FilteringIterator<T>== — итератор-обёртку, который принимает другой Iterator<T> и предикат Predicate<T>, и возвращает только те элементы, для которых предикат возвращает true.
 
 Пример (идея):
@@ -4553,7 +4553,7 @@ expl:`Ключевая идея — lookahead: advance() двигает внут
 p2:"Iterator / Predicate",
 repoSimilar:["st7","tp57","ya10"]},
 
-{id:"fit2",t:"Поиск Person по имени (Optional)",p:"Queue / Design",d:"легко",
+{id:"fit2",t:"Поиск Person по имени (Optional)",p:"Design",d:"легко",
 desc:`Реализовать функцию поиска Person по значению name. Функция принимает список людей и имя, возвращает ==Optional<Person>==.
 Предполагается, что у Person есть поле name (или геттер с тем же смыслом).
 
@@ -8357,7 +8357,7 @@ expl:`Каждый график — кусочно-постоянная функ
 lcSimilar:[{"n":1229,"t":"Meeting Scheduler","h":"meeting-scheduler"}]},
 
 // ===== QUEUE / DESIGN =====
-{id:"ya4",t:"UserStatistics: окно k мс и ≥ limit запросов",p:"Queue / Design",d:"средне",
+{id:"ya4",t:"UserStatistics: окно k мс и ≥ limit запросов",p:"Design",d:"средне",
 desc:`Есть последовательность запросов пользователей, каждый запрос — это пара (time, userId), запросы всегда приходят в отсортированном по времени порядке.
 Нужно быстро отвечать: сколько за последние k мс было пользователей, которые сделали >= limit запросов.
 k > 0, limit > 0.`,
@@ -8783,7 +8783,7 @@ expl:`Без сортировки хочется сравнивать почти
 ya:true},
 
 // ===== QUEUE / DESIGN =====
-{id:"ya10",t:"LC 362. Design Hit Counter",p:"Queue / Design",d:"средне",
+{id:"ya10",t:"LC 362. Design Hit Counter",p:"Design",d:"средне",
 desc:`Реализовать счётчик запросов за последние 5 минут (300 секунд).
 Методы:
 - hit(timestamp): зафиксировать запрос в секунду timestamp
@@ -8835,7 +8835,7 @@ ya:true,
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
 repoSimilar:["ya4"]},
 
-{id:"lc933",t:"LC 933 · Number of Recent Calls",p:"Queue / Design",d:"легко",
+{id:"lc933",t:"LC 933 · Number of Recent Calls",p:"Design",d:"легко",
 desc:`Есть класс ==RecentCounter==, который считает количество недавних запросов.
 
 Реализуй:
@@ -8966,7 +8966,7 @@ expl:`Смысл решения в том, чтобы на каждой глуб
 ya:true},
 
 // ===== QUEUE / DESIGN =====
-{id:"lc380",t:"LC 380 · Insert Delete GetRandom O(1)",p:"Queue / Design",d:"средне",
+{id:"lc380",t:"LC 380 · Insert Delete GetRandom O(1)",p:"Design",d:"средне",
 desc:`Реализовать структуру RandomizedSet с операциями:
 - insert(val)
 - remove(val)

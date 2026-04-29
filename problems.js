@@ -9591,8 +9591,8 @@ desc:`Слить два отсортированных связных списк
 hint:`Два указателя и dummy-узел результата.`,
 code:`class Solution {
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
-        ListNode dummy = new ListNode(0); // фиктивная голова — чтобы не писать отдельный случай для первого узла
-        ListNode cur = dummy;             // cur — хвост уже собранного списка
+     ListNode cur = new ListNode(0);
+     ListNode dummy = cur;
 
         while (list1 != null && list2 != null) {
             if (list1.val <= list2.val) {

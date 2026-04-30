@@ -4906,7 +4906,7 @@ lcSimilar:[{"t":"Remove Invalid Parentheses","h":"remove-invalid-parentheses"},{
 repoSimilar:["tp16","tp54"],
 diagram:{"type":"bsearch","data":[1,2,3,4,5],"steps":[{"l":0,"r":1,"m":0,"desc":"k=4, x=3. Ищем начало окна"},{"l":0,"r":0,"m":0,"desc":"|3-1|=2 vs |5-3|=2 → right=mid"},{"l":0,"r":0,"m":0,"found":0,"desc":"Окно [1,2,3,4] ✓"}]}},
 
-{id:"tp16",t:"К ближайших чисел",p:"Two Pointers",d:"средне",
+{id:"tp16",t:"К ближайших чисел",p:"Two Pointers",p2:"Binary Search",d:"средне",
 desc:`Дан ==отсортированный массив== и число target. Найти ==k ближайших к target чисел==. Если расстояния равны — меньший элемент предпочтительнее.
 
 Пример:

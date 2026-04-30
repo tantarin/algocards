@@ -3253,23 +3253,21 @@ code:`class Solution {
             if (Character.isDigit(c)) {
                 num = num * 10 + (c - '0');
             } else if (isOperator(c)) {
-                if (previousOperator == '+') {
-                    sum += last;
-                    last = num;
-                } else if (previousOperator == '-') {
-                    sum += last;
-                    last = -num;
-                } else if (previousOperator == '*') {
-                    last *= num;
-                } else if (previousOperator == '/') {
-                    last /= num;
-                }
+                State state = applyPreviousOperator(sum, last, num, previousOperator);
+                sum = state.sum();
+                last = state.last();
 
                 num = 0;
                 previousOperator = c;
             }
         }
 
+        State state = applyPreviousOperator(sum, last, num, previousOperator);
+
+        return state.sum() + state.last();
+    }
+
+    private State applyPreviousOperator(int sum, int last, int num, char previousOperator) {
         if (previousOperator == '+') {
             sum += last;
             last = num;
@@ -3282,11 +3280,14 @@ code:`class Solution {
             last /= num;
         }
 
-        return sum + last;
+        return new State(sum, last);
     }
 
     private boolean isOperator(char c) {
         return c == '+' || c == '-' || c == '*' || c == '/';
+    }
+
+    private record State(int sum, int last) {
     }
 }`,
 complexity:`Время: O(|s|), Память: O(1) доп. (целые num, last, sum, текущий оператор — константное число слотов)`,

@@ -342,6 +342,8 @@ code:`class Solution {
             if (nums[mid] > target) {
                 hi = mid;
             } else {
+               // nums[mid] <= target, значит mid не подходит
+               // первый > target может быть только правее
                 lo = mid + 1;
             }
         }

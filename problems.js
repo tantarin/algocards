@@ -8464,8 +8464,8 @@ code:` public int findPermutation(String t, String s) {
 
       int len = s.length();
       int need = s.length();
-      int left = 0;
 
+      int left = 0;
       for (int right = 0; right < t.length(); right++) {
           // правый символ входит в окно
           int inIdx = t.charAt(right) - 'a';

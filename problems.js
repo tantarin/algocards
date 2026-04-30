@@ -324,9 +324,9 @@ code:`class Solution {
             int mid = lo + (hi - lo) / 2;
 
             if (nums[mid] >= target) {
-                hi = mid;
+                hi = mid;  //подходит, но пробуем найти левее
             } else {
-                lo = mid + 1;
+                lo = mid + 1; //слишком маленькое, идём правее
             }
         }
 

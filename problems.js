@@ -3238,32 +3238,48 @@ desc:`Дана строка ==s==, представляющая арифмети
 hint:`Делаем один проход по строке: текущее число собираем из цифр, а предыдущее число держим в last. Для + и - переносим last в сумму, для * и / сразу пересчитываем last.`,
 code:`class Solution {
     public int calculate(String s) {
+        int sum = 0;
+        int last = 0;
         int num = 0;
-        char operator = '+';
-        int last = 0, sum = 0;
+        char previousOperator = '+';
+
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
 
-            if (Character.isDigit(c)) {
-                num = num * 10 + (c - '0');
+            if (c == ' ') {
+                continue;
             }
 
-            if (isOperator(c) || i == s.length() - 1) {
-                if (operator == '+') {
+            if (Character.isDigit(c)) {
+                num = num * 10 + (c - '0');
+            } else if (isOperator(c)) {
+                if (previousOperator == '+') {
                     sum += last;
                     last = num;
-                } else if (operator == '-') {
+                } else if (previousOperator == '-') {
                     sum += last;
                     last = -num;
-                } else if (operator == '*') {
+                } else if (previousOperator == '*') {
                     last *= num;
-                } else if (operator == '/') {
+                } else if (previousOperator == '/') {
                     last /= num;
                 }
 
                 num = 0;
-                operator = c;
+                previousOperator = c;
             }
+        }
+
+        if (previousOperator == '+') {
+            sum += last;
+            last = num;
+        } else if (previousOperator == '-') {
+            sum += last;
+            last = -num;
+        } else if (previousOperator == '*') {
+            last *= num;
+        } else if (previousOperator == '/') {
+            last /= num;
         }
 
         return sum + last;

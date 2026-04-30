@@ -333,7 +333,7 @@ code:`class Solution {
         return lo;
     }
 
-    // Первый индекс i, такой что nums[i] > target
+    // Первый индекс i, такой что nums[i] > target ТО ЕСТЬ АНАЛОГИЧНО ПРЕДЫДУЩЕМУ, НО СТРОГО БОЛЬШЕ
     private int upperBound(int[] nums, int target) {
         int lo = 0, hi = nums.length;
         while (lo < hi) {

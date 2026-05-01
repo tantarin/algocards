@@ -55,6 +55,21 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .problem-desc-stack{display:flex;flex-direction:column;gap:16px}
 .problem-desc-condition{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
 .problem-desc-condition--solo{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
+.problem-desc-rich{display:flex;flex-direction:column;gap:10px}
+.problem-desc-text{font-size:14px;line-height:1.65;color:var(--text);white-space:pre-wrap}
+.problem-desc-ascii{
+  margin:0;
+  padding:12px 14px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid #ffffff12;
+  color:var(--text);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:12px;
+  line-height:1.45;
+  white-space:pre;
+  overflow-x:auto;
+}
 .problem-desc-examples-wrap{
   border-radius:14px;
   border:1px solid rgba(124,58,237,0.28);
@@ -728,18 +743,57 @@ function splitProblemDesc(desc){
   if(/^\s*Пример(?:ы)?\s*\d*\s*:/.test(s))return{condition:'',examples:s.trim()};
   return{condition:s.trim(),examples:null};
 }
+function isAsciiArtLine(line){
+  return /[█▓▒░▀▄▌▐■□~]/.test(line);
+}
+function isAsciiCompanionLine(line){
+  return /^[\s\d]+$/.test(line) && /\d/.test(line);
+}
+function renderDescRichText(text, baseClass){
+  const lines=String(text||'').replace(/\r\n/g,'\n').split('\n');
+  const blocks=[];
+  let textBuf=[];
+  let asciiBuf=[];
+  function flushText(){
+    if(!textBuf.length)return;
+    blocks.push(`<div class="${baseClass}">${esc(textBuf.join('\n'))}</div>`);
+    textBuf=[];
+  }
+  function flushAscii(){
+    if(!asciiBuf.length)return;
+    blocks.push(`<pre class="problem-desc-ascii">${escCode(asciiBuf.join('\n'))}</pre>`);
+    asciiBuf=[];
+  }
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    const next=i+1<lines.length?lines[i+1]:'';
+    const prev=i>0?lines[i-1]:'';
+    const isAscii=isAsciiArtLine(line)||
+      (isAsciiCompanionLine(line)&&(isAsciiArtLine(prev)||isAsciiArtLine(next)||asciiBuf.length));
+    if(isAscii){
+      flushText();
+      asciiBuf.push(line);
+    }else{
+      flushAscii();
+      textBuf.push(line);
+    }
+  }
+  flushText();
+  flushAscii();
+  return `<div class="problem-desc-rich">${blocks.join('')}</div>`;
+}
 function renderProblemDescHtml(desc){
   const sp=splitProblemDesc(desc);
   if(sp.examples==null){
-    return `<div class="problem-desc-condition problem-desc-condition--solo">${esc(desc||'')}</div>`;
+    return renderDescRichText(desc||'','problem-desc-condition problem-desc-condition--solo problem-desc-text');
   }
   const head=sp.condition
-    ?`<div class="problem-desc-condition">${esc(sp.condition)}</div>`
+    ?renderDescRichText(sp.condition,'problem-desc-condition problem-desc-text')
     :'';
   return `<div class="problem-desc-stack">${head}
     <div class="problem-desc-examples-wrap" role="region" aria-label="Примеры">
       <div class="problem-desc-examples-label">Примеры</div>
-      <div class="problem-desc-examples-body">${esc(sp.examples)}</div>
+      <div class="problem-desc-examples-body">${renderDescRichText(sp.examples,'problem-desc-text')}</div>
     </div>
   </div>`;
 }

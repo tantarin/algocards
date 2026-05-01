@@ -8943,7 +8943,10 @@ code:`class RandomizedSet {
     private final Random random = new Random();
 
     public boolean insert(int val) {
-        if (index.containsKey(val)) return false;
+        if (index.containsKey(val)) {
+           return false;
+        }
+
         index.put(val, values.size());
         values.add(val);
         return true;
@@ -8951,7 +8954,10 @@ code:`class RandomizedSet {
 
     public boolean remove(int val) {
         Integer i = index.get(val);
-        if (i == null) return false;
+        if (i == null) {
+            return false;
+        }
+
         int lastIdx = values.size() - 1;
         int lastVal = values.get(lastIdx);
         values.set(i, lastVal);

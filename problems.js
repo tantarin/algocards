@@ -9719,6 +9719,9 @@ code:`class Solution {
                 continue;
             }
 
+            //a   → обычная папка → добавляем в стек: [a]
+            //b   → обычная папка → добавляем в стек: [a, b]
+            //..  → подняться выше → удаляем последний элемент: [a]
             if (part.equals("..")) {
                 if (!stack.isEmpty()) {
                     stack.pollLast();

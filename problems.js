@@ -8863,7 +8863,7 @@ code:`public class Solution {
     public void rightView(TreeNode curr, List<Integer> result, int currDepth) {
         if (curr == null) return;
         
-        // Первый узел на глубине (при обходе правый → левый) — виден справа
+        //сколько глубин мы уже заполнили.
         if (currDepth == result.size()) {
             result.add(curr.val);
         }

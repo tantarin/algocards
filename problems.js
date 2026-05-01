@@ -3602,6 +3602,95 @@ complexity:`Время: O(h + k), Память: O(h)`,
 complexityExpl:`Inorder-обход: спуск на глубину h + k шагов до k-го элемента — O(h+k). Рекурсивный стек — O(h) памяти.`,
 expl:`Inorder-обход BST выдаёт элементы в отсортированном порядке. Считаем посещённые узлы, при count == k — нашли ответ. O(H + k) время.`},
 
+{id:"lc146",t:"146. LRU Cache",p:"Queue / Design",d:"средне",
+desc:`Нужно реализовать структуру данных ==LRU Cache== с ограниченной ёмкостью.
+
+Методы:
+- LRUCache(int capacity) — создать кеш размера capacity
+- get(int key) — вернуть значение по ключу или -1, если ключа нет
+- put(int key, int value) — обновить значение, а если ключ новый — добавить его; при переполнении удалить ==наименее недавно использованный== ключ
+
+Важно: и get, и put должны работать в среднем за O(1).
+
+Пример:
+Ввод:
+["LRUCache","put","put","get","put","get","put","get","get","get"]
+[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]
+Вывод:
+[null,null,null,1,null,-1,null,-1,3,4]`,
+hint:`Комбинация HashMap + двусвязный список. HashMap даёт O(1) доступ к узлу по key, а список хранит порядок использования: голова = самый свежий, хвост = кандидат на eviction.`,
+code:`class LRUCache {
+    private static class Node {
+        int key, value;
+        Node prev, next;
+        Node(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private final int capacity;
+    private final Map<Integer, Node> map = new HashMap<>();
+    private final Node head = new Node(0, 0); // dummy head
+    private final Node tail = new Node(0, 0); // dummy tail
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    public int get(int key) {
+        Node node = map.get(key);
+        if (node == null) {
+            return -1;
+        }
+        moveToFront(node);
+        return node.value;
+    }
+
+    public void put(int key, int value) {
+        Node node = map.get(key);
+        if (node != null) {
+            node.value = value;
+            moveToFront(node);
+            return;
+        }
+
+        if (map.size() == capacity) {
+            Node lru = tail.prev;
+            remove(lru);
+            map.remove(lru.key);
+        }
+
+        Node fresh = new Node(key, value);
+        map.put(key, fresh);
+        addFirst(fresh);
+    }
+
+    private void moveToFront(Node node) {
+        remove(node);
+        addFirst(node);
+    }
+
+    private void addFirst(Node node) {
+        node.next = head.next;
+        node.prev = head;
+        head.next.prev = node;
+        head.next = node;
+    }
+
+    private void remove(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+}`,
+complexity:`Время: O(1) в среднем на get/put, Память: O(capacity)`,
+complexityExpl:`HashMap даёт O(1) доступ к узлу по ключу. Все операции со вставкой, удалением и перемещением узла в двусвязном списке делаются за O(1), потому что ссылки на соседей уже есть. Храним не больше capacity реальных узлов и map того же размера.`,
+expl:`Одного HashMap недостаточно: он быстро находит ключ, но не знает, какой элемент был использован давно. Один список тоже недостаточен: в нём поиск по key был бы O(n). Поэтому структура комбинирует обе идеи. Map хранит key -> node, а двусвязный список хранит порядок использования. Каждый get делает элемент самым свежим, значит узел нужно переставить в начало. Каждый put либо обновляет существующий узел и тоже двигает его в начало, либо добавляет новый; если места больше нет, удаляем узел перед хвостом — это и есть LRU.`,
+lcSimilar:[{"n":146,"t":"LRU Cache","h":"lru-cache"}],
+repoSimilar:["lc380","lc155"]},
+
 // ===== TWO POINTERS =====
 {id:"tp1",t:"Container With Most Water",p:"Two Pointers",d:"средне",
 desc:`Дан массив heights, heights[i] — высота линии.

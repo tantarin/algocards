@@ -1671,8 +1671,11 @@ function getFiltered(){
     if(lcNumMatch){
       const num=parseInt(lcNumMatch[1],10);
       const lcNumRe=new RegExp('(?:LC|LeetCode)\\s+'+num+'\\b','i');
+      const titleNumRe=new RegExp('^\\s*'+num+'(?:\\b|\\s*[.:-])','i');
       list=list.filter(p=>
         (p.t&&lcNumRe.test(p.t))||
+        (p.t&&titleNumRe.test(p.t))||
+        (p.lcSimilar&&p.lcSimilar.some(x=>titleNumRe.test(String(x.t||''))))||
         (p.lcSimilar&&p.lcSimilar.some(x=>x.n===num))
       );
     }else{

@@ -8863,7 +8863,7 @@ code:`public class Solution {
     public void rightView(TreeNode curr, List<Integer> result, int currDepth) {
         if (curr == null) return;
         
-        //сколько глубин мы уже заполнили.
+        //мы впервые пришли на эту глубину
         if (currDepth == result.size()) {
             result.add(curr.val);
         }

@@ -6702,15 +6702,11 @@ hint:`Два указателя с краёв. Вода в позиции i = mi
 code:`class Solution {
     public int trap(int[] height) {
         // Два указателя: левый и правый, движутся навстречу друг другу
-        int left = 0, right = height.length - 1;
-        
+        int left = 0, right = height.length - 1;       
         // Максимальная высота стенки слева и справа от текущей позиции
-        int maxLeft = 0, maxRight = 0;
-        
+        int maxLeft = 0, maxRight = 0;     
         // Общее количество забранной воды
         int water = 0;
-
-        // Пока указатели не встретятся
         while (left < right) {
             // Если левая стенка ниже или равна правой
             // (значит, уровень воды слева ограничен левой стенкой)
@@ -6726,7 +6722,6 @@ code:`class Solution {
                     water += maxLeft - height[left];
                 }
                 
-                // Сдвигаем левый указатель вправо
                 left++;
                 
             } else {
@@ -6742,12 +6737,10 @@ code:`class Solution {
                     water += maxRight - height[right];
                 }
                 
-                // Сдвигаем правый указатель влево
                 right--;
             }
         }
 
-        // Возвращаем общее количество воды
         return water;
     }
 }`,

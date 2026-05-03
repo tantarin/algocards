@@ -799,6 +799,19 @@ function renderProblemDescHtml(desc){
 }
 function escCode(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function shuffleWithSeed(list, seed){
+  const a=list.slice();
+  let s=(seed>>>0)||1;
+  function nextRand(){
+    s=(Math.imul(s,1664525)+1013904223)>>>0;
+    return s/4294967296;
+  }
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(nextRand()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
 
 // Очень простой stripper для Java/С-стиля комментариев.
 // Удаляет //... до конца строки и /* ... */ блоки, сохраняя переносы строк.
@@ -913,7 +926,7 @@ function hashString(s){
   return h>>>0;
 }
 
-/** Заполняет fcList из getFiltered() (полный список без лимита). При фильтре «Популярные» порядок — по убыванию оценочной сложности по памяти (см. memoryComplexityRank). */
+/** Заполняет fcList из getFiltered() (полный список без лимита). */
 function rebuildDailyList(){
   dailyListDateKey=todayLocalDateKey();
   fcList=[...getFiltered()];
@@ -1751,10 +1764,8 @@ function getFiltered(){
     }
   }
   if(yaFilter){
-    list=list.slice().sort((a,b)=>{
-      const d=memoryComplexityRank(b)-memoryComplexityRank(a);
-      return d||String(a.id).localeCompare(String(b.id));
-    });
+    const seed=hashString('ya-popular:'+todayLocalDateKey());
+    list=shuffleWithSeed(list,seed);
   }
   return list;
 }

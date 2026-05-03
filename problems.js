@@ -5223,24 +5223,43 @@ code:`import java.util.*;
 
 public class Solution {
     public Integer countPairs(List<Integer> nums, Integer k) {
-         Collections.sort(nums);
-        
+        Collections.sort(nums);
+
         int n = nums.size();
-        
+
+        // Если k <= 0, то подходят все пары i <= j:
+        // (0,0), (0,1), ..., (n-1,n-1)
+        //
+        // Количество таких пар:
+        // n + (n - 1) + ... + 1 = n * (n + 1) / 2
         if (k <= 0) {
             return n * (n + 1) / 2;
         }
-        
-        int left = 0;
-        int count = 0;      
-        for (int right = 0; right < n; right++) {
-            while (left < right && nums.get(right) - nums.get(left) >= k) {
-                left++;
+
+        int count = 0;
+        int right = 0;
+
+        // Фиксируем левую границу пары.
+        for (int left = 0; left < n; left++) {
+            // Для k > 0 пара с самим собой не подходит,
+            // поэтому right должен быть строго правее left.
+            if (right <= left) {
+                right = left + 1;
             }
 
-            count += left;
+            // Ищем первый right, где разность стала >= k.
+            while (right < n && nums.get(right) - nums.get(left) < k) {
+                right++;
+            }
+
+            // Если нашли такой right, то все элементы правее тоже подходят,
+            // потому что массив отсортирован.
+            //
+            // Подходящие пары:
+            // (left, right), (left, right + 1), ..., (left, n - 1)
+            count += n - right;
         }
-        
+
         return count;
     }
 }`,

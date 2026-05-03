@@ -5845,6 +5845,10 @@ code:`class Solution {
         
         String key = node.val + " " + left + " " + right;
 
+        // Если такое поддерево уже встречалось,
+        // берём его старый id.
+        // Если встречается впервые,
+        // создаём для него новый уникальный id.
         Integer id = ids.get(key);
         if (id == null) {
            id = serial;
@@ -5853,6 +5857,7 @@ code:`class Solution {
         }
 
         int cnt = count.merge(id, 1, Integer::sum);
+        //Добавляем поддерево в ответ только на втором появлении.
         if (cnt == 2) {
             result.add(node);
         }

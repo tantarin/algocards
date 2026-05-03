@@ -2105,6 +2105,14 @@ hint:`Хеш-таблица + префиксные суммы. Если prefixSu
 code:`class Solution {
     public int subarraySum(int[] nums, int k) {
         Map<Integer, Integer> prefixSumCount = new HashMap<>();
+        // Пустой префикс до начала массива имеет сумму 0.
+        // Это нужно, чтобы находить подмассивы,
+        // которые начинаются с индекса 0.
+        //
+        // Например: nums = [3, 1, 2], k = 3
+        // currentSum на первом элементе = 3
+        // currentSum - k = 0
+        // Значит, подмассив [3] подходит.
         prefixSumCount.put(0, 1);
 
         int count = 0;

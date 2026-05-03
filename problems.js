@@ -5827,6 +5827,7 @@ code:`class Solution {
     private Map<String, Integer> ids = new HashMap<>();
     private Map<Integer, Integer> count = new HashMap<>();
     private List<TreeNode> result = new ArrayList<>();
+    //Счётчик serial даёт нам короткий уникальный номер для каждого уникального вида поддерева.
     private int serial = 1;
     
     public List<TreeNode> findDuplicateSubtrees(TreeNode root) {

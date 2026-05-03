@@ -8229,6 +8229,9 @@ code:`public long countSubstrings(String s) {
     int left = 0;
     for (int right = 0; right < s.length(); right++) {
         char c = s.charAt(right);
+        // Если символ c уже встречался в текущем окне (т.е. lastSeenPlusOne[c] > left),
+        // то сдвигаем левую границу сразу за последнее место появления этого символа.
+        // Это гарантирует, что в окне [left, right] все символы уникальны.
         left = Math.max(left, lastSeenPlusOne[c]);
 
         lastSeenPlusOne[c] = right + 1;

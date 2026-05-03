@@ -5843,7 +5843,15 @@ code:`class Solution {
         // Ключ из значения и ID поддеревьев
         String key = node.val + " " + left + " " + right;
         
-        int id = ids.computeIfAbsent(key, k -> serial++);
+        String key = node.val + " " + left + " " + right;
+
+        Integer id = ids.get(key);
+        if (id == null) {
+           id = serial;
+           ids.put(key, id);
+           serial++;
+        }
+
         int cnt = count.merge(id, 1, Integer::sum);
         if (cnt == 2) {
             result.add(node);

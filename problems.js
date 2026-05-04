@@ -3171,70 +3171,41 @@ complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по токенам — O(n). Только result и prevMultiply — O(1) памяти.`,
 expl:`Выражение — сумма произведений. prevMultiply накапливает текущее произведение. При + — добавляем его к result и начинаем новое. O(n) время, O(1) память.`},
 
-{id:"st8",t:"LC 227 · Базовый калькулятор II",p:"Math / Simulation",d:"средне",
-desc:`Дана строка ==s==, представляющая арифметическое выражение. Нужно вычислить и вернуть результат.
+{id:"st8",t:"Базовый калькулятор ",p:"Math / Simulation",d:"средне",
+desc:`Дан массив токенов s, представляющий арифметическое выражение. Токены на чётных позициях (0, 2, 4, ...) — это положительные целые числа, записанные строками; токены на нечётных позициях — это операторы +, -, * или /.
 
-Допустимые операторы: ==+==, ==-==, ==*==, ==/==.
-Все числа неотрицательные, в строке могут быть пробелы.
-
-Важно:
-- Деление целочисленное, с усечением к нулю
-- Нельзя использовать встроенные функции вычисления выражений (например, eval)
+Верните значение выражения с учётом стандартного приоритета операций: * и / применяются раньше, чем + и -. Деление — целочисленное с округлением в сторону нуля. Гарантируется, что деления на ноль не возникает и все промежуточные значения помещаются в стандартный int.
 
 Пример 1:
-Ввод: s = "3+2*2"
-Вывод: 7
-
-Пример 2:
-Ввод: s = " 3/2 "
-Вывод: 1
-
-Пример 3:
-Ввод: s = " 3+5 / 2 "
-Вывод: 5
-
-Ограничения:
-- 1 <= s.length <= 3 * 10^5
-- s состоит из цифр, пробелов и операторов +, -, *, /
-- Выражение всегда корректно
-- Все промежуточные значения и ответ помещаются в 32-битный int`,
+Ввод: s = ["10", "/", "2", "+", "3", "*", "4", "-", "1"]
+Вывод: 16
+Объяснение: 10/2 = 5 и 3*4 = 12 вычисляются первыми, затем 5 + 12 - 1 = 16.`,
 hint:`Делаем один проход по строке: текущее число собираем из цифр, а предыдущее число держим в last. Для + и - переносим last в сумму, для * и / сразу пересчитываем last.`,
-code:`class Solution {
-    //11+2*2-6
-    public int calculate(String s) {
-        int num = 0;
-        char operator = '+';
-        int last = 0, sum = 0;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
+code:`import java.util.*;
 
-            if (Character.isDigit(c)) {
-                num = num * 10 + (c - '0');
-            }
-
-            if (isOperator(c) || i == s.length() - 1) {
-                if (operator == '+') {
-                    sum += last;
-                    last = num;
-                } else if (operator == '-') {
-                    sum += last;
-                    last = -num;
-                } else if (operator == '*') {
-                    last *= num;
-                } else if (operator == '/') {
-                    last /= num;
-                }
-
-                num = 0;
-                operator = c;
+public class Solution {
+    public Integer calculate(List<String> s) {
+        int result = 0;
+        int currentTerm = Integer.parseInt(s.get(0));
+        int sign = 1;
+        for (int i = 1; i < s.size(); i += 2) {
+            String op = s.get(i);
+            int num = Integer.parseInt(s.get(i + 1));
+            if (op.equals("+")) {
+                result += sign * currentTerm;
+                sign = 1;
+                currentTerm = num;
+            } else if (op.equals("-")) {
+                result += sign * currentTerm;
+                sign = -1;
+                currentTerm = num;
+            } else if (op.equals("*")) {
+                currentTerm *= num;
+            } else {
+                currentTerm = currentTerm / num;
             }
         }
-
-        return sum + last;
-    }
-
-    private boolean isOperator(char c) {
-        return c == '+' || c == '-' || c == '*' || c == '/';
+        return result + sign * currentTerm;
     }
 }`,
 complexity:`Время: O(|s|), Память: O(1) доп. (целые num, last, sum, текущий оператор — константное число слотов)`,

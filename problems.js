@@ -3189,6 +3189,7 @@ code:`public class Solution {
         int result = 0;
         int currentTerm = s.charAt(0) - '0';
         
+        //скачем по знакам 
         for (int i = 1; i < s.length(); i += 2) {
             char op = s.charAt(i);
             int num = s.charAt(i + 1) - '0';

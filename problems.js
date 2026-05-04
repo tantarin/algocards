@@ -3187,7 +3187,7 @@ hint:`Делаем один проход по строке: текущее чи�
 code:`public class Solution {
     public int calculate(String s) {
         int result = 0;
-        int currentTerm = s.charAt(0) - '0';
+        int currentTerm = s.charAt(0) - '0'; //то что накопили до знака
         
         //скачем по знакам 
         for (int i = 1; i < s.length(); i += 2) {

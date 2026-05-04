@@ -3196,10 +3196,11 @@ code:`public class Solution {
             
             if (op == '+') {
                 result += currentTerm;
+                //начинаем новое слагаемое с числа num
                 currentTerm = num;
             } else if (op == '-') {
                 result += currentTerm;
-                currentTerm = -num;  // ← ключевое отличие
+                currentTerm = -num;  
             } else if (op == '*') {
                 currentTerm *= num;
             } else { // op == '/'

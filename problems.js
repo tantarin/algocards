@@ -3188,20 +3188,17 @@ code:`public class Solution {
     public int calculate(String s) {
         int result = 0;
         int currentTerm = s.charAt(0) - '0';
-        int sign = 1;
         
         for (int i = 1; i < s.length(); i += 2) {
             char op = s.charAt(i);
             int num = s.charAt(i + 1) - '0';
             
             if (op == '+') {
-                result += sign * currentTerm;
-                sign = 1;
+                result += currentTerm;
                 currentTerm = num;
             } else if (op == '-') {
-                result += sign * currentTerm;
-                sign = -1;
-                currentTerm = num;
+                result += currentTerm;
+                currentTerm = -num;  // ← ключевое отличие
             } else if (op == '*') {
                 currentTerm *= num;
             } else { // op == '/'
@@ -3209,7 +3206,7 @@ code:`public class Solution {
             }
         }
         
-        return result + sign * currentTerm;
+        return result + currentTerm;
     }
 }`,
 complexity:`Время: O(|s|), Память: O(1) доп. (целые num, last, sum, текущий оператор — константное число слотов)`,

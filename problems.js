@@ -3208,7 +3208,7 @@ code:`public class Solution {
             }
         }
         
-        return result + currentTerm;
+        return result + currentTerm; //просто в цикле что-то добавляется если встретили знак
     }
 }`,
 complexity:`Время: O(|s|), Память: O(1) доп. (целые num, last, sum, текущий оператор — константное число слотов)`,

@@ -1057,10 +1057,7 @@ function javaToPython(src){
     .trim();
 }
 function getPythonCode(p, which){
-  const src=which===2?(p.code2||''):(p.code||'');
-  if(!src)return '';
-  const manual=which===2?(p.py2||''):(p.py||'');
-  return manual||javaToPython(src);
+  return which===2?(p.py2||''):(p.py||'');
 }
 
 let currentTheoryPattern = null;

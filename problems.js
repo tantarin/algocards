@@ -48,6 +48,21 @@ code:`class Solution {
         backtrack(openCount, closeCount + 1, current + ")");
     }
 }`,
+py:`class Solution:
+    def generateParenthesis(self, n):
+        result = []
+
+        def backtrack(open_count, close_count, current):
+            if open_count == n and close_count == n:
+                result.append(current)
+                return
+            if open_count < n:
+                backtrack(open_count + 1, close_count, current + "(")
+            if close_count < open_count:
+                backtrack(open_count, close_count + 1, current + ")")
+
+        backtrack(0, 0, "")
+        return result`,
 complexity:`Время: O(4^n / √n), Память: O(n)`,
 complexityExpl:`Рекурсивный DFS с двумя ветвлениями строит все скобочные последовательности; их число — число Каталана O(4^n/√n). Глубина рекурсии и длина строки — O(n) памяти.`,
 expl:`Поиск в глубину с отсечением ветвей (DFS + pruning).
@@ -85,6 +100,21 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def cartesianProduct(self, arrays):
+        result = []
+
+        def backtrack(idx, current):
+            if idx == len(arrays):
+                result.append(current[:])
+                return
+            for val in arrays[idx]:
+                current.append(val)
+                backtrack(idx + 1, current)
+                current.pop()
+
+        backtrack(0, [])
+        return result`,
 complexity:`Время: O(∏ |arrays[i]|), Память: O(k)`,
 complexityExpl:`На каждом уровне перебираем элементы массива, рекурсия углубляется — всего перебирается произведение размеров. Глубина рекурсии = число массивов k — O(k) памяти.`,
 expl:`На каждом уровне рекурсии выбираем элемент из соответствующего массива. После возврата удаляем последний элемент (backtrack). Когда idx == arrays.size() — комбинация готова.`,
@@ -137,6 +167,30 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def restoreIpAddresses(self, s):
+        result = []
+
+        def backtrack(start, parts):
+            if len(parts) == 4:
+                if start == len(s):
+                    result.append(".".join(parts))
+                return
+
+            for length in range(1, 4):
+                if start + length > len(s):
+                    break
+                segment = s[start:start + length]
+                if len(segment) > 1 and segment[0] == "0":
+                    break
+                if int(segment) > 255:
+                    break
+                parts.append(segment)
+                backtrack(start + length, parts)
+                parts.pop()
+
+        backtrack(0, [])
+        return result`,
 complexity:`Время: O(1) (3^4 = 81 ветвлений), Память: O(1)`,
 complexityExpl:`Четыре октета, на каждом не более трёх длин — конечное дерево ветвлений (константа). Рекурсия глубины 4, список из 4 строк — O(1) памяти.`,
 expl:`Разбиваем строку на 4 октета. Для каждого пробуем 1–3 цифры. Проверяем валидность: 0–255 без ведущих нулей. Когда 4 части и строка кончилась — IP найден.`},
@@ -196,6 +250,48 @@ code:`class Solution {
         return count == 0;
     }
 }`,
+py:`class Solution:
+    def removeInvalidParentheses(self, s):
+        result = set()
+        open_to_remove = 0
+        close_to_remove = 0
+
+        for ch in s:
+            if ch == "(":
+                open_to_remove += 1
+            elif ch == ")":
+                if open_to_remove > 0:
+                    open_to_remove -= 1
+                else:
+                    close_to_remove += 1
+
+        def is_valid(text):
+            balance = 0
+            for ch in text:
+                if ch == "(":
+                    balance += 1
+                elif ch == ")":
+                    balance -= 1
+                    if balance < 0:
+                        return False
+            return balance == 0
+
+        def backtrack(text, start, open_rem, close_rem):
+            if open_rem == 0 and close_rem == 0:
+                if is_valid(text):
+                    result.add(text)
+                return
+
+            for i in range(start, len(text)):
+                if i > start and text[i] == text[i - 1]:
+                    continue
+                if text[i] == "(" and open_rem > 0:
+                    backtrack(text[:i] + text[i + 1:], i, open_rem - 1, close_rem)
+                if text[i] == ")" and close_rem > 0:
+                    backtrack(text[:i] + text[i + 1:], i, open_rem, close_rem - 1)
+
+        backtrack(s, 0, open_to_remove, close_to_remove)
+        return list(result)`,
 complexity:`Время: O(2^n · n), Память: O(n)`,
 complexityExpl:`В худшем случае backtrack перебирает O(2^n) подпоследовательностей. Для каждой из них при openRem==0 && closeRem==0 вызывается isValid — линейный проход O(n). Итого O(2^n · n). Рекурсия глубины n, строки длиной n — O(n) памяти на уровень стека.`,
 expl:`Считаем лишние открывающие и закрывающие скобки. Backtrack: пробуем удалить каждую, пропуская дубликаты (если s[i]==s[i-1]). Когда обе счётчика == 0, проверяем валидность строки.`},
@@ -239,6 +335,35 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    PHONE = {
+        "2": "abc",
+        "3": "def",
+        "4": "ghi",
+        "5": "jkl",
+        "6": "mno",
+        "7": "pqrs",
+        "8": "tuv",
+        "9": "wxyz",
+    }
+
+    def letterCombinations(self, s):
+        if not s:
+            return []
+
+        result = []
+
+        def backtrack(idx, current):
+            if idx == len(s):
+                result.append("".join(current))
+                return
+            for ch in self.PHONE[s[idx]]:
+                current.append(ch)
+                backtrack(idx + 1, current)
+                current.pop()
+
+        backtrack(0, [])
+        return result`,
 complexity:`Время: O(4^n · n), Память: O(n)`,
 complexityExpl:`Для каждой позиции перебираем 3 или 4 буквы; в худшем случае все цифры дают по 4 варианта, значит число комбинаций O(4^n). Построение строки результата длины n для каждой готовой комбинации даёт множитель n. Глубина рекурсии и текущий StringBuilder — O(n) памяти, не считая списка ответа.`,
 expl:`Это дерево перебора: каждая цифра задаёт следующий слой, а её буквы — ветви. На уровне idx выбираем одну букву для s[idx], добавляем её в текущую строку и рекурсивно строим комбинации для оставшихся цифр. Когда дошли до конца строки, текущая комбинация готова.`,
@@ -288,6 +413,28 @@ code:`class Solution {
         return -1;
     }
 }`,
+py:`class Solution:
+    def search(self, nums, target):
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            mid = left + (right - left) // 2
+            if nums[mid] == target:
+                return mid
+
+            if nums[left] <= nums[mid]:
+                if nums[left] <= target < nums[mid]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+            else:
+                if nums[mid] < target <= nums[right]:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+
+        return -1`,
 complexity:`Время: O(log n) сравнений (каждое O(1)), Память: O(1) доп. (три индекса left, right, mid — фиксированное число переменных, не от n)`,
 complexityExpl:`Интервал [left, right] сокращается примерно вдвое за шаг, шагов O(log n). Дополнительно храним только границы и mid.`,
 expl:`Если идти в лоб, получится обычный линейный поиск. Но после поворота массив не стал полностью хаотичным: в любой момент одна из половин всё равно остаётся отсортированной. Значит, на каждом шаге можно понять, в какой половине target точно не лежит, и выбросить её. Отсюда и получается модифицированный бинарный поиск, а не проход по всем элементам.`,
@@ -349,6 +496,36 @@ code:`class Solution {
         return lo;
     }
 }`,
+py:`class Solution:
+    def searchRange(self, nums, target):
+        left = self.lowerBound(nums, target)
+        right = self.upperBound(nums, target) - 1
+
+        if left == len(nums) or nums[left] != target:
+            return [-1, -1]
+        return [left, right]
+
+    def lowerBound(self, nums, target):
+        lo = 0
+        hi = len(nums)
+        while lo < hi:
+            mid = lo + (hi - lo) // 2
+            if nums[mid] >= target:
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo
+
+    def upperBound(self, nums, target):
+        lo = 0
+        hi = len(nums)
+        while lo < hi:
+            mid = lo + (hi - lo) // 2
+            if nums[mid] > target:
+                hi = mid
+            else:
+                lo = mid + 1
+        return lo`,
 complexity:`Время: O(log n), Память: O(1)`,
 complexityExpl:`Два бинарных поиска (findLeft + findRight) — суммарно O(log n). Константные переменные — O(1) памяти.`,
 expl:`Для левой границы: при nums[mid]==target идём влево (hi=mid-1). Для правой: идём вправо (lo=mid+1). Оба поиска O(log n).`,
@@ -382,6 +559,21 @@ code:`class Solution {
         return -1;  // не найдено
     }
 }`,
+py:`class Solution:
+    def search(self, nums, target):
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            mid = left + (right - left) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        return -1`,
 complexity:`Время: O(log n), Память: O(1)`,
 complexityExpl:`Классический бинарный поиск: интервал сокращается вдвое — O(log n). Только lo, hi, mid — O(1) памяти.`,
 expl:`O(log n) время, O(1) память. На каждом шаге пространство поиска сокращается вдвое.`,
@@ -431,6 +623,16 @@ code:`class Solution {
         return isValid(node.left, low, node.val) && isValid(node.right, node.val, high);
     }
 }`,
+py:`class Solution:
+    def isValidBST(self, root):
+        def is_valid(node, low, high):
+            if node is None:
+                return True
+            if node.val <= low or node.val >= high:
+                return False
+            return is_valid(node.left, low, node.val) and is_valid(node.right, node.val, high)
+
+        return is_valid(root, float("-inf"), float("inf"))`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Рекурсия isValid посещает каждый узел один раз — O(n). Стек вызовов по высоте дерева — O(h) памяти.`,
 expl:`Рекурсия с границами. Для левого поддерева: max = node.val. Для правого: min = node.val. Используем long чтобы обработать граничные значения Integer.`,
@@ -473,6 +675,22 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def isSymmetric(self, points):
+        min_x = float("inf")
+        max_x = float("-inf")
+        point_set = set()
+
+        for x, y in points:
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            point_set.add((x, y))
+
+        axis_double = min_x + max_x
+        for x, y in points:
+            if (axis_double - x, y) not in point_set:
+                return False
+        return True`,
 complexity:`Время: O(n) (два прохода по точкам), Память: O(n) (HashSet строк-ключей «x,y», до одной на точку)`,
 complexityExpl:`Первый проход: min/max и вставка ключей. Второй: contains за O(1) в среднем на ключ фиксированной длины (координаты). Память — множество из ≤ n ключей.`,
 expl:`Сначала хочется как-то угадывать ось симметрии, но код опирается на более жёсткое наблюдение: если симметрия есть, то крайние точки по x уже фиксируют эту ось как середину между minX и maxX. После этого задача сводится к простой проверке пар: для каждой точки (x, y) должна существовать зеркальная (minX + maxX - x, y). Поэтому точки складываются в HashSet, чтобы каждую такую проверку делать быстро.`,
@@ -516,6 +734,23 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def isStrictlySymmetric(self, points):
+        min_x = float("inf")
+        max_x = float("-inf")
+        count = {}
+
+        for x, y in points:
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            key = (x, y)
+            count[key] = count.get(key, 0) + 1
+
+        axis_sum = min_x + max_x
+        for x, y in points:
+            if count.get((x, y), 0) != count.get((axis_sum - x, y), 0):
+                return False
+        return True`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Два линейных прохода: HashMap кратностей, затем проверка зеркальных пар — O(n). Карта до n ключей — O(n) памяти.`,
 expl:`Строгая биекция: количество совпадений точки и её зеркала должно совпадать. Точки на оси допустимы. O(n) время и память.`},
@@ -553,6 +788,22 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def isReflected(self, points):
+        min_x = float("inf")
+        max_x = float("-inf")
+        point_set = set()
+
+        for x, y in points:
+            min_x = min(min_x, x)
+            max_x = max(max_x, x)
+            point_set.add((x, y))
+
+        axis_sum = min_x + max_x
+        for x, y in points:
+            if (axis_sum - x, y) not in point_set:
+                return False
+        return True`,
 complexity:`Время: O(n) (два прохода), Память: O(n) (HashSet ключей «x,y», до n записей)`,
 complexityExpl:`Первый проход строит множество точек; второй проверяет для каждой точки зеркальный ключ. Операции с множеством — O(1) в среднем на короткий ключ.`,
 expl:`Логика та же: сначала находим крайние x и тем самым фиксируем возможную ось симметрии. Дальше для каждой точки нужно проверить, есть ли у неё зеркальная относительно этой оси. Код специально хранит не саму ось через деление, а сумму minX + maxX, чтобы обойтись без double и считать зеркальный x как sumAxis - x. После этого остаётся только быстрая проверка через HashSet.`,
@@ -624,6 +875,38 @@ code:`public class Solution {
         return path;
     }
 }`,
+py:`from collections import deque
+
+
+class Solution:
+    def findShortestPath(self, edges, start, end):
+        graph = {}
+        for u, v in edges:
+            graph.setdefault(u, []).append(v)
+            graph.setdefault(v, []).append(u)
+
+        queue = deque([start])
+        parent = {start: None}
+
+        while queue:
+            node = queue.popleft()
+            if node == end:
+                break
+            for nb in graph.get(node, []):
+                if nb not in parent:
+                    parent[nb] = node
+                    queue.append(nb)
+
+        if end not in parent:
+            return []
+
+        path = []
+        cur = end
+        while cur is not None:
+            path.append(cur)
+            cur = parent[cur]
+        path.reverse()
+        return path`,
 complexity:`Время: O(V + E), Память: O(V + E)`,
 complexityExpl:`BFS помечает каждую вершину и ребро один раз — O(V+E). Граф, очередь и карта родителей — O(V+E) памяти.`,
 expl:`BFS гарантирует кратчайший путь в невзвешенном графе. Очередь FIFO обрабатывает сначала ближайших соседей. Восстановление пути через карту родителей с обратным обходом от end к start.`,
@@ -691,6 +974,31 @@ public class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def route(self, tickets):
+        graph = {}
+        for a, b in tickets:
+            graph.setdefault(a, []).append(b)
+            graph.setdefault(b, []).append(a)
+
+        start = ""
+        for city, neighbors in graph.items():
+            if len(neighbors) == 1:
+                start = city
+                break
+
+        result = [start]
+        visited = {start}
+
+        for _ in range(len(tickets)):
+            current = result[-1]
+            for nxt in graph[current]:
+                if nxt not in visited:
+                    visited.add(nxt)
+                    result.append(nxt)
+                    break
+
+        return result`,
 complexity:`Время: O(n) (n — число рёбер; построение списков смежности + обход), Память: O(n) (граф, посещения, маршрут)`,
 complexityExpl:`Суммарная длина списков смежности 2n — O(n) построение. На каждом из n шагов смотрим не более константы соседей у вершины степени 2, у конца — 1. HashMap и Set — O(кол-во вершин) ≤ O(n+1).`,
 expl:`Совокупность рёбру без повторов вершин образует ==простой путь== в неориентированном графе. У концов пути степень 1, внутри — 2, поэтому лист (степень 1) — один из концов. Идя от него, на каждом внутреннем шаге из двух соседей ровно один ещё не посещён — переход к нему однозначен. После n шагов посещены все n+1 вершин — маршрут совпал с оригиналом (прямым или обратным).`,
@@ -754,6 +1062,33 @@ code:`class Solution {
         return processed != indegree.size();
     }
 }`,
+py:`from collections import deque
+
+
+class Solution:
+    def hasCycle(self, deps):
+        graph = {}
+        indegree = {}
+
+        for frm, to in deps:
+            graph.setdefault(frm, []).append(to)
+            graph.setdefault(to, [])
+            indegree.setdefault(frm, 0)
+            indegree.setdefault(to, 0)
+            indegree[to] += 1
+
+        queue = deque(node for node, deg in indegree.items() if deg == 0)
+        processed = 0
+
+        while queue:
+            node = queue.popleft()
+            processed += 1
+            for nxt in graph[node]:
+                indegree[nxt] -= 1
+                if indegree[nxt] == 0:
+                    queue.append(nxt)
+
+        return processed != len(indegree)`,
 complexity:`Время: O(V + E), Память: O(V + E)`,
 complexityExpl:`Kahn: каждое ребро снимается один раз при уменьшении indegree — O(V+E). Граф, очередь и счётчики — O(V+E) памяти.`,
 expl:`Алгоритм Кана: считаем in-degree для каждой вершины, добавляем в очередь вершины с 0 входящих. Удаляем их, уменьшая in-degree соседей. Если не все вершины обработаны — граф содержит цикл. O(V+E).`},
@@ -813,6 +1148,30 @@ code:`class Solution {
         return processed == n;
     }
 }`,
+py:`from collections import deque
+
+
+class Solution:
+    def canFinish(self, n, prerequisites):
+        adj = [[] for _ in range(n)]
+        indegree = [0] * n
+
+        for course, prereq in prerequisites:
+            adj[prereq].append(course)
+            indegree[course] += 1
+
+        queue = deque(i for i in range(n) if indegree[i] == 0)
+        processed = 0
+
+        while queue:
+            cur = queue.popleft()
+            processed += 1
+            for nxt in adj[cur]:
+                indegree[nxt] -= 1
+                if indegree[nxt] == 0:
+                    queue.append(nxt)
+
+        return processed == n`,
 complexity:`Время: O(V + E), Память: O(V + E)`,
 complexityExpl:`Каждая вершина и каждое ребро обрабатываются один раз. Граф, очередь и indegree — O(V+E) памяти.`,
 expl:`Задача сводится к поиску цикла в ориентированном графе. Алгоритм Кана: начинаем с курсов без prerequisites (indegree = 0), поочерёдно «снимаем» их и уменьшаем indegree соседей. Если удалось обработать все n курсов — цикла нет → true. Иначе — в графе есть цикл → false.`,
@@ -898,6 +1257,32 @@ class Solution {
         return false;
     }
 }`,
+py:`from collections import deque
+
+
+class Solution:
+    def eventualSafeNodes(self, graph):
+        n = len(graph)
+        reverse = [[] for _ in range(n)]
+        outdegree = [0] * n
+
+        for u in range(n):
+            outdegree[u] = len(graph[u])
+            for v in graph[u]:
+                reverse[v].append(u)
+
+        queue = deque(i for i in range(n) if outdegree[i] == 0)
+        safe = [False] * n
+
+        while queue:
+            node = queue.popleft()
+            safe[node] = True
+            for parent in reverse[node]:
+                outdegree[parent] -= 1
+                if outdegree[parent] == 0:
+                    queue.append(parent)
+
+        return [i for i in range(n) if safe[i]]`,
 complexity:`Время: O(V + E), Память: O(V + E)`,
 complexityExpl:`Оба подхода обходят каждую вершину и ребро один раз — O(V+E). Обратный граф и массивы — O(V+E) памяти.`,
 expl:`Безопасные узлы = не участвующие в цикле и не ведущие в цикл. Алгоритм Кана на обратном графе: терминальные (outdegree=0) безопасны; убираем их рёбра, уменьшаем outdegree родителей — все достигшие 0 тоже безопасны. Альтернатива — DFS с 3 состояниями: VISITING при повторном заходе означает цикл.`,
@@ -931,6 +1316,12 @@ code:`class Solution {
         return totalProfit;
     }
 }`,
+py:`class Solution:
+    def maxProfit(self, prices):
+        total_profit = 0
+        for day in range(1, len(prices)):
+            total_profit += max(0, prices[day] - prices[day - 1])
+        return total_profit`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по ценам — O(n). Только totalProfit и счётчик — O(1) памяти.`,
 expl:`Сумма всех маленьких ростов = максимальная прибыль`,
@@ -970,6 +1361,23 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def partitionLabels(self, s):
+        last_occurrence = {}
+        for i, ch in enumerate(s):
+            last_occurrence[ch] = i
+
+        result = []
+        partition_start = 0
+        max_reach = 0
+
+        for i, ch in enumerate(s):
+            max_reach = max(max_reach, last_occurrence[ch])
+            if i == max_reach:
+                result.append(i - partition_start + 1)
+                partition_start = i + 1
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода: заполнение lastOccurrence[26] и проход по строке — O(n). Массив из 26 целых — O(1) памяти.`,
 expl:`Заметим, что сами части могут быть мелкими, главное чтоб их было как можно больше. 
@@ -1002,6 +1410,20 @@ code:`class Solution {
         return first + min1 + min2;
     }
 }`,
+py:`class Solution:
+    def minSumOfFirstElements(self, arr):
+        first = arr[0]
+        min1 = float("inf")
+        min2 = float("inf")
+
+        for val in arr[1:]:
+            if val < min1:
+                min2 = min1
+                min1 = val
+            elif val < min2:
+                min2 = val
+
+        return first + min1 + min2`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением двух минимумов — O(n). Только переменные — O(1) памяти.`,
 expl:`Первый элемент всегда начинает первую часть. Из позиций 1..n-1 выбираем два минимальных — это начала второй и третьей частей. O(n).`},
@@ -1060,6 +1482,23 @@ public class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def longestSubarrayWithMinX(self, arr, x):
+        result = 0
+        left = 0
+        has_target = False
+
+        for right, value in enumerate(arr):
+            if value < x:
+                left = right + 1
+                has_target = False
+                continue
+            if value == x:
+                has_target = True
+            if has_target:
+                result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл со скользящим окном, каждый индекс обрабатывается константное число раз — O(n). Переменные — O(1).`,
 expl:`Все элементы в окне должны быть >= x, и хотя бы один == x. Элементы < x разрывают окно. Сдвигаем left и сбрасываем hasTarget. O(n).`,
@@ -1102,6 +1541,31 @@ class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    @staticmethod
+    def searchMonoton(nums):
+        max_len = 1
+        inc_len = 1
+        dec_len = 1
+        result = [0, 0]
+
+        for idx in range(1, len(nums)):
+            if nums[idx - 1] < nums[idx]:
+                inc_len += 1
+                dec_len = 1
+            elif nums[idx - 1] > nums[idx]:
+                dec_len += 1
+                inc_len = 1
+            else:
+                inc_len = 1
+                dec_len = 1
+
+            curr_len = max(inc_len, dec_len)
+            if curr_len > max_len:
+                result = [idx - curr_len + 1, idx]
+                max_len = curr_len
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением счётчиков incLen/decLen — O(n). Несколько целых — O(1) памяти.`,
 expl:`Ведём два счётчика: incLen и decLen. При смене направления или равных элементах сбрасываем. Запоминаем лучший результат. O(n).`,
@@ -1135,6 +1599,23 @@ code:`class Solution {
         return result == Integer.MAX_VALUE ? -1 : result;
     }
 }`,
+py:`class Solution:
+    def minDistanceXY(self, s):
+        last_x = -1
+        last_y = -1
+        result = float("inf")
+
+        for i, ch in enumerate(s):
+            if ch == "X":
+                last_x = i
+                if last_y != -1:
+                    result = min(result, i - last_y)
+            elif ch == "Y":
+                last_y = i
+                if last_x != -1:
+                    result = min(result, i - last_x)
+
+        return -1 if result == float("inf") else result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по строке с обновлением lastX/lastY — O(n). Несколько индексов — O(1) памяти.`,
 expl:`Минимальное расстояние всегда достигается парой соседних X и Y по позиции. Один проход, обновляем lastX/lastY и result. O(n).`},
@@ -1179,6 +1660,26 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def rearrangeHalves(self, arr, k):
+        arr.sort()
+        n = len(arr)
+        min_val = arr[0]
+        max_val = arr[-1]
+
+        low_group = []
+        high_group = []
+        mid_group = []
+
+        for val in arr:
+            if val <= min_val + k:
+                low_group.append(val)
+            elif val >= max_val - k:
+                high_group.append(val)
+            else:
+                mid_group.append(val)
+
+        return low_group + mid_group + high_group`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Arrays.sort — O(n log n), затем линейное распределение по группам. Три списка суммарно n элементов — O(n) памяти.`,
 expl:`Сортируем массив. Распределяем по группам: близкие к min, близкие к max, и промежуточные. Каждая половина отсортированного массива автоматически удовлетворяет условию разницы ≤ k.`},
@@ -1228,6 +1729,37 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def optimizeRoute(self, moves):
+        result = []
+        coords = [(0, 0)]
+        pos_to_index = {(0, 0): 0}
+        x = 0
+        y = 0
+
+        for move in moves:
+            if move == "U":
+                y += 1
+            elif move == "D":
+                y -= 1
+            elif move == "L":
+                x -= 1
+            elif move == "R":
+                x += 1
+
+            point = (x, y)
+            if point in pos_to_index:
+                keep_index = pos_to_index[point]
+                while len(coords) - 1 > keep_index:
+                    removed = coords.pop()
+                    pos_to_index.pop(removed, None)
+                    result.pop()
+            else:
+                result.append(move)
+                coords.append(point)
+                pos_to_index[point] = len(coords) - 1
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Каждый добавленный шаг может быть удалён не более одного раза — амортизированно O(n). coords, visited, result — O(n) памяти.`,
 expl:`Отслеживаем посещённые точки. При повторном посещении разматываем путь (удаляем координаты и команды) до точки совпадения — это и есть петля. O(n) амортизировано.`},
@@ -1264,6 +1796,22 @@ code:`class Solution {
         return best;
     }
 }`,
+py:`class Solution:
+    def maxDistToClosest(self, seats):
+        n = len(seats)
+        prev = -1
+        best = 0
+
+        for i, seat in enumerate(seats):
+            if seat == 1:
+                if prev == -1:
+                    best = i
+                else:
+                    best = max(best, (i - prev) // 2)
+                prev = i
+
+        best = max(best, n - 1 - prev)
+        return best`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один линейный проход по seats — O(n). Константные переменные — O(1) памяти.`,
 expl:`O(n) один проход. Три случая: начальные нули (расстояние = позиция первой 1), промежуток между двумя 1 (расстояние = gap/2), конечные нули (расстояние = n-1-lastOne).`},
@@ -1305,6 +1853,19 @@ code:`class Solution {
         return sb.toString();
     }
 }`,
+py:`class Solution:
+    def groupAnagrams(self, strs):
+        groups = {}
+
+        for s in strs:
+            cnt = [0] * 26
+            for ch in s:
+                cnt[ord(ch) - ord('a')] += 1
+
+            key = tuple(cnt)
+            groups.setdefault(key, []).append(s)
+
+        return list(groups.values())`,
 complexity:`Время: O(n·L), Память: O(n·L); L — макс. длина слова; на слово: массив cnt[26] (|Σ|=26 латинских букв — константа алфавита) + сборка ключа O(26)`,
 complexityExpl:`Суммарная длина всех строк O(n·L); на каждое слово линейный проход по символам. Память: карта групп хранит все строки входа и ключи.`,
 expl:`Если сортировать каждое слово, тоже можно группировать анаграммы, но код идёт от более прямой идеи. У анаграмм одинаков не порядок символов, а их количества. Значит, для каждого слова можно построить канонический ключ по частотам букв и уже по нему складывать строки в HashMap. Тогда все слова с одинаковым набором букв автоматически оказываются в одной группе.`,
@@ -1341,6 +1902,21 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def isAnagram(self, s, t):
+        if len(s) != len(t):
+            return False
+
+        count = [0] * 26
+        for i in range(len(s)):
+            count[ord(s[i]) - ord('a')] += 1
+            count[ord(t[i]) - ord('a')] -= 1
+
+        for value in count:
+            if value != 0:
+                return False
+
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по символам с инкрементами в count[26] — O(n). Массив из 26 элементов — O(1) памяти.`,
 expl:`Частотный подсчёт. Если все счётчики равны нулю — строки являются анаграммами. O(n) время, O(1) память.`,
@@ -1371,6 +1947,19 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def isIsomorphic(self, s, t):
+        last_seen_s = {}
+        last_seen_t = {}
+
+        for i in range(len(s)):
+            if last_seen_s.get(s[i], 0) != last_seen_t.get(t[i], 0):
+                return False
+
+            last_seen_s[s[i]] = i + 1
+            last_seen_t[t[i]] = i + 1
+
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по позициям строки с проверкой пар в массивах — O(n). Два массива на 256 целых — O(1) памяти.`,
 expl:`Первая мысль — изоморфизм это биекция. Каждый символ из s должен однозначно отображаться в символ из t, и обратно. Значит нужно хранить два маппинга: s→t и t→s.
@@ -1403,6 +1992,18 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def removeDuplicates(self, arr, n):
+        count = {}
+        result = []
+
+        for value in arr:
+            current = count.get(value, 0)
+            if current < n:
+                result.append(value)
+                count[value] = current + 1
+
+        return result`,
 complexity:`Время: O(n), Память: O(u)`,
 complexityExpl:`Один проход по массиву с O(1) операциями HashMap на элемент — O(n). Карта до u различных ключей — O(u) памяти.`,
 expl:`Хотим оставить не более n копий каждого элемента. Один проход по arr: смотрим count[val] — сколько раз этот элемент уже добавлен. Если count < n — добавляем в результат и увеличиваем счётчик. Иначе — пропускаем. O(n) время и память.`},
@@ -1433,6 +2034,19 @@ code:`class Solution {
         return oddCount <= 1;
     }
 }`,
+py:`class Solution:
+    def canFormPalindrome(self, s):
+        count = [0] * 26
+
+        for ch in s:
+            count[ord(ch) - ord('a')] += 1
+
+        odd_count = 0
+        for value in count:
+            if value % 2 != 0:
+                odd_count += 1
+
+        return odd_count <= 1`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Цикл по строке считает частоты за O(n), затем 26 проверок. Массив count[26] — O(1) памяти.`,
 expl:`Цикл по строке считает частоту каждого символа (массив count[26]). Затем считаем количество символов с нечётной частотой (oddCount). Палиндром допускает максимум один такой символ (центр строки нечётной длины) → если oddCount ≤ 1, вернуть true. O(n) время, O(1) память.`},
@@ -1484,6 +2098,28 @@ code:`class Solution {
         return route;
     }
 }`,
+py:`class Solution:
+    def reconstructRoute(self, tickets):
+        destinations = set()
+        mapping = {}
+
+        for start, end in tickets:
+            mapping[start] = end
+            destinations.add(end)
+
+        start = None
+        for from_city, _ in tickets:
+            if from_city not in destinations:
+                start = from_city
+                break
+
+        route = []
+        current = start
+        while current is not None:
+            route.append(current)
+            current = mapping.get(current)
+
+        return route`,
 complexity:`Время: O(n) (n — число билетов; построение карт + проход цепочки), Память: O(n) (mapping, множество назначений, маршрут)`,
 complexityExpl:`Два прохода по билетам + цикл по цепочке — O(n). HashMap, HashSet и список маршрута — O(n) памяти.`,
 expl:`По коду видно, что здесь не нужен ни DFS, ни перебор вариантов: каждый билет задаёт единственный переход from -> to, то есть весь маршрут на самом деле является обычной цепочкой. Тогда естественно хранить HashMap "откуда -> куда" и просто идти по ней. Осталось понять старт: это единственный город, который встречается как from, но ни разу не встречается как destination. После этого маршрут восстанавливается простым проходом по цепочке.`,
@@ -1523,6 +2159,20 @@ code:`class Solution {
         return ordered;
     }
 }`,
+py:`class Solution:
+    def orderTickets(self, tickets, start):
+        by_from = {}
+        for ticket in tickets:
+            by_from[ticket[0]] = ticket
+
+        ordered = []
+        city = start
+        while city in by_from:
+            ticket = by_from[city]
+            ordered.append(ticket)
+            city = ticket[1]
+
+        return ordered`,
 complexity:`Время: O(n) (n — число билетов; построение карты from→билет + проход цепочки ≤ n шагов), Память: O(n) (HashMap — до n пар «город → ссылка на тот же List из tickets»; список ordered — n ссылок на те же внутренние списки, новых списков-билетов не создаём)`,
 complexityExpl:`Каждый билет один раз кладём в map. Цикл по цепочке не длиннее n. Доп. память: карта и список указателей на исходные List<String>.`,
 expl:`Здесь код исходит из того, что branching нет: из каждого города есть не набор вариантов, а максимум один следующий билет. Поэтому вместо графового обхода достаточно собрать карту byFrom и дальше идти от заданного start по цепочке перелётов. На каждом шаге берём билет из текущего города, добавляем его в ответ и переходим в следующий город. Получается простой линейный проход по уже заданному маршруту.`,
@@ -1576,6 +2226,26 @@ code:`class Solution {
        return result;
     }
 }`,
+py:`import heapq
+
+class Solution:
+    def topKFrequent(self, nums, k):
+        frequency_map = {}
+        for num in nums:
+            frequency_map[num] = frequency_map.get(num, 0) + 1
+
+        min_heap = []
+        for num, freq in frequency_map.items():
+            heapq.heappush(min_heap, (freq, num))
+            if len(min_heap) > k:
+                heapq.heappop(min_heap)
+
+        result = []
+        while min_heap:
+            result.append(heapq.heappop(min_heap)[1])
+
+        result.reverse()
+        return result`,
 complexity:`Время: O(n log k), Память: O(n + k)`,
 complexityExpl:`Подсчёт частот O(n), затем для каждого элемента push/pop в min-heap размера k — O(log k). Итого O(n log k). Карта O(n), куча O(k).`,
 expl:`Шаг 1: один проход по nums — считаем частоты в HashMap. Шаг 2: для каждой пары (элемент, частота) добавляем в min-heap (отсортирован по частоте). Если размер кучи > k — удаляем минимальный элемент. В итоге в куче остаются ровно k самых частых. O(n log k) время, O(n + k) память.`},
@@ -1617,6 +2287,14 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def topKFrequent(self, words, k):
+        freq_map = {}
+        for word in words:
+            freq_map[word] = freq_map.get(word, 0) + 1
+
+        ordered = sorted(freq_map, key=lambda word: (-freq_map[word], word))
+        return ordered[:k]`,
 complexity:`Время: O(n log k), Память: O(n + k)`,
 complexityExpl:`Частоты слов O(n), затем операции с кучей размера k — O(n log k). freqMap O(n), куча O(k).`,
 expl:`Шаг 1: один проход по words — считаем частоты в HashMap. Шаг 2: min-heap с компаратором: наверху — наименее частое слово, при равной частоте — лексикографически большее (чтобы первыми вытеснять «худшие»). Если размер > k — poll(). При сборе результата переворачиваем список. O(n log k) время.`},
@@ -1642,6 +2320,18 @@ code:`class Solution {
         return minHeap.peek();
     }
 }`,
+py:`import heapq
+
+class Solution:
+    def findKthLargest(self, nums, k):
+        min_heap = []
+
+        for num in nums:
+            heapq.heappush(min_heap, num)
+            if len(min_heap) > k:
+                heapq.heappop(min_heap)
+
+        return min_heap[0]`,
 complexity:`Время: O(n log k), Память: O(k)`,
 complexityExpl:`Для каждого элемента делаем вставку в кучу и иногда удаление минимума, обе операции O(log k). Размер кучи ограничен k.`,
 expl:`k-й по величине — это минимум из k наибольших элементов. Инвариант: min-heap всегда хранит ровно k наибольших из просмотренных. Для каждого num: добавляем в кучу, если size > k — poll() (выталкиваем наименьший). В конце peek() — это и есть k-й по величине. O(n log k) время, O(k) память.`,
@@ -1684,6 +2374,22 @@ code:`class Solution {
         return merged.toArray(new int[merged.size()][]);
     }
 }`,
+py:`class Solution:
+    def merge(self, intervals):
+        intervals.sort(key=lambda interval: interval[0])
+
+        merged = []
+        current_start, current_end = intervals[0]
+
+        for next_start, next_end in intervals[1:]:
+            if current_end < next_start:
+                merged.append([current_start, current_end])
+                current_start, current_end = next_start, next_end
+            else:
+                current_end = max(current_end, next_end)
+
+        merged.append([current_start, current_end])
+        return merged`,
 complexity:`Время: O(n log n) доминирует сортировка по left + O(n) слияние, Память: O(n) (список merged; стек сортировки in-place O(log n), обычно не указывают отдельно)`,
 complexityExpl:`Arrays.sort по началу интервала — O(n log n). Один проход слияния — O(n). Результат до n интервалов.`,
 expl:`Ключевая мысль здесь не в самом merge, а в том, что без сортировки вообще непонятно, с чем сравнивать текущий интервал. Как только интервалы упорядочены по началу, достаточно держать один "текущий" отрезок. Если следующий начинается уже после его конца, пересечения нет и текущий можно зафиксировать в ответе. Если пересечение есть, мы просто расширяем правую границу текущего интервала.`,
@@ -1722,6 +2428,26 @@ public class Solution {
         return new ArrayList<>(result);
     }
 }`,
+py:`class Solution:
+    @staticmethod
+    def isOverlapping(a, b):
+        return max(a[0], b[0]) <= min(a[1], b[1])
+
+    @staticmethod
+    def findOverlappings(segments):
+        segments = sorted(segments, key=lambda segment: (segment[0], segment[1]))
+        result = set()
+        max_end_index = 0
+
+        for i in range(1, len(segments)):
+            if Solution.isOverlapping(segments[i], segments[max_end_index]):
+                result.add(tuple(segments[i]))
+                result.add(tuple(segments[max_end_index]))
+
+            if segments[i][1] > segments[max_end_index][1]:
+                max_end_index = i
+
+        return [list(segment) for segment in result]`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка индексов — O(n log n), линейный проход с массивом флагов — O(n). Массив idx и boolean[] — O(n) памяти.`,
 expl:`Задача про пересечение отрезков естественно решается после СОРТИРОВКИ по началу.
@@ -1759,6 +2485,21 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def carPooling(self, trips, capacity):
+        passenger_changes = [0] * 1001
+
+        for passengers, start, end in trips:
+            passenger_changes[start] += passengers
+            passenger_changes[end] -= passengers
+
+        current = 0
+        for change in passenger_changes:
+            current += change
+            if current > capacity:
+                return False
+
+        return True`,
 complexity:`Время: O(n + U), Память: O(U)`,
 complexityExpl:`Один проход по trips для массива разностей длины U — O(n+U). Массив passengerChanges — O(U) памяти.`,
 expl:`Вместо того чтобы следить за каждой поездкой отдельно, используем разностный массив: на остановке from люди садятся (+passengers), на to — выходят (-passengers). Затем один проход — префиксная сумма: текущая загрузка = накопленная сумма изменений. Если в любой точке > capacity → false. O(n + maxLocation) время, O(1) доп. память.`},
@@ -1805,6 +2546,30 @@ code:`public int minMeetingRooms(int[][] intervals) {
     
     return maxRooms;
 }`,
+py:`class Solution:
+    def minMeetingRooms(self, intervals):
+        n = len(intervals)
+        if n == 0:
+            return 0
+
+        starts = [interval[0] for interval in intervals]
+        ends = [interval[1] for interval in intervals]
+        starts.sort()
+        ends.sort()
+
+        rooms = 0
+        max_rooms = 0
+        end_idx = 0
+
+        for start in starts:
+            while end_idx < n and start >= ends[end_idx]:
+                rooms -= 1
+                end_idx += 1
+
+            rooms += 1
+            max_rooms = max(max_rooms, rooms)
+
+        return max_rooms`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка двух массивов starts/ends — O(n log n). Два указателя — O(n). Два массива — O(n) памяти.`,
 expl:`Ключевой вопрос: нужна ли новая комната или можно занять освободившуюся? Нам не важно КАКАЯ встреча заканчивается — важно лишь: закончилась ли хоть одна к моменту starts[i]? Сортируем starts и ends по отдельности. Два указателя: если starts[i] >= ends[j] — одна встреча уже закончилась, комнату переиспользуем (rooms--, j++). Иначе — нужна новая (rooms++). Запоминаем максимум. O(n log n).`},
@@ -1843,6 +2608,18 @@ code:`class Solution {
         return prev;  // новая голова
     }
 }`,
+py:`class Solution:
+    def reverseList(self, head):
+        prev = None
+        curr = head
+
+        while curr is not None:
+            nxt = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nxt
+
+        return prev`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по списку с перестановкой next — O(n). Три указателя — O(1) памяти.`,
 expl:`Три указателя: prev = null, curr = head. Цикл: сохраняем next = curr.next, разворачиваем curr.next = prev, затем сдвигаем: prev = curr, curr = next. Когда curr == null — prev указывает на новый head. O(n) время, O(1) память.`},
@@ -1876,6 +2653,23 @@ code:`class Solution {
         return dummy.next;
     }
 }`,
+py:`class Solution:
+    def removeNthFromEnd(self, head, n):
+        dummy = ListNode(0)
+        dummy.next = head
+
+        fast = dummy
+        slow = dummy
+
+        for _ in range(n + 1):
+            fast = fast.next
+
+        while fast is not None:
+            fast = fast.next
+            slow = slow.next
+
+        slow.next = slow.next.next
+        return dummy.next`,
 complexity:`Время: O(n) (один проход списка), Память: O(1) доп. (указатели fast, slow и dummy-узел — фиксированное число ссылок)`,
 complexityExpl:`fast уходит на n+1 шагов, затем оба идут до конца — O(n). Константные указатели — O(1) памяти.`,
 expl:`Если смотреть на задачу правильно, удалять нужно не сам N-й узел с конца, а иметь доступ к узлу перед ним, чтобы перекинуть ссылку. Поэтому код разводит fast и slow так, чтобы к моменту, когда fast дойдёт до конца списка, slow оказался ровно перед удаляемым элементом. Для этого fast стартует с dummy и уходит вперёд на n+1 шагов. Dummy здесь важен отдельно: он делает удаление головы обычным случаем, без специальной ветки в коде.`,
@@ -1912,6 +2706,20 @@ code:`class Solution {
     }
 }
 `,
+py:`class Solution:
+    def multiplyByDigit(self, num, n):
+        result = []
+        carry = 0
+
+        for digit in num:
+            product = digit * n + carry
+            result.append(product % 10)
+            carry = product // 10
+
+        if carry > 0:
+            result.append(carry)
+
+        return result`,
 complexity:`Время: O(m), Память: O(m)`,
 complexityExpl:`Один цикл по m цифрам с carry — O(m). Список result до m+1 цифр — O(m) памяти.`,
 expl:`Умножение столбиком: цифра × n + carry. Остаток от 10 — текущая цифра, целая часть — перенос. O(n) время.`},
@@ -1960,6 +2768,47 @@ private char intToHex(int n) {
     if (n >= 10 && n <= 15) return (char) (n - 10 + 'a');
     throw new IllegalArgumentException("Invalid hex digit: " + n);
 }`,
+py:`class Solution:
+    def addHex(self, a, b):
+        if a is None:
+            a = ""
+        if b is None:
+            b = ""
+
+        i = len(a) - 1
+        j = len(b) - 1
+        carry = 0
+        result = []
+
+        while i >= 0 or j >= 0 or carry > 0:
+            total = carry
+            if i >= 0:
+                total += self.hexToInt(a[i])
+                i -= 1
+            if j >= 0:
+                total += self.hexToInt(b[j])
+                j -= 1
+
+            result.append(self.intToHex(total % 16))
+            carry = total // 16
+
+        return "".join(reversed(result))
+
+    def hexToInt(self, ch):
+        if '0' <= ch <= '9':
+            return ord(ch) - ord('0')
+        if 'a' <= ch <= 'f':
+            return ord(ch) - ord('a') + 10
+        if 'A' <= ch <= 'F':
+            return ord(ch) - ord('A') + 10
+        raise ValueError(f"Invalid hex char: {ch}")
+
+    def intToHex(self, value):
+        if 0 <= value <= 9:
+            return chr(ord('0') + value)
+        if 10 <= value <= 15:
+            return chr(ord('a') + value - 10)
+        raise ValueError(f"Invalid hex digit: {value}")`,
 code2:`class Solution {
 
     public String addHex(String a, String b) {
@@ -1990,6 +2839,36 @@ code2:`class Solution {
         return (char) ('a' + n - 10);
     }
 }`,
+py2:`class Solution:
+    def addHex(self, a, b):
+        result = []
+        p1 = len(a) - 1
+        p2 = len(b) - 1
+        carry = 0
+
+        while p1 >= 0 or p2 >= 0 or carry > 0:
+            total = carry
+            if p1 >= 0:
+                total += self.hexToInt(a[p1])
+                p1 -= 1
+            if p2 >= 0:
+                total += self.hexToInt(b[p2])
+                p2 -= 1
+
+            result.append(self.intToHex(total % 16))
+            carry = total // 16
+
+        return "".join(reversed(result))
+
+    def hexToInt(self, ch):
+        if '0' <= ch <= '9':
+            return ord(ch) - ord('0')
+        return ord(ch) - ord('a') + 10
+
+    def intToHex(self, value):
+        if value < 10:
+            return chr(ord('0') + value)
+        return chr(ord('a') + value - 10)`,
 complexity:`Время: O(max(|a|, |b|)), Память: O(max(|a|, |b|))`,
 complexityExpl:`Один проход с конца строк с carry — O(max(|a|,|b|)). StringBuilder длины результата — O(max(|a|,|b|)) памяти.`,
 expl:`Аналогично десятичному сложению, но в системе 16. Справа налево: складываем цифры + carry. Остаток от 16 — цифра, целая часть — перенос. O(max(a,b)).`},
@@ -2033,6 +2912,31 @@ code:`class Solution {
             Math.min(candidate2, candidate3));
     }
 }`,
+py:`class Solution:
+    def minProduct(self, arr):
+        min1 = float('inf')
+        min2 = float('inf')
+        max1 = float('-inf')
+        max2 = float('-inf')
+
+        for value in arr:
+            if value < min1:
+                min2 = min1
+                min1 = value
+            elif value < min2:
+                min2 = value
+
+            if value > max1:
+                max2 = max1
+                max1 = value
+            elif value > max2:
+                max2 = value
+
+        candidate1 = min1 * min2
+        candidate2 = min1 * max1
+        candidate3 = max1 * max2
+
+        return min(candidate1, candidate2, candidate3)`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением двух min и двух max — O(n). Только переменные — O(1) памяти.`,
 expl:`Минимальное произведение пары — один из трёх кандидатов: min1*min2 (два наименьших, оба отрицательных → положительный), min1*max1 (наименьшее × наибольшее → наибольшее по модулю отрицательное), max1*max2 (два наибольших положительных). За один проход находим min1, min2 и max1, max2. Ответ = min(candidate1, candidate2, candidate3).`},
@@ -2072,6 +2976,24 @@ code:`class Solution {
         return 0;
     }
 }`,
+py:`class Solution:
+    def hIndex(self, citations):
+        n = len(citations)
+        buckets = [0] * (n + 1)
+
+        for citation in citations:
+            if citation >= n:
+                buckets[n] += 1
+            else:
+                buckets[citation] += 1
+
+        count = 0
+        for i in range(n, -1, -1):
+            count += buckets[i]
+            if count >= i:
+                return i
+
+        return 0`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход для buckets размера n+1, второй — накопление справа — O(n). Массив buckets — O(n) памяти.`,
 expl:`O(n) с bucket sort. Создаём buckets[0..n], где buckets[i] = количество статей с i цитированиями (или >= n). Суммируем справа налево: когда count >= i, нашли h-индекс.`,
@@ -2128,6 +3050,18 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def subarraySum(self, nums, k):
+        prefix_sum_count = {0: 1}
+        count = 0
+        current_sum = 0
+
+        for num in nums:
+            current_sum += num
+            count += prefix_sum_count.get(current_sum - k, 0)
+            prefix_sum_count[current_sum] = prefix_sum_count.get(current_sum, 0) + 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход: обновляем currentSum и проверяем HashMap за O(1) в среднем — O(n). Карта до n различных сумм — O(n) памяти.`,
 expl:`Наблюдение: сумма nums[i+1..j] = prefix[j] - prefix[i] = k ↔ prefix[i] = currentSum - k. Для каждого j проверяем: сколько раз значение (currentSum - k) уже встречалось — столько подмассивов оканчивается здесь с нужной суммой. map.put(0, 1) в начале — чтобы поймать подмассивы с самого нулевого индекса. Текущий префикс добавляем в карту ПОСЛЕ проверки. O(n) время, O(n) память.`,
@@ -2173,6 +3107,20 @@ code:`class Solution {
         return -1;
     }
 }`,
+py:`class Solution:
+    def findSubarrayEnd(self, nums, k):
+        prefix_sums = {0}
+        current_sum = 0
+
+        for i, num in enumerate(nums):
+            current_sum += num
+
+            if current_sum - k in prefix_sums:
+                return i
+
+            prefix_sums.add(current_sum)
+
+        return -1`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Линейный проход с currentSum и проверкой HashMap — O(n). Карта «сумма → индекс» до O(n) записей.`,
 expl:`Та же идея что ps1: сумма nums[i+1..j] = k ↔ prefix[i] = currentSum - k. HashSet хранит все предыдущие префиксы. prefixSums.add(0) в начале — для подмассивов с индекса 0. Если (currentSum - k) есть в сете — нашли правую границу, возвращаем i. Текущий префикс добавляем в сет ПОСЛЕ проверки. O(n) время и память.`,
@@ -2218,6 +3166,20 @@ class Solution {
         return Arrays.asList(-1, -1);
     }
 }`,
+py:`class Solution:
+    def subsequenceSumK(self, nums, k):
+        prefix_index = {0: -1}
+        prefix_sum = 0
+
+        for idx, value in enumerate(nums):
+            prefix_sum += value
+            diff = prefix_sum - k
+            if diff in prefix_index:
+                return [prefix_index[diff] + 1, idx]
+            if prefix_sum not in prefix_index:
+                prefix_index[prefix_sum] = idx
+
+        return [-1, -1]`,
 code2:`class Solution {
     public int[] subarraySum(int[] nums, int k) {
         Map<Integer, Integer> map = new HashMap<>();
@@ -2241,6 +3203,22 @@ code2:`class Solution {
         return new int[]{-1, -1};
     }
 }`,
+py2:`class Solution:
+    def subarraySum(self, nums, k):
+        prefix_index = {0: -1}
+        current_sum = 0
+
+        for right, value in enumerate(nums):
+            current_sum += value
+
+            if current_sum - k in prefix_index:
+                left = prefix_index[current_sum - k] + 1
+                return [left, right]
+
+            if current_sum not in prefix_index:
+                prefix_index[current_sum] = right
+
+        return [-1, -1]`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход с обновлением prefixSum и проверкой HashMap — O(n) в среднем. Карта хранит до O(n) различных префиксных сумм — O(n) памяти.`,
 expl:`Сумма nums[l..r] = prefix[r] − prefix[l−1]. Ищем в карте prefix[r]−k = префикс до l−1. Индекс начала: сохранённый индекс + 1. putIfAbsent даёт самое раннее начало при нескольких вариантах. O(n) время и память.`,
@@ -2289,6 +3267,36 @@ code:`class Solution {
         return false;  // ничего не нашли
     }
 }`,
+py:`class Solution:
+    def checkSubarraySum(self, nums, k):
+        if k == 0:
+            prefix = 0
+            first_index = {0: -1}
+
+            for i, num in enumerate(nums):
+                prefix += num
+                if prefix in first_index:
+                    if i - first_index[prefix] >= 2:
+                        return True
+                else:
+                    first_index[prefix] = i
+
+            return False
+
+        k = abs(k)
+        first_index = {0: -1}
+        prefix = 0
+
+        for i, num in enumerate(nums):
+            prefix = (prefix + num) % k
+
+            if prefix in first_index:
+                if i - first_index[prefix] >= 2:
+                    return True
+            else:
+                first_index[prefix] = i
+
+        return False`,
 complexity:`Время: O(n), Память: O(k)`,
 complexityExpl:`Один проход по nums — O(n). В HashMap храним первое вхождение остатка prefix % k; число разных остатков ограничено k (и не больше n), поэтому O(k).`,
 expl:`Если у нас есть два префикса с ОДИНАКОВЫМ остатком от деления на k, то сумма элементов между ними КРАТНА k.
@@ -2341,6 +3349,26 @@ class Solution {
         return ans;
     }
 }`,
+py:`class Solution:
+    def prefixIntersectionSizes(self, a, b):
+        n = len(a)
+        in_a = set()
+        in_b = set()
+        ans = [0] * n
+        common = 0
+
+        for i in range(n):
+            if a[i] not in in_a and a[i] in in_b:
+                common += 1
+            in_a.add(a[i])
+
+            if b[i] not in in_b and b[i] in in_a:
+                common += 1
+            in_b.add(b[i])
+
+            ans[i] = common
+
+        return ans`,
 complexity:`Время: O(n) в среднем, Память: O(n)`,
 complexityExpl:`На каждом из n шагов константное число операций с HashSet — O(n) амортизированно. В худшем случае в множествах до O(n) различных значений — O(n) памяти.`,
 expl:`Инвариант: common = |inA ∩ inB|. При добавлении нового значения в одно множество, если оно уже было в другом, размер пересечения увеличивается на 1. Дубликаты внутри одного массива не увеличивают множество повторно.`,
@@ -2382,6 +3410,23 @@ class Solution {
         return out.stream().mapToInt(i -> i).toArray();
     }
 }`,
+py:`class Solution:
+    def intersectWithDuplicates(self, nums1, nums2):
+        if len(nums1) > len(nums2):
+            return self.intersectWithDuplicates(nums2, nums1)
+
+        freq = {}
+        for value in nums1:
+            freq[value] = freq.get(value, 0) + 1
+
+        out = []
+        for value in nums2:
+            count = freq.get(value, 0)
+            if count > 0:
+                out.append(value)
+                freq[value] = count - 1
+
+        return out`,
 complexity:`Время: O(n + m), Память: O(min(n, m))`,
 complexityExpl:`Подсчёт частот первого массива — O(n), проход по второму — O(m). В карте не больше уникальных значений меньшего массива — O(min(n,m)) памяти.`,
 expl:`Для каждого значения v в пересечении берём min(частота в nums1, частота в nums2) вхождений. Реализация через уменьшение счётчика при совпадении из второго массива даёт ровно эту минимальную кратность.`,
@@ -2419,6 +3464,21 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def productExceptSelf(self, nums):
+        n = len(nums)
+        result = [0] * n
+
+        result[0] = 1
+        for i in range(1, n):
+            result[i] = result[i - 1] * nums[i - 1]
+
+        suffix = 1
+        for i in range(n - 2, -1, -1):
+            suffix *= nums[i + 1]
+            result[i] *= suffix
+
+        return result`,
 complexity:`Время: O(n), Память: O(1) доп.`,
 complexityExpl:`Два прохода: слева префиксные произведения, справа суффикс в переменной — O(n). Кроме массива ответа — O(1) доп. памяти.`,
 expl:`Первый проход слева направо: result[i] = произведение всех элементов левее i. Второй проход справа налево: накапливаем suffix = произведение всех правее i, умножаем result[i] *= suffix. Итог: result[i] = prefix * suffix = всё кроме i. O(n) время, O(1) доп. память.`,
@@ -2449,6 +3509,18 @@ code:`class Solution {
         return -1;
     }
 }`,
+py:`class Solution:
+    def pivotIndex(self, nums):
+        total_sum = sum(nums)
+        left_sum = 0
+
+        for i, num in enumerate(nums):
+            right_sum = total_sum - left_sum - num
+            if left_sum == right_sum:
+                return i
+            left_sum += num
+
+        return -1`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Сумма всех элементов O(n), затем один проход с leftSum — O(n). Пара переменных — O(1) памяти.`,
 expl:`O(n) один проход (после подсчёта суммы). rightSum = totalSum - leftSum - nums[i]. Когда leftSum == rightSum — нашли pivot.`},
@@ -2510,6 +3582,41 @@ code:`class Solution {
         return minLen == Integer.MAX_VALUE ? "" : s.substring(bestStart, bestStart + minLen);
     }
 }`,
+py:`class Solution:
+    def minWindow(self, s, t):
+        if s is None or t is None or len(s) < len(t):
+            return ""
+
+        freq = [0] * 128
+        for ch in t:
+            freq[ord(ch)] += 1
+
+        need_count = len(t)
+        best_start = 0
+        min_len = float("inf")
+        left = 0
+
+        for right, ch in enumerate(s):
+            idx = ord(ch)
+            if freq[idx] > 0:
+                need_count -= 1
+            freq[idx] -= 1
+
+            while need_count == 0:
+                window_size = right - left + 1
+                if window_size < min_len:
+                    min_len = window_size
+                    best_start = left
+
+                left_idx = ord(s[left])
+                freq[left_idx] += 1
+                if freq[left_idx] > 0:
+                    need_count += 1
+                left += 1
+
+        if min_len == float("inf"):
+            return ""
+        return s[best_start:best_start + min_len]`,
 complexity:`Время: O(|s|) (каждый индекс входит/выходит из окна ≤1 раз), Память: O(1) доп. (массив freq[128] под ASCII + целые left/right/best*; размер 128 не растёт с n)`,
 complexityExpl:`Левый и правый указатели двигаются только вправо — O(|s|) амортизированно. Массив частот фиксированной длины (алфавит ASCII в условии) — O(1) памяти.`,
 expl:`В лоб хотелось бы проверить все подстроки, но это слишком дорого. Здесь условие окна можно поддерживать на лету: freq показывает, каких символов нам ещё не хватает, а needCount хранит, сколько обязательных символов всё ещё не покрыто. Поэтому правую границу мы расширяем, пока не соберём валидное окно, а потом двигаем левую, чтобы выкинуть всё лишнее и оставить минимальный вариант. Такой инвариант и делает sliding window естественным решением.`,
@@ -2556,6 +3663,26 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def characterReplacement(self, s, k):
+        freq = [0] * 26
+        max_freq = 0
+        left = 0
+        result = 0
+
+        for right, ch in enumerate(s):
+            idx = ord(ch) - ord('A')
+            freq[idx] += 1
+            max_freq = max(max_freq, freq[idx])
+
+            window_length = right - left + 1
+            if window_length - max_freq > k:
+                freq[ord(s[left]) - ord('A')] -= 1
+                left += 1
+
+            result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right проходит строку один раз, left тоже не более n раз — O(n). Массив частот на 26 букв — O(1) памяти.`,
 expl:`Хотим найти окно, где заменой k символов можно получить строку из одинаковых. Количество нужных замен = длина окна − частота самого частого символа (windowLength − maxFreq). Если это значение > k — замен не хватает, сжимаем слева.
@@ -2606,6 +3733,35 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def findAnagrams(self, s, t):
+        result = []
+        if len(s) < len(t):
+            return result
+
+        freq = [0] * 128
+        for ch in t:
+            freq[ord(ch)] += 1
+
+        need_count = len(t)
+        window_size = len(t)
+
+        for right, ch in enumerate(s):
+            idx = ord(ch)
+            if freq[idx] > 0:
+                need_count -= 1
+            freq[idx] -= 1
+
+            if right >= window_size:
+                left_idx = ord(s[right - window_size])
+                freq[left_idx] += 1
+                if freq[left_idx] > 0:
+                    need_count += 1
+
+            if need_count == 0:
+                result.append(right - window_size + 1)
+
+        return result`,
 complexity:`Время: O(|s|), Память: O(1)`,
 complexityExpl:`Один проход с окном длины |t|, на каждом шаге обновляем freq и needCount — O(|s|). Массив freq[128] — O(1) памяти.`,
 expl:`Шаг 1: проходим по t и заполняем freq[] — сколько каждого символа нужно, needCount = |t|. Шаг 2: фиксированное окно размера |t| скользит по s: правый край добавляет символ (если freq[c] > 0 → needCount--; freq[c]--), левый убирает (freq[c]++; если freq[c] > 0 → needCount++). Когда needCount == 0 — анаграмма, записываем индекс. O(n).`,
@@ -2640,6 +3796,22 @@ code:`class Solution {
         return maxLength;
     }
 }`,
+py:`class Solution:
+    def longestIncreasing(self, arr):
+        if not arr:
+            return 0
+
+        curr_length = 1
+        max_length = 1
+
+        for i in range(1, len(arr)):
+            if arr[i] > arr[i - 1]:
+                curr_length += 1
+                max_length = max(max_length, curr_length)
+            else:
+                curr_length = 1
+
+        return max_length`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл от 1 до n−1, сравнение соседей — O(n). Несколько счётчиков — O(1) памяти.`,
 expl:`Один проход O(n). Если текущий элемент > предыдущего — увеличиваем длину. Иначе — сбрасываем до 1. Запоминаем максимум.`,
@@ -2675,6 +3847,24 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def longestOnes(self, nums, k):
+        left = 0
+        zeros_count = 0
+        result = 0
+
+        for right, value in enumerate(nums):
+            if value == 0:
+                zeros_count += 1
+
+            while zeros_count > k:
+                if nums[left] == 0:
+                    zeros_count -= 1
+                left += 1
+
+            result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два указателя: right проходит массив, left только увеличивается — O(n). Счётчики — O(1) памяти.`,
 expl:`Скользящее окно с двумя указателями. Расширяем окно вправо (right), считаем нули внутри. Когда нулей становится > k — сжимаем слева: сдвигаем left, уменьшая zerosCount если nums[left] == 0. На каждом шаге обновляем максимум длины окна (right - left + 1). O(n) время, O(1) память.`,
@@ -2716,6 +3906,24 @@ code:`class Solution {
         return maxLen;
     }
 }`,
+py:`class Solution:
+    def longestSubarray(self, nums):
+        left = 0
+        zero_count = 0
+        max_len = 0
+
+        for right, value in enumerate(nums):
+            if value == 0:
+                zero_count += 1
+
+            while zero_count > 1:
+                if nums[left] == 0:
+                    zero_count -= 1
+                left += 1
+
+            max_len = max(max_len, right - left)
+
+        return max_len`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением prev и curr при нулях — O(n). Константные переменные — O(1) памяти.`,
 expl:`Задача сводится к: найти максимальное окно с не более чем одним нулём, удалить из него ровно один элемент. Скользящее окно: расширяем right, считаем нули. Когда нулей > 1 — сжимаем left.
@@ -2761,6 +3969,29 @@ code:`class Solution {
         return maxLen;
     }
 }`,
+py:`class Solution:
+    def longestOnesAfterFlip(self, nums):
+        left = 0
+        zero_count = 0
+        max_len = 0
+        has_zero = False
+
+        for right, value in enumerate(nums):
+            if value == 0:
+                zero_count += 1
+                has_zero = True
+
+            while zero_count > 1:
+                if nums[left] == 0:
+                    zero_count -= 1
+                left += 1
+
+            max_len = max(max_len, right - left + 1)
+
+        if not has_zero:
+            return len(nums) - 1
+
+        return max_len`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Линейный проход с подсчётом блоков единиц — O(n). Несколько целых — O(1) памяти.`,
 expl:`prev — единицы перед последним нулём, count — единицы после. При нуле: prev + 1 + count (1 — перевёрнутый ноль). Ограничиваем длиной массива. O(n).`,
@@ -2850,6 +4081,31 @@ code2:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def countComplete(self, s):
+        target = len(set(s))
+        freq = [0] * 128
+
+        have_count = 0
+        left = 0
+        count = 0
+
+        for right, ch in enumerate(s):
+            idx = ord(ch)
+            freq[idx] += 1
+            if freq[idx] == 1:
+                have_count += 1
+
+            while have_count == target:
+                count += len(s) - right
+
+                left_idx = ord(s[left])
+                freq[left_idx] -= 1
+                if freq[left_idx] == 0:
+                    have_count -= 1
+                left += 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`right идёт один раз, left сдвигается при валидном окне — O(n). Массив freq[128] — O(1) памяти.`,
 expl:`Шаг 1: считаем количество уникальных символов (unique). Шаг 2: расширяем right — при freq[char] == 1 → covered++. Шаг 3: когда covered == unique — все уникальные в окне; все дальнейшие расширения вправо (s.length() - right) тоже валидны, сразу прибавляем к ответу. Шаг 4: сжимаем left — при freq[char] == 0 → covered--. O(n).`,
@@ -2887,6 +4143,35 @@ code:`public boolean containsMutation(String gene, String virus) {
     }
     return false;
 }`,
+py:`class Solution:
+    def containsMutation(self, gene, virus):
+        if len(gene) < len(virus):
+            return False
+
+        freq = [0] * 128
+        for ch in virus:
+            freq[ord(ch)] += 1
+
+        need = len(virus)
+        left = 0
+
+        for right, ch in enumerate(gene):
+            idx = ord(ch)
+            if freq[idx] > 0:
+                need -= 1
+            freq[idx] -= 1
+
+            if right - left + 1 > len(virus):
+                left_idx = ord(gene[left])
+                freq[left_idx] += 1
+                if freq[left_idx] > 0:
+                    need += 1
+                left += 1
+
+            if need == 0:
+                return True
+
+        return False`,
 complexity:`Время: O(|gene| + |virus|), Память: O(1)`,
 complexityExpl:`Сначала инициализируем freq по строке virus за O(|virus|), затем один раз проводим фиксированное окно по gene с O(1) работой на каждый сдвиг — O(|gene|). Итого O(|gene| + |virus|). Массив freq[128] — O(1) памяти.`,
 expl:`Та же техника, что и поиск анаграмм, но возвращаем boolean. Сначала заполняем freq по virus, затем ведём фиксированное окно по gene и поддерживаем needCount. Итого O(|gene| + |virus|), память O(1).`,
@@ -2941,6 +4226,35 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def slidingProduct(self, arr, k):
+        n = len(arr)
+        result = [0] * (n - k + 1)
+        zero_count = 0
+        prod = 1
+
+        for i in range(k):
+            if arr[i] == 0:
+                zero_count += 1
+            else:
+                prod *= arr[i]
+
+        result[0] = 0 if zero_count > 0 else prod
+
+        for i in range(k, n):
+            if arr[i - k] == 0:
+                zero_count -= 1
+            else:
+                prod //= arr[i - k]
+
+            if arr[i] == 0:
+                zero_count += 1
+            else:
+                prod *= arr[i]
+
+            result[i - k + 1] = 0 if zero_count > 0 else prod
+
+        return result`,
 complexity:`Время: O(n), Память: O(1) доп.`,
 complexityExpl:`Инициализация первого окна O(k), затем O(n−k) сдвигов — O(n). Массив результата O(n−k+1), дополнительно O(1).`,
 expl:`O(n). Отслеживаем нули отдельно (zeroCount). Для ненулевых поддерживаем произведение, делим/умножаем при сдвиге окна. Если есть нули — результат = 0.`},
@@ -3006,6 +4320,24 @@ code:`class Solution {
             || (open == '[' && close == ']');
     }
 }`,
+py:`class Solution:
+    def isValid(self, s):
+        stack = []
+
+        for ch in s:
+            if ch in "({[":
+                stack.append(ch)
+            elif not stack or not self.isMatchingPair(stack.pop(), ch):
+                return False
+
+        return not stack
+
+    def isMatchingPair(self, open_bracket, close_bracket):
+        return (
+            (open_bracket == '(' and close_bracket == ')')
+            or (open_bracket == '{' and close_bracket == '}')
+            or (open_bracket == '[' and close_bracket == ']')
+        )`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход: каждый символ — push или pop стека — O(n). Стек до n элементов — O(n) памяти.`,
 expl:`O(n) время, O(n) память в худшем случае (все открывающие). Стек хранит незакрытые скобки. При закрывающей — проверяем пару с вершиной.`,
@@ -3072,6 +4404,19 @@ class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def dailyTemperatures(self, temps):
+        n = len(temps)
+        ans = [0] * n
+        stack = []
+
+        for i, temp in enumerate(temps):
+            while stack and temp > temps[stack[-1]]:
+                prev_day = stack.pop()
+                ans[prev_day] = i - prev_day
+            stack.append(i)
+
+        return ans`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Каждый индекс кладётся и извлекается из стека не более одного раза — O(n). Стек до n элементов — O(n) памяти.`,
 expl:`Монотонный убывающий стек хранит индексы. Каждый индекс push/pop ровно один раз → O(n). При нахождении более тёплого дня записываем разницу.`},
@@ -3126,6 +4471,31 @@ code:`class Solution {
         return stack.pop();
     }
 }`,
+py:`class Solution:
+    def evalRPN(self, tokens):
+        stack = []
+
+        for token in tokens:
+            if token == "+":
+                b = stack.pop()
+                a = stack.pop()
+                stack.append(a + b)
+            elif token == "-":
+                b = stack.pop()
+                a = stack.pop()
+                stack.append(a - b)
+            elif token == "*":
+                b = stack.pop()
+                a = stack.pop()
+                stack.append(a * b)
+            elif token == "/":
+                b = stack.pop()
+                a = stack.pop()
+                stack.append(int(a / b))
+            else:
+                stack.append(int(token))
+
+        return stack.pop()`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход по токенам, на каждом операторе два pop и push — O(n). Стек до O(n) операндов — O(n) памяти.`,
 expl:`Стек для RPN-вычислений. Числа — в стек. Оператор — извлекаем два операнда, считаем, результат обратно. Порядок важен для - и /. O(n).`},
@@ -3167,6 +4537,22 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def calculate(self, s):
+        result = 0
+        current_product = 1
+
+        for token in s:
+            if token == "*":
+                continue
+            if token == "+":
+                result += current_product
+                current_product = 1
+            else:
+                current_product *= int(token)
+
+        result += current_product
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один цикл по токенам — O(n). Только result и prevMultiply — O(1) памяти.`,
 expl:`Выражение — сумма произведений. prevMultiply накапливает текущее произведение. При + — добавляем его к result и начинаем новое. O(n) время, O(1) память.`},
@@ -3211,6 +4597,27 @@ code:`public class Solution {
         return result + currentTerm; //просто в цикле что-то добавляется если встретили знак
     }
 }`,
+py:`class Solution:
+    def calculate(self, s):
+        result = 0
+        current_term = ord(s[0]) - ord('0')
+
+        for i in range(1, len(s), 2):
+            op = s[i]
+            num = ord(s[i + 1]) - ord('0')
+
+            if op == '+':
+                result += current_term
+                current_term = num
+            elif op == '-':
+                result += current_term
+                current_term = -num
+            elif op == '*':
+                current_term *= num
+            else:
+                current_term = int(current_term / num)
+
+        return result + current_term`,
 complexity:`Время: O(|s|), Память: O(1) доп. (целые num, last, sum, текущий оператор — константное число слотов)`,
 complexityExpl:`Один проход по строке длины |s|; на каждый символ O(1) действий. Доп. память не зависит от длины входа.`,
 expl:`Начальное состояние: берём первую цифру как currentTerm
@@ -3262,6 +4669,38 @@ code:`class Solution {
         return sb.toString();
     }
 }`,
+py:`class Solution:
+    def reverseWords(self, s):
+        parts = []
+        words = []
+        i = 0
+
+        while i < len(s):
+            if s[i] == ' ':
+                start = i
+                while i < len(s) and s[i] == ' ':
+                    i += 1
+                parts.append(s[start:i])
+            else:
+                start = i
+                while i < len(s) and s[i] != ' ':
+                    i += 1
+                word = s[start:i]
+                parts.append(word)
+                words.append(word)
+
+        words.reverse()
+        word_idx = 0
+        result = []
+
+        for part in parts:
+            if part[0] == ' ':
+                result.append(part)
+            else:
+                result.append(words[word_idx])
+                word_idx += 1
+
+        return "".join(result)`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Два прохода по строке — O(n). Список частей и deque слов — O(n) памяти.`,
 expl:`Разделяем строку на блоки слов и пробелов. Слова собираем в deque в обратном порядке. При реконструкции сохраняем пробельные блоки и подставляем слова из deque. O(n).`},
@@ -3327,6 +4766,34 @@ code:`public class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    @staticmethod
+    def inBound(i, j, grid):
+        return 0 <= i < len(grid) and 0 <= j < len(grid[0])
+
+    @staticmethod
+    def dfs(i, j, grid):
+        if not Solution.inBound(i, j, grid) or grid[i][j] == 0:
+            return
+
+        grid[i][j] = 0
+        dirs = ((1, 0), (-1, 0), (0, 1), (0, -1))
+        for di, dj in dirs:
+            Solution.dfs(i + di, j + dj, grid)
+
+    @staticmethod
+    def numIslands(grid):
+        if not grid:
+            return 0
+
+        count = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    Solution.dfs(i, j, grid)
+                    count += 1
+
+        return count`,
 complexity:`Время: O(m·n), Память: O(m·n)`,
 complexityExpl:`Двойной цикл по клеткам; DFS посещает каждую '1' один раз — O(m·n). Глубина рекурсии в худшем O(m·n) — O(m·n) памяти.`,
 expl:`DFS flood fill. При нахождении 1 — затапливаем весь остров (ставим 0), +1 к счётчику. Каждая клетка посещается один раз. O(m×n) время и память.`},
@@ -3372,6 +4839,20 @@ code:`class Solution {
         return isMirror(left.left, right.right) && isMirror(left.right, right.left);
     }
 }`,
+py:`class Solution:
+    def isSymmetric(self, root):
+        if root is None:
+            return True
+        return self.isMirror(root.left, root.right)
+
+    def isMirror(self, left, right):
+        if left is None and right is None:
+            return True
+        if left is None or right is None:
+            return False
+        if left.val != right.val:
+            return False
+        return self.isMirror(left.left, right.right) and self.isMirror(left.right, right.left)`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Рекурсия isMirror посещает каждый узел один раз — O(n). Стек вызовов глубины h — O(h) памяти.`,
 expl:`Рекурсивное зеркальное сравнение: left.left ↔ right.right и left.right ↔ right.left. O(n) время, O(h) стек рекурсии.`,
@@ -3419,6 +4900,16 @@ code:`class Solution {
         return isValid(node.left, low, node.val) && isValid(node.right, node.val, high);
     }
 }`,
+py:`class Solution:
+    def isValidBST(self, root):
+        return self.isValid(root, float("-inf"), float("inf"))
+
+    def isValid(self, node, low, high):
+        if node is None:
+            return True
+        if node.val <= low or node.val >= high:
+            return False
+        return self.isValid(node.left, low, node.val) and self.isValid(node.right, node.val, high)`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`isValid обходит каждый узел один раз с границами — O(n). Глубина рекурсии — O(h) памяти.`,
 expl:`Рекурсия с границами: для левого поддерева max = node.val, для правого min = node.val. Используем long для обработки граничных значений Integer. O(n).`,
@@ -3473,6 +4964,25 @@ code:`class Solution {
         inorder(node.right, k);
     }
 }`,
+py:`class Solution:
+    def kthSmallest(self, root, k):
+        self.count = 0
+        self.result = 0
+        self.inorder(root, k)
+        return self.result
+
+    def inorder(self, node, k):
+        if node is None:
+            return
+
+        self.inorder(node.left, k)
+
+        self.count += 1
+        if self.count == k:
+            self.result = node.val
+            return
+
+        self.inorder(node.right, k)`,
 complexity:`Время: O(h + k), Память: O(h)`,
 complexityExpl:`Inorder-обход: спуск на глубину h + k шагов до k-го элемента — O(h+k). Рекурсивный стек — O(h) памяти.`,
 expl:`Inorder-обход BST выдаёт элементы в отсортированном порядке. Считаем посещённые узлы, при count == k — нашли ответ. O(H + k) время.`},
@@ -3561,6 +5071,59 @@ code:`class LRUCache {
         node.next.prev = node.prev;
     }
 }`,
+py:`class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.map = {}
+        self.head = Node(0, 0)
+        self.tail = Node(0, 0)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def get(self, key):
+        node = self.map.get(key)
+        if node is None:
+            return -1
+        self.moveToFront(node)
+        return node.value
+
+    def put(self, key, value):
+        node = self.map.get(key)
+        if node is not None:
+            node.value = value
+            self.moveToFront(node)
+            return
+
+        if len(self.map) == self.capacity:
+            lru = self.tail.prev
+            self.remove(lru)
+            del self.map[lru.key]
+
+        fresh = Node(key, value)
+        self.map[key] = fresh
+        self.addFirst(fresh)
+
+    def moveToFront(self, node):
+        self.remove(node)
+        self.addFirst(node)
+
+    def addFirst(self, node):
+        node.next = self.head.next
+        node.prev = self.head
+        self.head.next.prev = node
+        self.head.next = node
+
+    def remove(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev`,
 complexity:`Время: O(1) в среднем на get/put, Память: O(capacity)`,
 complexityExpl:`HashMap даёт O(1) доступ к узлу по ключу. Все операции со вставкой, удалением и перемещением узла в двусвязном списке делаются за O(1), потому что ссылки на соседей уже есть. Храним не больше capacity реальных узлов и map того же размера.`,
 expl:`Одного HashMap недостаточно: он быстро находит ключ, но не знает, какой элемент был использован давно. Один список тоже недостаточен: в нём поиск по key был бы O(n). Поэтому структура комбинирует обе идеи. Map хранит key -> node, а двусвязный список хранит порядок использования. Каждый get делает элемент самым свежим, значит узел нужно переставить в начало. Каждый put либо обновляет существующий узел и тоже двигает его в начало, либо добавляет новый; если места больше нет, удаляем узел перед хвостом — это и есть LRU.`,
@@ -3597,6 +5160,22 @@ code:`public class Solution {
         return resultArea;
     }
 }`,
+py:`class Solution:
+    def maxArea(self, height):
+        left = 0
+        right = len(height) - 1
+        result_area = 0
+
+        while left < right:
+            curr_area = min(height[left], height[right]) * (right - left)
+            result_area = max(result_area, curr_area)
+
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+
+        return result_area`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Цикл while двигает l или r на каждом шаге — O(n) итераций. Несколько переменных — O(1) памяти.`,
 expl:`O(n) время, O(1) память. Два указателя с краёв. Сдвигаем меньший — сдвиг большего уменьшит ширину без возможности увеличить высоту.`},
@@ -3662,6 +5241,24 @@ code2:`class Solution {
         return (c >= 'A' && c <= 'Z') ? (char)(c + 32) : c;
     }
 }`,
+py:`class Solution:
+    def isPalindrome(self, s):
+        left = 0
+        right = len(s) - 1
+
+        while left < right:
+            while left < right and not s[left].isalnum():
+                left += 1
+            while left < right and not s[right].isalnum():
+                right -= 1
+
+            if s[left].lower() != s[right].lower():
+                return False
+
+            left += 1
+            right -= 1
+
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Указатели l и r сходятся к центру — O(n). Только индексы — O(1) памяти.`,
 expl:`Два указателя к центру. Пропускаем пунктуацию/пробелы. Сравниваем в нижнем регистре. O(n) время, O(1) память.`},
@@ -3691,6 +5288,17 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def moveZeroes(self, nums):
+        write = 0
+        for read in range(len(nums)):
+            if nums[read] != 0:
+                nums[write] = nums[read]
+                write += 1
+
+        while write < len(nums):
+            nums[write] = 0
+            write += 1`,
 complexity:`Время: O(n), Память: O(1) доп. (два индекса read/write; массив nums меняем на месте)`,
 complexityExpl:`Один проход сдвигает ненули, затем заполняем хвост нулями — O(n). In-place — O(1) памяти.`,
 expl:`Если пытаться менять местами элементы по дороге, легко получить лишние действия. Код делает проще: сначала одним проходом компактно переносит все ненулевые числа в начало массива, сохраняя их порядок. Указатель write всегда показывает, куда писать следующий ненулевой элемент. Когда все полезные значения уже сдвинуты влево, остаток массива можно спокойно заполнить нулями.`,
@@ -3723,6 +5331,23 @@ code:`class Solution {
         return write;
     }
 }`,
+py:`class Solution:
+    def compressSpaces(self, arr):
+        write = 0
+        prev_space = False
+
+        for read in range(len(arr)):
+            if arr[read] == ' ':
+                if not prev_space:
+                    arr[write] = ' '
+                    write += 1
+                    prev_space = True
+            else:
+                arr[write] = arr[read]
+                write += 1
+                prev_space = False
+
+        return write`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по arr с указателем записи w — O(n). In-place — O(1) памяти.`,
 expl:`Указатель записи w. Пробел записываем только при !prevSpace. Возвращаем новую длину. O(n) время, O(1) память.`,
@@ -3752,6 +5377,17 @@ code:`class Solution {
         return p1 == s.length();
     }
 }`,
+py:`class Solution:
+    def isSubsequence(self, s, t):
+        p1 = 0
+        p2 = 0
+
+        while p1 < len(s) and p2 < len(t):
+            if s[p1] == t[p2]:
+                p1 += 1
+            p2 += 1
+
+        return p1 == len(s)`,
 complexity:`Время: O(|t|), Память: O(1)`,
 complexityExpl:`Указатель по t проходит строку один раз — O(|t|). Два индекса — O(1) памяти.`,
 expl:`Два указателя: p1 по s, p2 по t. При совпадении продвигаем оба, иначе только p2. Если p1 дошёл до конца — s является подпоследовательностью t. O(|t|).`,
@@ -3784,6 +5420,21 @@ code:`class Solution {
         return new int[]{-1, -1};
     }
 }`,
+py:`class Solution:
+    def twoSum(self, nums, target):
+        left = 0
+        right = len(nums) - 1
+
+        while left < right:
+            curr_sum = nums[left] + nums[right]
+            if curr_sum == target:
+                return [left + 1, right + 1]
+            if curr_sum < target:
+                left += 1
+            else:
+                right -= 1
+
+        return [-1, -1]`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два указателя с концов: на каждом шаге сдвигается один — O(n). Константная память.`,
 expl:`Массив отсортирован → два указателя. Сумма < target → увеличиваем (l++). Сумма > target → уменьшаем (r--). O(n) время, O(1) память.`},
@@ -3815,6 +5466,23 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def commonElements(self, a, b):
+        result = []
+        p1 = 0
+        p2 = 0
+
+        while p1 < len(a) and p2 < len(b):
+            if a[p1] == b[p2]:
+                result.append(a[p1])
+                p1 += 1
+                p2 += 1
+            elif a[p1] < b[p2]:
+                p1 += 1
+            else:
+                p2 += 1
+
+        return result`,
 complexity:`Время: O(n + m), Память: O(min(n, m))`,
 complexityExpl:`Указатели по двум массивам, каждый элемент один раз — O(n+m). Список совпадений — O(min(n,m)) памяти.`,
 expl:`Merge-подобная техника на отсортированных массивах. При совпадении — добавляем и двигаем оба указателя. Иначе — двигаем указатель на меньший элемент. O(n+m).`},
@@ -3858,6 +5526,27 @@ class Solution {
         return result.toString();
     }
 }`,
+py:`class Solution:
+    def summaryRanges(self, nums):
+        if nums is None or not nums:
+            return ""
+
+        nums.sort()
+        parts = []
+        i = 0
+
+        while i < len(nums):
+            start = nums[i]
+            while i + 1 < len(nums) and nums[i] + 1 == nums[i + 1]:
+                i += 1
+
+            if start != nums[i]:
+                parts.append(f"{start}->{nums[i]}")
+            else:
+                parts.append(str(start))
+            i += 1
+
+        return ",".join(parts)`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка O(n log n), один проход группировки O(n). Список строк результата — O(n) памяти.`,
 expl:`Сортируем — тогда числа, идущие подряд по числовому ряду, окажутся рядом в массиве. Далее один проход: запоминаем start = nums[i], затем двигаем i вперёд пока nums[i+1] == nums[i] + 1. Когда последовательность прерывается — оформляем диапазон: если start == nums[i] — одиночное число, иначе "start->nums[i]". Добавляем в список и переходим к следующему.`,
@@ -3899,6 +5588,29 @@ code:`class Solution {
         return write;
     }
 }`,
+py:`class Solution:
+    def removeSmileys(self, arr):
+        write = 0
+        read = 0
+        n = len(arr)
+
+        while read < n:
+            if (
+                read + 2 < n
+                and arr[read] == ':'
+                and arr[read + 1] == '-'
+                and arr[read + 2] in '()'
+            ):
+                bracket = arr[read + 2]
+                read += 3
+                while read < n and arr[read] == bracket:
+                    read += 1
+            else:
+                arr[write] = arr[read]
+                write += 1
+                read += 1
+
+        return write`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с пропуском смайликов — O(n). Несколько счётчиков — O(1) памяти.`,
 expl:`Обнаруживаем паттерн :- после чего ) или (. Пропускаем смайлик и повторы скобки. Два указателя read/write сжимают массив в начало; возвращаем write. O(n).`,
@@ -3943,6 +5655,29 @@ code:`class Solution {
         return w;
     }
 }`,
+py:`class Solution:
+    def encode(self, arr):
+        write = 0
+        i = 0
+
+        while i < len(arr):
+            ch = arr[i]
+            j = i
+            while j < len(arr) and arr[j] == ch:
+                j += 1
+
+            arr[write] = ch
+            write += 1
+
+            count = j - i
+            if count > 1:
+                for digit in str(count):
+                    arr[write] = digit
+                    write += 1
+
+            i = j
+
+        return write`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Цикл по блокам одинаковых символов — O(n). Запись in-place — O(1) памяти.`,
 expl:`Группируем последовательные одинаковые символы. Записываем символ, затем цифры количества (если > 1). Для многозначных чисел записываем каждую цифру отдельно. O(n).`,
@@ -3984,6 +5719,26 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def validPalindrome(self, s):
+        left = 0
+        right = len(s) - 1
+
+        while left < right:
+            if s[left] != s[right]:
+                return self.isPalin(s, left + 1, right) or self.isPalin(s, left, right - 1)
+            left += 1
+            right -= 1
+
+        return True
+
+    def isPalin(self, s, left, right):
+        while left < right:
+            if s[left] != s[right]:
+                return False
+            left += 1
+            right -= 1
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Основной проход двумя указателями делает не более n/2 сравнений. При первом несовпадении метод сразу завершает основной цикл и максимум один раз запускает две дополнительные проверки, каждая тоже до n/2 сравнений. Итого не более n/2 + n/2 + n/2 = 3n/2 сравнений, а это O(n). Память O(1): только несколько индексов.`,
 expl:`Два указателя с краёв. При первом несовпадении проверяем оба варианта: пропустить левый или правый. Если хотя бы один даёт палиндром — true.
@@ -4020,6 +5775,27 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def sortedSquares(self, nums):
+        n = len(nums)
+        result = [0] * n
+        left = 0
+        right = n - 1
+        write = n - 1
+
+        while left <= right:
+            left_sq = nums[left] * nums[left]
+            right_sq = nums[right] * nums[right]
+
+            if left_sq > right_sq:
+                result[write] = left_sq
+                left += 1
+            else:
+                result[write] = right_sq
+                right -= 1
+            write -= 1
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход двумя указателями — O(n). Массив result — O(n) памяти.`,
 expl:`Наибольшие квадраты — на краях массива (отрицательные или положительные). Два указателя сравнивают абсолютные значения, заполняем результат справа налево. O(n).`,
@@ -4078,6 +5854,40 @@ code:`public class Solution {
         return result;
     }
 }`,
+py:`import heapq
+
+class Solution:
+    def merge(self, graphics):
+        k = len(graphics)
+        current_values = [0] * k
+        current_sum = 0
+        heap = []
+
+        for i, graph in enumerate(graphics):
+            if graph:
+                heapq.heappush(heap, (graph[0][0], i, 0))
+
+        result = []
+        while heap:
+            cur_time = heap[0][0]
+
+            while heap and heap[0][0] == cur_time:
+                _, gi, pi = heapq.heappop(heap)
+                graph = graphics[gi]
+                new_val = graph[pi][1]
+                old_val = current_values[gi]
+
+                if new_val != old_val:
+                    current_values[gi] = new_val
+                    current_sum += new_val - old_val
+
+                if pi + 1 < len(graph):
+                    nxt = graph[pi + 1]
+                    heapq.heappush(heap, (nxt[0], gi, pi + 1))
+
+            result.append([cur_time, current_sum])
+
+        return result`,
 complexity:`Время: O(N log k), Память: O(k)`,
 complexityExpl:`В куче O(k) элементов, всего N извлечений по O(log k) — O(N log k). Куча и currentValues — O(k) памяти.`,
 expl:`Min-heap обрабатывает события по времени. Все события одного момента — за раз. Поддерживаем текущие значения каждого графика и их сумму. O(N log k) где N — суммарное число точек.`},
@@ -4135,6 +5945,40 @@ code:`public class Solution {
         return result;
     }
 }`,
+py:`import heapq
+
+class Solution:
+    def mergeCharts(self, charts):
+        k = len(charts)
+        vals = [0] * k
+        total = 0
+        heap = []
+
+        for i, chart in enumerate(charts):
+            if chart:
+                first = chart[0]
+                heapq.heappush(heap, (first[0], i, 0))
+
+        result = []
+
+        while heap:
+            time = heap[0][0]
+
+            while heap and heap[0][0] == time:
+                _, ci, pi = heapq.heappop(heap)
+                chart = charts[ci]
+                new_val = chart[pi][1]
+
+                total += new_val - vals[ci]
+                vals[ci] = new_val
+
+                if pi + 1 < len(chart):
+                    nxt = chart[pi + 1]
+                    heapq.heappush(heap, (nxt[0], ci, pi + 1))
+
+            result.append([time, total])
+
+        return result`,
 complexity:`Время: O(N log k), Память: O(k)`,
 complexityExpl:`Тот же паттерн: N операций с кучей размера k — O(N log k). Куча и vals — O(k) памяти.`,
 expl:`Идентичный подход: min-heap обрабатывает события хронологически. Поддерживаем текущую сумму, обновляя при каждом событии. O(N log k).`},
@@ -4170,6 +6014,17 @@ code:`class Solution {
         return strs[0];
     }
 }`,
+py:`class Solution:
+    def longestCommonPrefix(self, strs):
+        if strs is None or not strs:
+            return ""
+
+        for i, ch in enumerate(strs[0]):
+            for j in range(1, len(strs)):
+                if i >= len(strs[j]) or strs[j][i] != ch:
+                    return strs[0][:i]
+
+        return strs[0]`,
 complexity:`Время: O(S), Память: O(1)`,
 complexityExpl:`Внешний цикл по позициям, внутренний по строкам — до суммарной длины S. Только индексы — O(1) памяти.`,
 expl:`Вертикальное сканирование: внешний цикл по позиции символа, внутренний — по всем строкам. Останавливаемся при первом несовпадении или конце строки. O(S) где S — суммарная длина строк.`},
@@ -4219,6 +6074,34 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`from collections import deque
+
+class Solution:
+    def longestSubarray(self, nums, limit):
+        max_d = deque()
+        min_d = deque()
+        left = 0
+        result = 0
+
+        for right, value in enumerate(nums):
+            while max_d and nums[max_d[-1]] <= value:
+                max_d.pop()
+            max_d.append(right)
+
+            while min_d and nums[min_d[-1]] >= value:
+                min_d.pop()
+            min_d.append(right)
+
+            while nums[max_d[0]] - nums[min_d[0]] > limit:
+                left += 1
+                if max_d[0] < left:
+                    max_d.popleft()
+                if min_d[0] < left:
+                    min_d.popleft()
+
+            result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Каждый индекс входит/выходит из деков один раз — O(n) амортизированно. Деки до O(n) элементов — O(n) памяти.`,
 expl:`Два монотонных дека: maxD хранит индексы в убывающем порядке значений (голова = максимум окна), minD — в возрастающем (голова = минимум). Когда max - min > limit, сжимаем окно слева. Каждый элемент push/pop один раз → O(n).`,
@@ -4340,6 +6223,41 @@ private int expand(String s, int left, int right) {
     }
     return right - left - 1;
 }`,
+py:`class Solution:
+    def longestPalindrome(self, s):
+        t = [''] * (2 * len(s) + 3)
+        t[0] = '^'
+        t[1] = '#'
+        for i, ch in enumerate(s):
+            t[2 * i + 2] = ch
+            t[2 * i + 3] = '#'
+        t[-1] = '$'
+
+        p = [0] * len(t)
+        center = 0
+        right = 0
+
+        for i in range(1, len(t) - 1):
+            mirror = 2 * center - i
+            if i < right:
+                p[i] = min(right - i, p[mirror])
+
+            while t[i + p[i] + 1] == t[i - p[i] - 1]:
+                p[i] += 1
+
+            if i + p[i] > right:
+                center = i
+                right = i + p[i]
+
+        max_len = 0
+        best_center = 0
+        for i in range(1, len(t) - 1):
+            if p[i] > max_len:
+                max_len = p[i]
+                best_center = i
+
+        start = (best_center - max_len) // 2
+        return s[start:start + max_len]`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Алгоритм Манакера: один проход, правая граница только растёт — O(n). Массив радиусов — O(n) памяти.`,
 expl:`Алгоритм Манакера. Строим расширенную строку с разделителями '#'. Для каждой позиции используем зеркальное свойство: если i внутри правой границы текущего палиндрома, начальный радиус берём из зеркала. Затем расширяем. Итого O(n) за счёт того, что правая граница сдвигается только вправо.`},
@@ -4390,6 +6308,29 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def minSquareDecomposition(self, n):
+        dp = [10 ** 9] * (n + 1)
+        chosen = [0] * (n + 1)
+
+        dp[0] = 0
+        for total in range(1, n + 1):
+            x = int(total ** 0.5)
+            while x >= 1:
+                sq = x * x
+                if dp[total - sq] + 1 < dp[total]:
+                    dp[total] = dp[total - sq] + 1
+                    chosen[total] = x
+                x -= 1
+
+        result = []
+        cur = n
+        while cur > 0:
+            x = chosen[cur]
+            result.append(x)
+            cur -= x * x
+
+        return result`,
 complexity:`Время: O(N·√N) (для каждой суммы 1..N — до √N кандидатов x), Память: O(N) (массивы dp и chosen длины N+1)`,
 complexityExpl:`Для каждой суммы i перебираем все квадратные числа ≤ i (их порядка sqrt(i)). Итого O(N * sqrt(N)). Массивы dp и chosen длиной N+1 дают O(N) памяти.`,
 expl:`Жадный выбор здесь не работает: самый большой квадрат не всегда ведёт к оптимальному разложению. Значит, нужно для каждой суммы sum честно спросить, какой последний квадрат выгоднее взять, если оптимум для меньшей суммы уже известен. Именно поэтому код строит dp снизу вверх по формуле dp[sum] = min(dp[sum - x^2] + 1). А массив chosen нужен затем, чтобы восстановить не только количество, но и сами числа, из квадратов которых получился ответ.`,
@@ -4428,6 +6369,19 @@ code:`class Solution {
         return dp[n];
     }
 }`,
+py:`class Solution:
+    def numSquares(self, n):
+        dp = [10 ** 9] * (n + 1)
+        dp[0] = 0
+
+        for total in range(1, n + 1):
+            x = 1
+            while x * x <= total:
+                sq = x * x
+                dp[total] = min(dp[total], dp[total - sq] + 1)
+                x += 1
+
+        return dp[n]`,
 complexity:`Время: O(n * sqrt(n)), Память: O(n)`,
 complexityExpl:`Для каждой суммы 1..n перебираем все квадраты не больше этой суммы. Число таких квадратов порядка sqrt(n), поэтому итог O(n * sqrt(n)). Массив dp длины n + 1 даёт O(n) памяти.`,
 expl:`Это классический DP по сумме. Для каждой суммы sum спрашиваем, какой последний квадрат выгоднее взять, если оптимум для меньшей суммы уже известен. Получаем переход dp[sum] = min(dp[sum - x^2] + 1) по всем квадратам x^2 <= sum. Здесь не нужно восстанавливать сами числа, поэтому хватает одного массива dp.`,
@@ -4504,6 +6458,42 @@ code:`class Solution {
         return current.toString();
     }
 }`,
+py:`class Solution:
+    def decode(self, s):
+        str_stack = []
+        current = []
+        i = 0
+
+        while i < len(s):
+            ch = s[i]
+
+            if ch == '(':
+                str_stack.append(current)
+                current = []
+                i += 1
+            elif ch == ')':
+                i += 1
+                if i < len(s) and s[i] == '[':
+                    i += 1
+
+                repeat = 0
+                while i < len(s) and s[i].isdigit():
+                    repeat = repeat * 10 + int(s[i])
+                    i += 1
+
+                if i < len(s) and s[i] == ']':
+                    i += 1
+
+                repeated = ''.join(current)
+                prev = str_stack.pop()
+                for _ in range(repeat):
+                    prev.append(repeated)
+                current = prev
+            else:
+                current.append(ch)
+                i += 1
+
+        return ''.join(current)`,
 complexity:`Время: O(|результат|), Память: O(глубина вложенности)`,
 complexityExpl:`Каждый символ обрабатывается константное число раз — O(размер выхода). Стеки глубины вложенности — O(глубина) памяти.`,
 expl:`Стек строк хранит накопленные prefix-ы. При открывающей скобке — push текущего контекста и начинаем новую строку. При закрытии ] достаём prefix и повторяем текущую строку n раз. O(n × суммарная длина результата).`,
@@ -4549,6 +6539,22 @@ code:`public class NestedIterator implements Iterator<Integer> {
         return !stack.isEmpty();
     }
 }`,
+py:`class NestedIterator:
+    def __init__(self, nestedList):
+        self.stack = []
+        for item in reversed(nestedList):
+            self.stack.append(item)
+
+    def next(self):
+        return self.stack.pop().getInteger()
+
+    def hasNext(self):
+        while self.stack and not self.stack[-1].isInteger():
+            top = self.stack.pop()
+            nested_list = top.getList()
+            for item in reversed(nested_list):
+                self.stack.append(item)
+        return bool(self.stack)`,
 complexity:`Время: O(n) суммарно, Память: O(n)`,
 complexityExpl:`Каждый NestedInteger попадает в стек и извлекается из стека не более одного раза, поэтому суммарно по всем вызовам next/hasNext получаем O(n). Стек может хранить до O(n) элементов.`,
 expl:`Кладём стартовый список в стек в обратном порядке, чтобы сохранить левый-to-правый порядок при pop.
@@ -4612,6 +6618,32 @@ public class FilteringIterator<T> implements Iterator<T> {
         return result; // возвращаем текущий, а не следующий
     }
 }`,
+py:`class FilteringIterator:
+    def __init__(self, predicate, iterator):
+        self.predicate = predicate
+        self.iterator = iterator
+        self._next = None
+        self._has_next = False
+        self.advance()
+
+    def advance(self):
+        self._has_next = False
+        self._next = None
+        for candidate in self.iterator:
+            if self.predicate(candidate):
+                self._next = candidate
+                self._has_next = True
+                return
+
+    def hasNext(self):
+        return self._has_next
+
+    def next(self):
+        if not self._has_next:
+            raise StopIteration
+        result = self._next
+        self.advance()
+        return result`,
 complexity:`Время: O(1) амортизированно на вызов next/hasNext, Память: O(1)`,
 complexityExpl:`Каждый элемент базового итератора рассматривается не более одного раза — суммарно O(n) на весь обход. Дополнительно храним только ссылку на следующий элемент и флаг — O(1).`,
 expl:`Ключевая идея — lookahead: advance() двигает внутренний итератор до первого подходящего значения и запоминает его. hasNext() только читает флаг; next() отдаёт сохранённое значение и снова вызывает advance().
@@ -4644,6 +6676,17 @@ class Solution {
                 .findFirst();
     }
 }`,
+py:`class Person:
+    def __init__(self, name):
+        self.name = name
+
+
+class Solution:
+    def findPersonByName(self, persons, name):
+        for person in persons:
+            if person.name == name:
+                return person
+        return None`,
 complexity:`Время: O(n) в худшем случае, Память: O(1)`,
 complexityExpl:`Линейный проход по списку до первого совпадения — O(n). Промежуточный stream не хранит все элементы в дополнительной структуре — O(1) доп. памяти кроме входного списка.`,
 expl:`findFirst() останавливается на первом подходящем элементе (для последовательного stream — это линейный поиск слева направо).
@@ -4689,6 +6732,24 @@ code:`class Solution {
         return new int[]{};
     }
 }`,
+py:`class Solution:
+    def meetingTime(self, a, b, duration):
+        i = 0
+        j = 0
+
+        while i < len(a) and j < len(b):
+            start = max(a[i][0], b[j][0])
+            end = min(a[i][1], b[j][1])
+
+            if end - start >= duration:
+                return [start, start + duration]
+
+            if a[i][1] < b[j][1]:
+                i += 1
+            else:
+                j += 1
+
+        return []`,
 complexity:`Время: O(n + m), Память: O(1)`,
 complexityExpl:`Два указателя по спискам интервалов — O(n+m). Константная память.`,
 expl:`Считаем пересечение: min(end1,end2) - max(start1,start2). Если >= duration — нашли слот. Двигаем указатель, чей интервал заканчивается раньше. O(n+m).`},
@@ -4766,6 +6827,28 @@ public class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def findCommonPrefix(self, A, B):
+        n = len(A)
+        seen_in_a = [False] * (n + 1)
+        seen_in_b = [False] * (n + 1)
+        result = [0] * n
+        common = 0
+
+        for i in range(n):
+            if not seen_in_a[A[i]]:
+                seen_in_a[A[i]] = True
+                if seen_in_b[A[i]]:
+                    common += 1
+
+            if not seen_in_b[B[i]]:
+                seen_in_b[B[i]] = True
+                if seen_in_a[B[i]]:
+                    common += 1
+
+            result[i] = common
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один цикл с двумя инкрементами в count — O(n). Массив count[n+1] — O(n) памяти.`,
 expl:`Массив count[v] хранит, сколько раз число v встречено (в A, в B, или в обоих). Когда count == 2 — число есть в обоих массивах. Не учитываем кратность (число входит максимум 1 раз в каждый массив). O(n).`},
@@ -4804,6 +6887,26 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def commonPrefixWithMultiplicity(self, A, B):
+        n = len(A)
+        count_a = {}
+        count_b = {}
+        result = [0] * n
+        common = 0
+
+        for i in range(n):
+            count_a[A[i]] = count_a.get(A[i], 0) + 1
+            if count_a[A[i]] <= count_b.get(A[i], 0):
+                common += 1
+
+            count_b[B[i]] = count_b.get(B[i], 0) + 1
+            if count_b[B[i]] <= count_a.get(B[i], 0):
+                common += 1
+
+            result[i] = common
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Константное число операций HashMap на шаг — O(n). Две карты с O(n) ключей — O(n) памяти.`,
 expl:`При добавлении A[i]: если countA[v] <= countB[v] (т.е. после инкремента новый min увеличился), то common++. Аналогично для B[i]. O(n) при HashMap.`},
@@ -4837,6 +6940,25 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def findThePrefixCommonArray(self, A, B):
+        n = len(A)
+        freq = [0] * (n + 1)
+        result = [0] * n
+        common = 0
+
+        for i in range(n):
+            freq[A[i]] += 1
+            if freq[A[i]] == 2:
+                common += 1
+
+            freq[B[i]] += 1
+            if freq[B[i]] == 2:
+                common += 1
+
+            result[i] = common
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход с обновлением freq — O(n). Массив freq[n+1] — O(n) памяти.`,
 expl:`Так как A и B — перестановки, каждое число встречается ровно по 1 разу в каждом. freq[v] считает сколько раз v встретилось суммарно. Когда freq == 2 — число есть и в A[0..i], и в B[0..i]. O(n) время, O(n) память.`},
@@ -4877,6 +6999,21 @@ code:`class Solution {
         return arr;
     }
 }`,
+py:`class Solution:
+    def arrayRankTransform(self, arr):
+        sorted_values = sorted(arr)
+        rank = {}
+        next_rank = 1
+
+        for value in sorted_values:
+            if value not in rank:
+                rank[value] = next_rank
+                next_rank += 1
+
+        for i in range(len(arr)):
+            arr[i] = rank[arr[i]]
+
+        return arr`,
 complexity:`Время: O(n log n), Память: O(n)`,
 complexityExpl:`Сортировка копии O(n log n), построение рангов + второй проход O(n). Копия, карта, результат — O(n) памяти.`,
 expl:`Сортируем копию массива. Назначаем ранги уникальным значениям (1, 2, 3, ...). Затем заменяем каждый элемент его рангом. O(n log n).`,
@@ -4927,6 +7064,32 @@ public class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def dotProduct(self, vec1, vec2):
+        result = 0
+        i = 0
+        j = 0
+        cnt1 = 0
+        cnt2 = 0
+        val1 = 0
+        val2 = 0
+
+        while i < len(vec1) or j < len(vec2):
+            if cnt1 == 0:
+                val1 = vec1[i][0]
+                cnt1 = vec1[i][1]
+                i += 1
+            if cnt2 == 0:
+                val2 = vec2[j][0]
+                cnt2 = vec2[j][1]
+                j += 1
+
+            take = min(cnt1, cnt2)
+            result += val1 * val2 * take
+            cnt1 -= take
+            cnt2 -= take
+
+        return result`,
 complexity:`Время: O(m + k), Память: O(1)`,
 complexityExpl:`Каждый блок обрабатываем за O(1), указатели только двигаются вперёд — O(m+k) для m и k сегментов. Константное число переменных — O(1) доп. памяти.`,
 expl:`Разворачивать векторы не нужно. На каждом шаге активны val1, val2 и оставшиеся длины cnt1, cnt2; пересечение блоков даёт min(cnt1,cnt2) слагаемых val1*val2. Сумма по шагам — скалярное произведение.`,
@@ -4960,6 +7123,21 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def countPairs(self, nums, k):
+        nums.sort()
+
+        count = 0
+        left = 0
+        right = len(nums) - 1
+        while left < right:
+            if nums[left] + nums[right] >= k:
+                count += right - left
+                right -= 1
+            else:
+                left += 1
+
+        return count`,
 complexity:`Время: O(n log n), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n), два указателя O(n) — доминирует сортировка. In-place — O(1) доп. памяти.`,
 expl:`Сортируем массив. Если nums[l] + nums[r] >= k, то все элементы между l и r в паре с r тоже подойдут (массив отсортирован) → count += (r-l). O(n log n).`},
@@ -5009,6 +7187,19 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def findClosestElements(self, arr, k, x):
+        left = 0
+        right = len(arr) - k
+
+        while left < right:
+            mid = left + (right - left) // 2
+            if x - arr[mid] > arr[mid + k] - x:
+                left = mid + 1
+            else:
+                right = mid
+
+        return arr[left:left + k]`,
 complexity:`Время: O(log(n−k) + k) (бинпоиск начала окна длины k на отсортированном arr + формирование ответа), Память: O(k) (список результата; вход отсортирован заранее)`,
 complexityExpl:`Бинарный поиск по [0, n−k] — O(log(n−k)), затем копируем k элементов. Список из k элементов — O(k) памяти.`,
 expl:`После сортировки ответ здесь всегда является непрерывным окном длины k. Значит, искать нужно не сами элементы по отдельности, а правильное начало такого окна. Код бинарно ищет эту левую границу и сравнивает два соседних кандидата: окно, начинающееся в mid, и окно, начинающееся в mid + 1. Если правое окно ближе к x, старт надо двигать вправо; иначе лучше оставить текущее или идти влево.`,
@@ -5060,6 +7251,39 @@ code:`class Solution {
         return lo;
     }
 }`,
+py:`class Solution:
+    def kClosest(self, arr, target, k):
+        pos = self.binarySearch(arr, target)
+        left = pos - 1
+        right = pos
+        result = []
+
+        while len(result) < k:
+            if left < 0:
+                result.append(arr[right])
+                right += 1
+            elif right >= len(arr):
+                result.append(arr[left])
+                left -= 1
+            elif abs(arr[left] - target) <= abs(arr[right] - target):
+                result.append(arr[left])
+                left -= 1
+            else:
+                result.append(arr[right])
+                right += 1
+
+        return result
+
+    def binarySearch(self, arr, target):
+        lo = 0
+        hi = len(arr)
+        while lo < hi:
+            mid = lo + (hi - lo) // 2
+            if arr[mid] < target:
+                lo = mid + 1
+            else:
+                hi = mid
+        return lo`,
 complexity:`Время: O(log n + k), Память: O(k)`,
 complexityExpl:`binarySearch O(log n), затем k шагов выбора ближайшего — O(k). Список из k чисел — O(k) памяти.`,
 expl:`Бинарный поиск позиции ближайшей к target. Два указателя расходятся от этой позиции: выбираем ближайший из arr[left] и arr[right]. O(log n + k).`,
@@ -5094,6 +7318,22 @@ code:`class Solution {
         return minDiff;
     }
 }`,
+py:`class Solution:
+    def minDifference(self, a, b):
+        i = 0
+        j = 0
+        min_diff = float('inf')
+
+        while i < len(a) and j < len(b):
+            diff = abs(a[i] - b[j])
+            min_diff = min(min_diff, diff)
+
+            if a[i] < b[j]:
+                i += 1
+            else:
+                j += 1
+
+        return min_diff`,
 complexity:`Время: O(n + m), Память: O(1)`,
 complexityExpl:`Два указателя по отсортированным массивам — O(n+m). Только переменные — O(1) памяти.`,
 expl:`Два указателя на отсортированных массивах. Двигаем указатель на меньший элемент — это приближает значения друг к другу. O(n+m) время, O(1) память.`},
@@ -5147,6 +7387,14 @@ public List<List<Integer>> groupAnagrams(int[] nums) {
     
     return new ArrayList<>(map.values());
 }`,
+py:`class Solution:
+    def groupAnagramNumbers(self, nums):
+        groups = {}
+        for num in nums:
+            key = ''.join(sorted(str(num)))
+            groups.setdefault(key, []).append(num)
+
+        return list(groups.values())`,
 complexity:`Время: O(n · d log d), Память: O(n)`,
 complexityExpl:`Для каждого числа сортируем d цифр O(d log d) и кладём в HashMap — O(n·d log d). Карта и списки — O(n) памяти.`,
 expl:`Для каждого числа сортируем его цифры — это ключ в HashMap. Числа с одинаковым ключом — анаграммы. O(n × d log d), где d — кол-во цифр.`},
@@ -5178,6 +7426,18 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def findPairs(self, nums, k):
+        if k < 0:
+            return 0
+
+        freq = {}
+        count = 0
+        for num in nums:
+            count += freq.get(num - k, 0)
+            freq[num] = freq.get(num, 0) + 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход по массиву — O(n). HashMap занимает O(n) памяти.`,
 expl:`Ведём HashMap частот и идём слева направо. Для каждого num проверяем, сколько раз (num − k) уже встречалось в map — столько новых пар с нужной разностью. После подсчёта добавляем num в map. Это корректно: i < j гарантируется порядком обхода. Работает и при k == 0 (ищем дубликаты num — 0 = num). O(n) время, O(n) память.`,
@@ -5240,6 +7500,27 @@ public class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def countPairs(self, nums, k):
+        nums.sort()
+        n = len(nums)
+
+        if k <= 0:
+            return n * (n + 1) // 2
+
+        count = 0
+        right = 0
+
+        for left in range(n):
+            if right <= left:
+                right = left + 1
+
+            while right < n and nums[right] - nums[left] < k:
+                right += 1
+
+            count += n - right
+
+        return count`,
 complexity:`Время: O(n log n), Память: O(1)`,
 complexityExpl:`Сортировка — O(n log n). Затем два указателя: right проходит массив, left только растёт — итого O(n). Итого O(n log n). Память O(1).`,
 expl:`Сортируем массив. Фиксируем указатель left = 0. Для каждого right двигаем left вправо, пока nums[right] - nums[left] >= k — left движется к первому невалидному индексу. Все элементы с индексами 0..left-1 имеют разность >= k с nums[right], поэтому count += left. Поскольку массив отсортирован и left не откатывается назад — два указателя работают корректно.`},
@@ -5270,6 +7551,18 @@ code:`class Solution {
         return maxProfit;
     }
 }`,
+py:`class Solution:
+    def maxProfit(self, prices):
+        min_price = float('inf')
+        max_profit = 0
+
+        for price in prices:
+            if price < min_price:
+                min_price = price
+            else:
+                max_profit = max(max_profit, price - min_price)
+
+        return max_profit`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по ценам с minPrice — O(n). Только переменные — O(1) памяти.`,
 expl:`Один проход: отслеживаем минимальную цену. Для каждого дня — потенциальная прибыль = price - minPrice. Обновляем максимум. O(n) время, O(1) память.`},
@@ -5311,6 +7604,27 @@ code:`class Solution {
         return new String(str, 0, newLen);
     }
 }`,
+py:`class Solution:
+    def urlify(self, s, trueLength):
+        space_count = 0
+        for read in range(trueLength):
+            if s[read] == ' ':
+                space_count += 1
+
+        new_len = trueLength + space_count * 2
+        write = new_len - 1
+
+        for read in range(trueLength - 1, -1, -1):
+            if s[read] == ' ':
+                s[write] = '0'
+                s[write - 1] = '2'
+                s[write - 2] = '%'
+                write -= 3
+            else:
+                s[write] = s[read]
+                write -= 1
+
+        return ''.join(s[:new_len])`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода: подсчёт пробелов + заполнение с конца — O(n). In-place в char[] — O(1) доп. памяти.`,
 expl:`Два прохода: считаем пробелы, затем заполняем с конца. Каждый пробел заменяется на '%20' (3 символа вместо 1). O(n) время, O(1) дополнительная память.`,
@@ -5349,6 +7663,22 @@ code:`class Solution {
         return maxWater;
     }
 }`,
+py:`class Solution:
+    def maxArea(self, height):
+        left = 0
+        right = len(height) - 1
+        max_water = 0
+
+        while left < right:
+            water = min(height[left], height[right]) * (right - left)
+            max_water = max(max_water, water)
+
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+
+        return max_water`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два указателя с краёв: двигаем меньшую стенку — O(n). Константная доп. память.`,
 expl:`Жадный подход с двумя указателями. Сдвигаем меньший столбец — сдвиг большего не может увеличить площадь (высота ограничена меньшим). O(n) время, O(1) память.`},
@@ -5400,6 +7730,20 @@ code:`class Solution {
         return closest;
     }
 }`,
+py:`class Solution:
+    def closestValue(self, root, target):
+        closest = root.val
+
+        while root is not None:
+            if abs(root.val - target) < abs(closest - target):
+                closest = root.val
+
+            if target < root.val:
+                root = root.left
+            else:
+                root = root.right
+
+        return closest`,
 complexity:`Время: O(h), Память: O(1)`,
 complexityExpl:`Спуск по BST от корня к листу — O(h). Один указатель и closest — O(1) памяти.`,
 expl:`Итеративный спуск по BST. На каждом шаге обновляем closest, если текущий узел ближе к target. Идём влево если target < val, иначе вправо. O(h) время, O(1) память.`,
@@ -5432,6 +7776,19 @@ code:`class Solution {
             + rangeSumBST(root.right, low, high);
     }
 }`,
+py:`class Solution:
+    def rangeSumBST(self, root, low, high):
+        if root is None:
+            return 0
+        if root.val < low:
+            return self.rangeSumBST(root.right, low, high)
+        if root.val > high:
+            return self.rangeSumBST(root.left, low, high)
+        return (
+            root.val
+            + self.rangeSumBST(root.left, low, high)
+            + self.rangeSumBST(root.right, low, high)
+        )`,
 complexity:`Время: O(n) в худшем случае, Память: O(h)`,
 complexityExpl:`В худшем случае посещаем все узлы — O(n). Глубина рекурсии равна высоте дерева h, поэтому стек вызовов — O(h). За счёт отсечения веток на сбалансированном BST обычно быстрее полного обхода.`,
 expl:`Ключ — использовать свойство BST. Если root.val < low, весь левый subtree тоже меньше low и его можно пропустить. Если root.val > high, весь правый subtree больше high и тоже отсекается. Иначе текущий узел входит в ответ, рекурсивно считаем обе стороны.`,
@@ -5472,6 +7829,21 @@ code:`class Solution {
         return node.val + Math.max(left, right);
     }
 }`,
+py:`class Solution:
+    def maxPathSum(self, root):
+        self.max_sum = float('-inf')
+        self.dfs(root)
+        return self.max_sum
+
+    def dfs(self, node):
+        if node is None:
+            return 0
+
+        left = max(0, self.dfs(node.left))
+        right = max(0, self.dfs(node.right))
+
+        self.max_sum = max(self.max_sum, node.val + left + right)
+        return node.val + max(left, right)`,
 complexity:`Время: O(n) (каждый узел один раз), Память: O(h) (стек DFS; h — высота дерева)`,
 complexityExpl:`Каждый узел посещается один раз — O(n). Дополнительная память определяется глубиной рекурсии h (высота дерева), поэтому O(h).`,
 expl:`Главная идея здесь в том, что у задачи есть два разных ответа, и их нельзя смешивать. Для глобального максимума путь через текущий узел может забрать обе ветки сразу: левую и правую. А вот родителю мы можем вернуть только одну ветку, потому что путь вверх не может раздваиваться. Поэтому код отдельно обновляет maxSum через node.val + left + right и отдельно возвращает вклад одной лучшей стороны; отрицательные ветки просто невыгодно брать вообще.`,
@@ -5545,6 +7917,37 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`from collections import deque
+
+class Solution:
+    def zigzagLevelOrder(self, root):
+        result = []
+        if root is None:
+            return result
+
+        queue = deque([root])
+        left_to_right = True
+
+        while queue:
+            size = len(queue)
+            level = deque()
+
+            for _ in range(size):
+                node = queue.popleft()
+                if left_to_right:
+                    level.append(node.val)
+                else:
+                    level.appendleft(node.val)
+
+                if node.left is not None:
+                    queue.append(node.left)
+                if node.right is not None:
+                    queue.append(node.right)
+
+            result.append(list(level))
+            left_to_right = not left_to_right
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`BFS по уровням: каждый узел один раз — O(n). Очередь и списки — O(n) памяти.`,
 expl:`BFS по уровням. Чередуем направление: чётные уровни — addLast, нечётные — addFirst (LinkedList как deque). O(n) время и память.`,
@@ -5591,6 +7994,15 @@ code:`class Solution {
             && isSameTree(p.right, q.right);
     }
 }`,
+py:`class Solution:
+    def isSameTree(self, p, q):
+        if p is None and q is None:
+            return True
+        if p is None or q is None:
+            return False
+        if p.val != q.val:
+            return False
+        return self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Рекурсивное сравнение: каждый узел один раз — O(n). Стек рекурсии — O(h) памяти.`,
 expl:`Рекурсия: базовые случаи — оба null (true), один null (false), значения разные (false). Иначе рекурсивно проверяем левые и правые поддеревья. O(n) время, O(h) стек.`,
@@ -5647,6 +8059,26 @@ code:`class Solution {
         return Math.max(left, right) + 1;
     }
 }`,
+py:`class Solution:
+    def isBalanced(self, root):
+        return self.height(root) != -1
+
+    def height(self, node):
+        if node is None:
+            return 0
+
+        left = self.height(node.left)
+        if left == -1:
+            return -1
+
+        right = self.height(node.right)
+        if right == -1:
+            return -1
+
+        if abs(left - right) > 1:
+            return -1
+
+        return max(left, right) + 1`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Для каждого узла считаем высоту с ранним выходом — O(n). Стек рекурсии — O(h) памяти.`,
 expl:`Возвращаем -1 как сигнал несбалансированности. Для каждого узла проверяем |leftH - rightH| <= 1. Рано прерываемся при -1. O(n) время, O(h) стек.`,
@@ -5703,6 +8135,26 @@ code:`class Solution {
         path.remove(path.size() - 1);
     }
 }`,
+py:`class Solution:
+    def pathSum(self, root, targetSum):
+        self.result = []
+        self.dfs(root, targetSum, [])
+        return self.result
+
+    def dfs(self, node, remaining, path):
+        if node is None:
+            return
+
+        path.append(node.val)
+        remaining -= node.val
+
+        if node.left is None and node.right is None and remaining == 0:
+            self.result.append(path[:])
+        else:
+            self.dfs(node.left, remaining, path)
+            self.dfs(node.right, remaining, path)
+
+        path.pop()`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`DFS с backtracking обходит дерево за O(n). Путь длины h и стек — O(h) памяти.`,
 expl:`DFS + backtracking. На каждом узле: добавляем в путь, вычитаем из remaining. На листе: если remaining == 0 — нашли путь. При возврате удаляем последний элемент. O(n) обход, O(n²) для копирования путей.`},
@@ -5789,6 +8241,31 @@ code:`class Solution {
         return left != null ? left : right;
     }
 }`,
+py:`class Solution:
+    def lowestCommonAncestor(self, root, p, q):
+        self.found_p = False
+        self.found_q = False
+        lca = self.dfs(root, p, q)
+        return lca if self.found_p and self.found_q else None
+
+    def dfs(self, node, p, q):
+        if node is None:
+            return None
+
+        left = self.dfs(node.left, p, q)
+        right = self.dfs(node.right, p, q)
+
+        if node is p:
+            self.found_p = True
+            return node
+        if node is q:
+            self.found_q = True
+            return node
+
+        if left is not None and right is not None:
+            return node
+
+        return left if left is not None else right`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`Один DFS: каждый узел константное число раз — O(n). Стек рекурсии — O(h) памяти.`,
 expl:`DFS обходит всё дерево (не останавливается рано). Флаги foundP/foundQ подтверждают, что оба узла найдены. Если один в левом поддереве, другой в правом — текущий узел = LCA. O(n).`},
@@ -5863,6 +8340,33 @@ code:`class Solution {
         return id;
     }
 }`,
+py:`class Solution:
+    def findDuplicateSubtrees(self, root):
+        self.ids = {}
+        self.count = {}
+        self.result = []
+        self.serial = 1
+        self.dfs(root)
+        return self.result
+
+    def dfs(self, node):
+        if node is None:
+            return 0
+
+        left = self.dfs(node.left)
+        right = self.dfs(node.right)
+        key = f"{node.val} {left} {right}"
+
+        if key not in self.ids:
+            self.ids[key] = self.serial
+            self.serial += 1
+
+        tree_id = self.ids[key]
+        self.count[tree_id] = self.count.get(tree_id, 0) + 1
+        if self.count[tree_id] == 2:
+            self.result.append(node)
+
+        return tree_id`,
 complexity:`Время: O(n) при хэшировании ключа O(1) в среднем (n узлов), Память: O(n) (карты ids/count + список ответа; до n различных сигнатур)`,
 complexityExpl:`DFS обходит каждый из n узлов ровно один раз. Для узла ключ — короткая строка из val и двух уже вычисленных id детей, обновление карт — амортизированно O(1). Храним до O(n) различных сигнатур поддеревьев и счётчики — O(n) памяти. (Строгая оценка с учётом длины строки ключа — O(n log n) по времени.)`,
 expl:`Сравнивать поддеревья напрямую было бы слишком дорого, поэтому код сначала придумывает для каждого поддерева канонический идентификатор. В постпорядке это делается естественно: сначала уже известны id левого и правого детей, потом по ним и значению текущего узла строится ключ текущего поддерева. Если два поддерева дают один и тот же ключ, им присваивается один и тот же id. Когда такой id встречается второй раз, текущий узел уже можно добавлять в ответ как представителя группы дубликатов.`,
@@ -5920,6 +8424,25 @@ code:`class Solution {
         reverseInorder(node.left, k);
     }
 }`,
+py:`class Solution:
+    def kthLargest(self, root, k):
+        self.count = 0
+        self.result = 0
+        self.reverseInorder(root, k)
+        return self.result
+
+    def reverseInorder(self, node, k):
+        if node is None or self.count >= k:
+            return
+
+        self.reverseInorder(node.right, k)
+
+        self.count += 1
+        if self.count == k:
+            self.result = node.val
+            return
+
+        self.reverseInorder(node.left, k)`,
 complexity:`Время: O(h + k), Память: O(h)`,
 complexityExpl:`Обратный inorder: h шагов вниз + k шагов — O(h+k). Стек рекурсии — O(h) памяти.`,
 expl:`Обратный inorder-обход (right → node → left) выдаёт элементы BST в убывающем порядке. Останавливаемся на k-м элементе. O(H + k) время.`},
@@ -5975,6 +8498,21 @@ code:`class Solution {
             && dfs(node.right, depth + 1);
     }
 }`,
+py:`class Solution:
+    def checkLeaves(self, root):
+        self.leaf_depth = -1
+        return self.dfs(root, 0)
+
+    def dfs(self, node, depth):
+        if node is None:
+            return True
+
+        if node.left is None and node.right is None:
+            if self.leaf_depth == -1:
+                self.leaf_depth = depth
+            return depth == self.leaf_depth
+
+        return self.dfs(node.left, depth + 1) and self.dfs(node.right, depth + 1)`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`DFS посещает каждый узел и сравнивает глубину листьев — O(n). Стек рекурсии — O(h) памяти.`,
 expl:`DFS с отслеживанием глубины. Первый лист задаёт эталонную глубину. Все остальные листья должны совпадать. O(n) время, O(h) стек.`},
@@ -6024,6 +8562,19 @@ code:`class Solution {
             + dfs(node.right, currentNum);
     }
 }`,
+py:`class Solution:
+    def sumNumbers(self, root):
+        return self.dfs(root, 0)
+
+    def dfs(self, node, current_num):
+        if node is None:
+            return 0
+
+        current_num = current_num * 10 + node.val
+        if node.left is None and node.right is None:
+            return current_num
+
+        return self.dfs(node.left, current_num) + self.dfs(node.right, current_num)`,
 complexity:`Время: O(n), Память: O(h)`,
 complexityExpl:`DFS передаёт число по пути, суммирует на листьях — O(n). Стек — O(h) памяти.`,
 expl:`DFS: на каждом узле формируем число currentNum * 10 + val. На листе возвращаем число. Суммируем все пути. O(n) время, O(h) стек.`},
@@ -6104,6 +8655,40 @@ public class Solution {
         return mask;
     }
 }`,
+py:`class Pair:
+    def __init__(self, first, second):
+        self.first = first
+        self.second = second
+
+
+class Solution:
+    def findEquivalentSubtrees(self, root):
+        self.result = None
+        seen = {}
+        self.dfs(root, seen)
+        return self.result
+
+    def dfs(self, node, seen):
+        if node is None or self.result is not None:
+            return 0
+
+        left_mask = self.dfs(node.left, seen)
+        if self.result is not None:
+            return 0
+
+        right_mask = self.dfs(node.right, seen)
+        if self.result is not None:
+            return 0
+
+        mask = left_mask | right_mask | (1 << (ord(node.value) - ord('A')))
+
+        prev = seen.get(mask)
+        if prev is not None:
+            self.result = Pair(prev, node)
+        else:
+            seen[mask] = node
+
+        return mask`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один DFS по всем n узлам. HashMap хранит не более n масок. Битовые операции O(1) (маска 26 бит — int).`,
 expl:`Каждое поддерево кодируется 26-битной маской (OR масок детей + бит своей буквы). Маска = «набор уникальных букв». Храним первый встреченный узел с каждой маской в HashMap. При повторе — возвращаем пару. Ранний выход через Holder обрывает рекурсию.`},
@@ -6181,6 +8766,52 @@ class Solution {
 
     record Result(TreeNode first, TreeNode second) {}
 }`,
+py:`class Result:
+    def __init__(self, first, second):
+        self.first = first
+        self.second = second
+
+
+class Info:
+    def __init__(self, mask, size, node):
+        self.mask = mask
+        self.size = size
+        self.node = node
+
+
+class Solution:
+    def findEquivalentSubtrees(self, root):
+        self.answer = Result(None, None)
+        self.best_sum = 0
+        self.best_by_mask = {}
+        self.dfs(root)
+        return self.answer
+
+    def dfs(self, node):
+        if node is None:
+            return Info(0, 0, None)
+
+        left = self.dfs(node.left)
+        right = self.dfs(node.right)
+
+        current_bit = 1 << (ord(node.value) - ord('A'))
+        mask = left.mask | right.mask | current_bit
+        size = left.size + right.size + 1
+        current = Info(mask, size, node)
+
+        previous_best = self.best_by_mask.get(mask)
+        if previous_best is not None:
+            candidate_sum = previous_best.size + current.size
+            if candidate_sum > self.best_sum:
+                self.best_sum = candidate_sum
+                self.answer = Result(previous_best.node, current.node)
+
+            if current.size > previous_best.size:
+                self.best_by_mask[mask] = current
+        else:
+            self.best_by_mask[mask] = current
+
+        return current`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один DFS — O(n). HashMap хранит не более n масок. Битовые операции O(1).`,
 expl:`Каждое поддерево кодируется 26-битной маской. DFS считает маску и размер снизу вверх. В HashMap храним для каждой маски узел с наибольшим поддеревом — это гарантирует максимальную сумму при совпадении. При каждом совпадении масок обновляем ответ, если сумма больше. Итог: один проход O(n), без повторного обхода.`},
@@ -6210,6 +8841,17 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def countKDifference(self, nums, k):
+        freq = {}
+        count = 0
+
+        for num in nums:
+            count += freq.get(num - k, 0)
+            count += freq.get(num + k, 0)
+            freq[num] = freq.get(num, 0) + 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход с HashMap: добавляем частоты num−k и num+k — O(n). Карта — O(n) памяти.`,
 expl:`Я решаю задачу за один проход с использованием hash map, где храню частоты уже просмотренных элементов.
@@ -6254,6 +8896,20 @@ code:`class Solution {
             .mapToInt(Integer::intValue).toArray();
     }
 }`,
+py:`class Solution:
+    def intersect(self, nums1, nums2):
+        freq = {}
+        for num in nums1:
+            freq[num] = freq.get(num, 0) + 1
+
+        result = []
+        for num in nums2:
+            count = freq.get(num, 0)
+            if count > 0:
+                result.append(num)
+                freq[num] = count - 1
+
+        return result`,
 complexity:`Время: O(n + m), Память: O(min(n, m))`,
 complexityExpl:`Частоты первого массива + проход по второму — O(n+m). Карта — O(min(n,m)) памяти.`,
 expl:`HashMap хранит частоты nums1. Для каждого элемента nums2: если freq > 0 — добавляем в результат и уменьшаем freq. O(n+m) время, O(min(n,m)) память.`},
@@ -6286,6 +8942,16 @@ code:`class Solution {
         return -1;
     }
 }`,
+py:`class Solution:
+    def firstUniqChar(self, s):
+        freq = [0] * 26
+        for ch in s:
+            freq[ord(ch) - ord('a')] += 1
+
+        for i, ch in enumerate(s):
+            if freq[ord(ch) - ord('a')] == 1:
+                return i
+        return -1`,
 complexity:`Время: O(n), Память: O(1) доп. (cnt[26] для строчных латинских букв — |Σ|=26, константа алфавита)`,
 complexityExpl:`Два линейных прохода по строке — O(n). Массив частот на 26 букв латиницы — O(1).`,
 expl:`Если для каждого символа отдельно проверять, уникален он или нет, получится лишний повторный обход. Код делит задачу на две простые части: сначала собирает частоты всех символов, а потом возвращается к строке в исходном порядке. Как только встречается символ с частотой 1, это и есть первый уникальный индекс.`,
@@ -6328,6 +8994,26 @@ code:`class Solution {
         return key.toString();
     }
 }`,
+py:`class Solution:
+    def groupAnagramsMixed(self, strs):
+        groups = {}
+
+        for s in strs:
+            key = self.buildKey(s)
+            groups.setdefault(key, []).append(s)
+
+        return list(groups.values())
+
+    def buildKey(self, s):
+        freq = {}
+        for ch in s:
+            code = ord(ch)
+            freq[code] = freq.get(code, 0) + 1
+
+        parts = []
+        for code in sorted(freq):
+            parts.append(f"{code}:{freq[code]}|")
+        return ''.join(parts)`,
 complexity:`Время: O(T log K), Память: O(T); T — суммарное число кодпоинтов по всем строкам, K — число различных символов в одном слове (лог из TreeMap на символ)`,
 complexityExpl:`На каждое слово: обход кодпоинтов O(длина), обновления в TreeMap O(log K) на уникальный символ в этом слове. Суммарно O(T log K). Память: ключи и группы суммарно O(T).`,
 expl:`Подход с массивом на 26 букв здесь уже не подходит, потому что алфавит не фиксирован. Поэтому код сначала строит универсальную карту частот по code point, а потом превращает её в стабильный канонический ключ. Дальше задача снова становится обычной группировкой по HashMap: одинаковый ключ означает одну и ту же анаграммную группу.`,
@@ -6361,6 +9047,17 @@ code:`class Solution {
         return '\\0';
     }
 }`,
+py:`class Solution:
+    def firstUniqueChar(self, s):
+        freq = {}
+        for ch in s:
+            freq[ch] = freq.get(ch, 0) + 1
+
+        for ch in s:
+            if freq[ch] == 1:
+                return ch
+
+        return '\\0' `,
 complexity:`Время: O(n), Память: O(k) (k — число различных символов в строке, k ≤ n; HashMap символ → частота)`,
 complexityExpl:`Два линейных прохода по строке — O(n). В карте не больше k записей.`,
 expl:`Ход мысли здесь такой же, как и в версии с индексом: сначала нужно узнать частоты, а уже потом искать первый подходящий символ в исходном порядке. Поэтому код делает два прохода. Первый собирает счётчик, второй возвращает первый символ, у которого частота равна единице.`,
@@ -6411,6 +9108,31 @@ code:`class Solution {
         return key.toString();
     }
 }`,
+py:`class Solution:
+    def digitPermutationGroups(self, arr):
+        groups = {}
+        for num in arr:
+            key = self.buildKeyIgnoringZeros(num)
+            groups.setdefault(key, []).append(num)
+
+        return list(groups.values())
+
+    def buildKeyIgnoringZeros(self, num):
+        if num == 0:
+            return ""
+
+        cnt = [0] * 10
+        while num > 0:
+            digit = num % 10
+            if digit != 0:
+                cnt[digit] += 1
+            num //= 10
+
+        parts = []
+        for digit in range(1, 10):
+            if cnt[digit] > 0:
+                parts.append(f"{digit}#{cnt[digit]}|")
+        return ''.join(parts)`,
 complexity:`Время: O(n·d), Память: O(n) (группы в HashMap); d — число десятичных цифр в числе; cnt[10] при сборке ключа — константа размера алфавита цифр`,
 complexityExpl:`n — количество чисел, d — количество цифр в числе. Для каждого числа делаем один проход по его цифрам и формируем короткий ключ. HashMap хранит все группы — O(n) суммарно.`,
 expl:`Если группировать числа просто по всем цифрам, нули начнут искусственно разделять эквивалентные случаи, хотя по условию они незначимы. Значит, в ключ нужно включать только то, что реально влияет на класс: количества цифр от 1 до 9. Именно поэтому код игнорирует нули при построении канонического представления. После этого числа попадают в одну группу ровно тогда, когда различаются только перестановкой и расстановкой нулей.`,
@@ -6449,6 +9171,21 @@ code:`class Solution {
         return minLen == Integer.MAX_VALUE ? 0 : minLen;
     }
 }`,
+py:`class Solution:
+    def minSubArrayLen(self, target, nums):
+        left = 0
+        current_sum = 0
+        min_len = float('inf')
+
+        for right, num in enumerate(nums):
+            current_sum += num
+
+            while current_sum >= target:
+                min_len = min(min_len, right - left + 1)
+                current_sum -= nums[left]
+                left += 1
+
+        return 0 if min_len == float('inf') else min_len`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Скользящее окно: каждый индекс входит/выходит один раз — O(n). Счётчики — O(1) памяти.`,
 expl:`Скользящее окно: расширяем правый край, добавляя к сумме. Когда sum >= target — сжимаем слева, обновляя минимальную длину. Каждый элемент добавляется и удаляется один раз → O(n).`,
@@ -6495,6 +9232,27 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`from collections import deque
+
+class Solution:
+    def maxSlidingWindow(self, nums, k):
+        n = len(nums)
+        result = [0] * (n - k + 1)
+        dq = deque()
+
+        for i in range(n):
+            while dq and dq[0] < i - k + 1:
+                dq.popleft()
+
+            while dq and nums[dq[-1]] <= nums[i]:
+                dq.pop()
+
+            dq.append(i)
+
+            if i >= k - 1:
+                result[i - k + 1] = nums[dq[0]]
+
+        return result`,
 complexity:`Время: O(n), Память: O(k)`,
 complexityExpl:`Монотонный deque: каждый индекс добавляется/удаляется O(1) раз — O(n). Deque размера O(k) памяти.`,
 expl:`Монотонный убывающий дек хранит индексы. Голова = индекс максимума окна. При добавлении нового элемента удаляем из хвоста все меньшие/равные. Удаляем из головы вышедшие за окно. Каждый элемент push/pop один раз → O(n).`},
@@ -6534,6 +9292,23 @@ code:`public boolean isOneEditDistance(String s, String t) {
     
     return true; 
 }`,
+py:`class Solution:
+    def isOneEditDistance(self, s, t):
+        s_len = len(s)
+        t_len = len(t)
+        if abs(s_len - t_len) > 1:
+            return False
+
+        if s_len > t_len:
+            return self.isOneEditDistance(t, s)
+
+        for i in range(s_len):
+            if s[i] != t[i]:
+                if s_len == t_len:
+                    return s[i + 1:] == t[i + 1:]
+                return s[i:] == t[i + 1:]
+
+        return s_len + 1 == t_len`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один линейный проход с ранним выходом — O(n). Несколько индексов — O(1) памяти.`,
 expl:`Если длины равны — при первом расхождении проверяем, что остальные совпадают (замена). Если разница 1 — пропускаем символ в длинной строке (вставка/удаление). O(n).`},
@@ -6605,6 +9380,29 @@ code:`class Solution {
         return length;
     }
 }`,
+py:`class Solution:
+    def longestPalindrome(self, words):
+        freq = {}
+        length = 0
+        center_used = False
+
+        for word in words:
+            freq[word] = freq.get(word, 0) + 1
+
+        for word in freq:
+            rev = word[1] + word[0]
+
+            if word == rev:
+                cnt = freq[word]
+                length += (cnt // 2) * 4
+                if cnt % 2 == 1 and not center_used:
+                    length += 2
+                    center_used = True
+            elif word < rev and rev in freq:
+                pairs = min(freq[word], freq[rev])
+                length += pairs * 4
+
+        return length`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Подсчёт частот пар в HashMap — O(n). Карта и ключи — O(n) памяти.`,
 expl:`Для пар (ab, ba): берём min(count) пар, каждая даёт +4. Для палиндромов (aa): пары дают +4, один нечётный можно в центр (+2). O(n) время.`},
@@ -6640,6 +9438,22 @@ code:`class Solution {
         return minDist;
     }
 }`,
+py:`class Solution:
+    def shortestDistance(self, words, word1, word2):
+        pos1 = -1
+        pos2 = -1
+        min_dist = float('inf')
+
+        for i, word in enumerate(words):
+            if word == word1:
+                pos1 = i
+            elif word == word2:
+                pos2 = i
+
+            if pos1 != -1 and pos2 != -1:
+                min_dist = min(min_dist, abs(pos1 - pos2))
+
+        return min_dist`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с обновлением позиций двух слов — O(n). Переменные — O(1) памяти.`,
 expl:`Один проход: обновляем позицию при нахождении word1 или word2. Если обе позиции известны — считаем расстояние. O(n) время, O(1) память.`,
@@ -6678,6 +9492,24 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def shortestToChar(self, s, c):
+        n = len(s)
+        result = [0] * n
+
+        prev = -n
+        for i in range(n):
+            if s[i] == c:
+                prev = i
+            result[i] = i - prev
+
+        prev = 2 * n
+        for i in range(n - 1, -1, -1):
+            if s[i] == c:
+                prev = i
+            result[i] = min(result[i], prev - i)
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Два прохода слева/справа для расстояния до c — O(n). Массив ответа — O(n) памяти.`,
 expl:`Два прохода: слева→ записываем расстояние от последнего c. Справа→ обновляем минимумом с расстоянием от ближайшего c справа. O(n) время, O(1) доп. память.`,
@@ -6710,6 +9542,21 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def productExceptSelf(self, nums):
+        n = len(nums)
+        result = [0] * n
+
+        result[0] = 1
+        for i in range(1, n):
+            result[i] = result[i - 1] * nums[i - 1]
+
+        suffix = 1
+        for i in range(n - 1, -1, -1):
+            result[i] *= suffix
+            suffix *= nums[i]
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода по массиву — O(n). result не считается доп. памятью (это ответ). Только переменная suffix — O(1).`,
 expl:`Для каждого i нужно произведение всего, кроме nums[i]. Делим задачу: prefix[i] = product(0..i-1), suffix[i] = product(i+1..n-1). Первый проход строит prefix в result[], второй — досчитывает suffix на ходу переменной suffix и умножает. Деление не нужно.`,
@@ -6767,6 +9614,29 @@ code:`class Solution {
         return water;
     }
 }`,
+py:`class Solution:
+    def trap(self, height):
+        left = 0
+        right = len(height) - 1
+        max_left = 0
+        max_right = 0
+        water = 0
+
+        while left < right:
+            if height[left] <= height[right]:
+                if height[left] >= max_left:
+                    max_left = height[left]
+                else:
+                    water += max_left - height[left]
+                left += 1
+            else:
+                if height[right] >= max_right:
+                    max_right = height[right]
+                else:
+                    water += max_right - height[right]
+                right -= 1
+
+        return water`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход двумя указателями — O(n). Только 4 переменные — O(1) памяти.`,
 expl:`Уровень воды определяется меньшим из двух ограничивающих столбиков слева и справа.
@@ -6833,6 +9703,26 @@ code:`class Solution {
         return result;  // возвращаем максимальную длину горы
     }
 }`,
+py:`class Solution:
+    def longestMountain(self, arr):
+        n = len(arr)
+        up = [0] * n
+        down = [0] * n
+
+        for i in range(1, n):
+            if arr[i] > arr[i - 1]:
+                up[i] = up[i - 1] + 1
+
+        for i in range(n - 2, -1, -1):
+            if arr[i] > arr[i + 1]:
+                down[i] = down[i + 1] + 1
+
+        result = 0
+        for i in range(n):
+            if up[i] > 0 and down[i] > 0:
+                result = max(result, up[i] + down[i] + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Три прохода по массиву — O(n). Два вспомогательных массива up[] и down[] — O(n) памяти.`,
 expl:`up[i] считает сколько шагов строго вверх завершается в i, down[i] — сколько шагов строго вниз начинается в i. Вершина горы — позиция, где оба > 0. Длина горы = up[i] + down[i] + 1 (сама вершина).`,
@@ -6910,6 +9800,24 @@ code2:`class Solution {
         return c; // уже нижний регистр или цифра
     }
 }`,
+py:`class Solution:
+    def isPalindrome(self, s):
+        left = 0
+        right = len(s) - 1
+
+        while left < right:
+            while left < right and not s[left].isalnum():
+                left += 1
+            while left < right and not s[right].isalnum():
+                right -= 1
+
+            if s[left].lower() != s[right].lower():
+                return False
+
+            left += 1
+            right -= 1
+
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход двумя указателями — O(n). Никаких дополнительных структур — O(1).`,
 expl:`Два указателя с концов, пропускаем не-алфавитные символы. Сравниваем без регистра. O(n) время, O(1) память.`,
@@ -6937,6 +9845,21 @@ code:`class Solution {
         return new int[]{-1, -1};
     }
 }`,
+py:`class Solution:
+    def twoSum(self, numbers, target):
+        left = 0
+        right = len(numbers) - 1
+
+        while left < right:
+            current = numbers[left] + numbers[right]
+            if current == target:
+                return [left + 1, right + 1]
+            if current < target:
+                left += 1
+            else:
+                right -= 1
+
+        return [-1, -1]`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). Только два указателя — O(1).`,
 expl:`Отсортированность даёт монотонность суммы: меньше — двигаем левый, больше — правый. Гарантированно находим за O(n).`,
@@ -6962,6 +9885,15 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def reverseString(self, s):
+        left = 0
+        right = len(s) - 1
+
+        while left < right:
+            s[left], s[right] = s[right], s[left]
+            left += 1
+            right -= 1`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`n/2 свапов — O(n). In-place — O(1).`,
 expl:`Классика двух указателей с концов: меняем местами элементы, идём к центру. O(n) время, O(1) память.`,
@@ -6996,6 +9928,18 @@ code:`class Solution {
         return writePointer + 1;
     }
 }`,
+py:`class Solution:
+    def removeDuplicates(self, nums):
+        if not nums:
+            return 0
+
+        write = 0
+        for read in range(1, len(nums)):
+            if nums[read] != nums[write]:
+                write += 1
+                nums[write] = nums[read]
+
+        return write + 1`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). In-place — O(1).`,
 expl:`slow отстаёт от fast: slow фиксирует позицию последнего уникального. Новый уникальный элемент — записываем в slow+1. O(n) время, O(1) память.`,
@@ -7024,6 +9968,14 @@ code:`class Solution {
         return slow;
     }
 }`,
+py:`class Solution:
+    def removeElement(self, nums, val):
+        slow = 0
+        for fast in range(len(nums)):
+            if nums[fast] != val:
+                nums[slow] = nums[fast]
+                slow += 1
+        return slow`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). In-place — O(1).`,
 expl:`slow — курсор записи. Копируем в начало только нужные элементы (не равные val). O(n) время, O(1) память.`,
@@ -7062,6 +10014,16 @@ code2:`public void moveZeroes(int[] nums) {
         }
     }
 }`,
+py:`class Solution:
+    def moveZeroes(self, nums):
+        slow = 0
+        for fast in range(len(nums)):
+            if nums[fast] != 0:
+                nums[slow] = nums[fast]
+                slow += 1
+        while slow < len(nums):
+            nums[slow] = 0
+            slow += 1`,
 complexity:`Время: O(n), Память: O(1) доп. (индексы slow/fast; массив in-place)`,
 complexityExpl:`До двух проходов по массиву длины n. Только индексы — O(1) доп. памяти.`,
 expl:`Идея здесь та же, что и в другой версии Move Zeroes: не нужно тасовать нули по одному. Код держит slow как позицию, куда должен встать следующий ненулевой элемент, и одним проходом сдвигает все полезные значения влево. После этого всё, что осталось справа от slow, уже должно быть нулями, и хвост просто дозаполняется.`,
@@ -7089,6 +10051,17 @@ code:`class Solution {
         return i == s.length();
     }
 }`,
+py:`class Solution:
+    def isSubsequence(self, s, t):
+        i = 0
+        j = 0
+
+        while i < len(s) and j < len(t):
+            if s[i] == t[j]:
+                i += 1
+            j += 1
+
+        return i == len(s)`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по t — O(n). Только два указателя — O(1).`,
 expl:`Жадно ищем символы s в t. Нашли — сдвигаем i. Прошли всю t — если i достиг конца s, то s — подпоследовательность. O(n) время, O(1) память.`,
@@ -7127,6 +10100,24 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def validPalindrome(self, s):
+        left = 0
+        right = len(s) - 1
+        while left < right:
+            if s[left] != s[right]:
+                return self.isPalin(s, left + 1, right) or self.isPalin(s, left, right - 1)
+            left += 1
+            right -= 1
+        return True
+
+    def isPalin(self, s, left, right):
+        while left < right:
+            if s[left] != s[right]:
+                return False
+            left += 1
+            right -= 1
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Основной проход + одна дополнительная проверка — O(n). Только указатели — O(1).`,
 expl:`При первом несовпадении пробуем пропустить один символ (левый или правый) и проверяем остаток. Не более одного пропуска — O(n) время.`,
@@ -7152,6 +10143,21 @@ code:`class Solution {
         return max;
     }
 }`,
+py:`class Solution:
+    def maxArea(self, height):
+        left = 0
+        right = len(height) - 1
+        best = 0
+
+        while left < right:
+            area = min(height[left], height[right]) * (right - left)
+            best = max(best, area)
+            if height[left] < height[right]:
+                left += 1
+            else:
+                right -= 1
+
+        return best`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). Только три переменные — O(1).`,
 expl:`Объём ограничен меньшей стенкой. Двигая меньшую стенку — единственный шанс найти большее. Двигать большую бессмысленно: ширина уменьшится, а высота не вырастет. O(n) время.`,
@@ -7185,6 +10191,33 @@ code:`class Solution {
         return res;
     }
 }`,
+py:`class Solution:
+    def threeSum(self, nums):
+        nums.sort()
+        result = []
+
+        for i in range(len(nums) - 2):
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+
+            left = i + 1
+            right = len(nums) - 1
+            while left < right:
+                total = nums[i] + nums[left] + nums[right]
+                if total == 0:
+                    result.append([nums[i], nums[left], nums[right]])
+                    while left < right and nums[left] == nums[left + 1]:
+                        left += 1
+                    while left < right and nums[right] == nums[right - 1]:
+                        right -= 1
+                    left += 1
+                    right -= 1
+                elif total < 0:
+                    left += 1
+                else:
+                    right -= 1
+
+        return result`,
 complexity:`Время: O(n²), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n) + двойной проход O(n²). Хранение результата не считается — O(1) доп. памяти.`,
 expl:`Сортируем, фиксируем i. Для остатка — классические two pointers: sum < 0 → left++, sum > 0 → right--. Пропуск дубликатов гарантирует уникальность. O(n²).`,
@@ -7251,6 +10284,28 @@ code:`class Solution {
         return closest;
     }
 }`,
+py:`class Solution:
+    def threeSumClosest(self, nums, target):
+        nums.sort()
+        closest = nums[0] + nums[1] + nums[2]
+
+        for i in range(len(nums) - 2):
+            left = i + 1
+            right = len(nums) - 1
+
+            while left < right:
+                total = nums[i] + nums[left] + nums[right]
+                if abs(total - target) < abs(closest - target):
+                    closest = total
+
+                if total < target:
+                    left += 1
+                elif total > target:
+                    right -= 1
+                else:
+                    return total
+
+        return closest`,
 complexity:`Время: O(n²), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n) + two pointers O(n²). O(1) доп. памяти.`,
 expl:`Для этой задачи не существует алгоритма лучше, чем O(n²).
@@ -7289,6 +10344,36 @@ code:`class Solution {
         return res;
     }
 }`,
+py:`class Solution:
+    def fourSum(self, nums, target):
+        nums.sort()
+        result = []
+
+        for i in range(len(nums) - 3):
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+            for j in range(i + 1, len(nums) - 2):
+                if j > i + 1 and nums[j] == nums[j - 1]:
+                    continue
+
+                left = j + 1
+                right = len(nums) - 1
+                while left < right:
+                    total = nums[i] + nums[j] + nums[left] + nums[right]
+                    if total == target:
+                        result.append([nums[i], nums[j], nums[left], nums[right]])
+                        while left < right and nums[left] == nums[left + 1]:
+                            left += 1
+                        while left < right and nums[right] == nums[right - 1]:
+                            right -= 1
+                        left += 1
+                        right -= 1
+                    elif total < target:
+                        left += 1
+                    else:
+                        right -= 1
+
+        return result`,
 complexity:`Время: O(n³), Память: O(1)`,
 complexityExpl:`Три вложенных прохода — O(n³). O(1) доп. памяти.`,
 expl:`Расширение 3Sum: фиксируем два элемента, на остатке — two pointers. Пропуск дубликатов на каждом уровне. O(n³).`,
@@ -7317,6 +10402,22 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def sortColors(self, nums):
+        low = 0
+        mid = 0
+        high = len(nums) - 1
+
+        while mid <= high:
+            if nums[mid] == 0:
+                nums[low], nums[mid] = nums[mid], nums[low]
+                low += 1
+                mid += 1
+            elif nums[mid] == 2:
+                nums[mid], nums[high] = nums[high], nums[mid]
+                high -= 1
+            else:
+                mid += 1`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). In-place три указателя — O(1).`,
 expl:`Dutch National Flag: low..mid-1 — нули, mid..high — единицы (необработанные), high+1..n-1 — двойки. Один проход. O(n) время, O(1) память.`,
@@ -7349,6 +10450,22 @@ code:`public class Solution {
         return null;
     }
 }`,
+py:`class Solution:
+    def detectCycle(self, head):
+        slow = head
+        fast = head
+
+        while fast is not None and fast.next is not None:
+            slow = slow.next
+            fast = fast.next.next
+            if slow is fast:
+                slow = head
+                while slow is not fast:
+                    slow = slow.next
+                    fast = fast.next
+                return slow
+
+        return None`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода — O(n). Только два указателя — O(1).`,
 expl:`Алгоритм Флойда: fast и slow встречаются внутри цикла. После встречи — slow в head, двигаем оба по 1 шагу: встретятся ровно в начале цикла (математически доказуемо). O(n), O(1).`,
@@ -7397,6 +10514,23 @@ code2:`class Solution {
         return xor;
     }
 }`,
+py:`class Solution:
+    def findDuplicate(self, nums):
+        slow = nums[0]
+        fast = nums[0]
+
+        while True:
+            slow = nums[slow]
+            fast = nums[nums[fast]]
+            if slow == fast:
+                break
+
+        slow = nums[0]
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[fast]
+
+        return slow`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Два прохода по списку — O(n). Только два указателя — O(1).`,
 expl:`Массив как связный список: индекс i ведёт в nums[i]. Дубликат создаёт цикл. Алгоритм Флойда находит вход в цикл = дублирующее число. O(n), O(1).`,
@@ -7424,6 +10558,25 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def characterReplacement(self, s, k):
+        count = [0] * 26
+        left = 0
+        max_count = 0
+        result = 0
+
+        for right, ch in enumerate(s):
+            idx = ord(ch) - ord('A')
+            count[idx] += 1
+            max_count = max(max_count, count[idx])
+
+            while (right - left + 1) - max_count > k:
+                count[ord(s[left]) - ord('A')] -= 1
+                left += 1
+
+            result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). Массив из 26 символов — O(1).`,
 expl:`Заменять нужно все символы кроме самого частого. Если замен больше k — сужаем окно. maxCount не уменьшаем (нас интересует максимальное окно). O(n) время, O(1) память.`,
@@ -7451,6 +10604,23 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def numSubarrayProductLessThanK(self, nums, k):
+        if k <= 1:
+            return 0
+
+        left = 0
+        product = 1
+        count = 0
+
+        for right, num in enumerate(nums):
+            product *= num
+            while product >= k:
+                product //= nums[left]
+                left += 1
+            count += right - left + 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход — O(n). Только три переменные — O(1).`,
 expl:`Для каждого right — максимальное окно с product < k. Новых подмассивов, заканчивающихся на right: right - left + 1. O(n) время, O(1) память.`,
@@ -7478,6 +10648,20 @@ code:`class Solution {
         return boats;
     }
 }`,
+py:`class Solution:
+    def numRescueBoats(self, people, limit):
+        people.sort()
+        left = 0
+        right = len(people) - 1
+        boats = 0
+
+        while left <= right:
+            if people[left] + people[right] <= limit:
+                left += 1
+            right -= 1
+            boats += 1
+
+        return boats`,
 complexity:`Время: O(n log n), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n), один проход O(n). O(1) доп. памяти.`,
 expl:`Самый тяжёлый всегда занимает лодку. Если с ним помещается самый лёгкий — берём обоих. Сортировка + two pointers: O(n log n) время, O(1) память.`,
@@ -7504,6 +10688,24 @@ code:`class Solution {
         return res.toArray(new int[0][]);
     }
 }`,
+py:`class Solution:
+    def intervalIntersection(self, first, second):
+        result = []
+        i = 0
+        j = 0
+
+        while i < len(first) and j < len(second):
+            lo = max(first[i][0], second[j][0])
+            hi = min(first[i][1], second[j][1])
+            if lo <= hi:
+                result.append([lo, hi])
+
+            if first[i][1] < second[j][1]:
+                i += 1
+            else:
+                j += 1
+
+        return result`,
 complexity:`Время: O(n+m), Память: O(1)`,
 complexityExpl:`Один проход по обоим спискам — O(n+m). Только два указателя — O(1) доп. памяти.`,
 expl:`Два указателя: пересечение двух отрезков — max начал до min концов. Интервал с меньшим концом больше не пересечётся с текущим — двигаем его. O(n+m) время.`,
@@ -7530,6 +10732,22 @@ code:`class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def longestOnes(self, nums, k):
+        left = 0
+        zeros = 0
+        result = 0
+
+        for right, num in enumerate(nums):
+            if num == 0:
+                zeros += 1
+            while zeros > k:
+                if nums[left] == 0:
+                    zeros -= 1
+                left += 1
+            result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n) (right и left только вперёд по массиву), Память: O(1) доп. (left, right, zeros, result — константное число целых)`,
 complexityExpl:`Каждый индекс добавляется в окно и может вытолкнуться слева не более одного раза — O(n).`,
 expl:`Если смотреть на задачу правильно, мы ищем самое длинное окно, внутри которого можно "потратить" не больше k удалений нулей. Поэтому код держит количество нулей внутри текущего окна и расширяет right, пока ограничение не нарушено. Когда нулей стало слишком много, left двигается вправо, пока окно снова не станет допустимым. Максимальная длина такого окна и есть ответ.`,
@@ -7563,6 +10781,21 @@ code:`class Solution {
         return sb.toString();
     }
 }`,
+py:`class Solution:
+    def mergeAlternately(self, word1, word2):
+        parts = []
+        p1 = 0
+        p2 = 0
+
+        while p1 < len(word1) and p2 < len(word2):
+            parts.append(word1[p1])
+            p1 += 1
+            parts.append(word2[p2])
+            p2 += 1
+
+        parts.append(word1[p1:])
+        parts.append(word2[p2:])
+        return ''.join(parts)`,
 complexity:`Время: O(n+m), Память: O(n+m)`,
 complexityExpl:`Один проход по обеим строкам — O(n+m). StringBuilder — O(n+m) памяти.`,
 expl:`Два указателя на две строки. Поочерёдный выбор символов, затем дописываем хвост. O(n+m) время и память.`,
@@ -7619,6 +10852,27 @@ public class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def findDifference(self, nums1, nums2):
+        result = []
+        p1 = 0
+        p2 = 0
+
+        while p1 < len(nums1):
+            if p2 >= len(nums2):
+                result.append(nums1[p1])
+                p1 += 1
+                continue
+
+            if nums1[p1] < nums2[p2]:
+                result.append(nums1[p1])
+                p1 += 1
+            elif nums1[p1] > nums2[p2]:
+                p2 += 1
+            else:
+                p1 += 1
+
+        return result`,
 complexity:`Время: O(n+m), Память: O(k)`,
 complexityExpl:`Оба указателя движутся только вперёд: p1 не более n шагов, p2 не более m шагов, значит суммарно O(n+m). Дополнительная память нужна только под ответ из k элементов.`,
 expl:`Главная идея — использовать два указателя на отсортированных массивах. Если nums1[p1] меньше nums2[p2], текущее значение из nums1 уже точно не встретится дальше в nums2, значит его надо добавить в ответ. Если nums1[p1] больше, двигаем p2 и догоняем. Если значения равны, это число нужно удалить из ответа полностью, поэтому просто пропускаем элемент в nums1. За счёт того, что p2 остаётся на том же значении, все дубли этого числа в nums1 тоже будут пропущены.`,
@@ -7682,6 +10936,39 @@ class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def findNearestNumbers(self, nums, idx, k):
+        if k == 0:
+            return []
+
+        result = [nums[idx]]
+        ref = nums[idx]
+        left = idx - 1
+        right = idx + 1
+
+        for _ in range(k - 1):
+            can_take_left = left >= 0
+            can_take_right = right < len(nums)
+
+            if not can_take_right:
+                result.append(nums[left])
+                left -= 1
+                continue
+            if not can_take_left:
+                result.append(nums[right])
+                right += 1
+                continue
+
+            left_dist = abs(ref - nums[left])
+            right_dist = abs(ref - nums[right])
+            if left_dist <= right_dist:
+                result.append(nums[left])
+                left -= 1
+            else:
+                result.append(nums[right])
+                right += 1
+
+        return result`,
 complexity:`Время: O(k), Память: O(k)`,
 complexityExpl:`Ровно k−1 итераций расширения от центра, на шаг константная работа — O(k). Новый список длины k — O(k) памяти.`,
 expl:`Массив отсортирован, опорное значение ref = nums[idx]. Разносим указатели влево и вправо как у слияния: всегда добавляем конец с меньшим расстоянием до ref; при равенстве — левый (меньший элемент). O(k) время и память.`,
@@ -7727,6 +11014,31 @@ code:`class Solution {
         return true;
     }
 }`,
+py:`class Solution:
+    def isPalindrome(self, head):
+        slow = head
+        fast = head
+        while fast is not None and fast.next is not None:
+            slow = slow.next
+            fast = fast.next.next
+
+        prev = None
+        curr = slow
+        while curr is not None:
+            nxt = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nxt
+
+        left = head
+        right = prev
+        while right is not None:
+            if left.val != right.val:
+                return False
+            left = left.next
+            right = right.next
+
+        return True`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Проходим список для поиска середины, затем для разворота второй половины и сравнения — суммарно O(n). Дополнительные указатели занимают O(1).`,
 expl:`Ищем середину двумя указателями. Разворачиваем вторую половину списка in-place. После этого сравниваем первую половину с развёрнутой второй узел к узлу. Если все значения совпали — это палиндром.`,
@@ -7764,6 +11076,23 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def reverseWords(self, s):
+        arr = list(s)
+        start = 0
+
+        for i in range(len(arr) + 1):
+            if i == len(arr) or arr[i] == ' ':
+                self.reverse(arr, start, i - 1)
+                start = i + 1
+
+        return ''.join(arr)
+
+    def reverse(self, arr, left, right):
+        while left < right:
+            arr[left], arr[right] = arr[right], arr[left]
+            left += 1
+            right -= 1`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход для поиска границ слов и локальные развороты суммарно покрывают каждый символ константное число раз — O(n). char[] копия строки занимает O(n) памяти.`,
 expl:`Сканируем строку слева направо. Как только встретили пробел или конец массива, разворачиваем текущий диапазон символов слова in-place в char[]. Затем продолжаем со следующего слова.`,
@@ -7805,6 +11134,50 @@ code:`public class ZigzagIterator {
         return i1.hasNext() || i2.hasNext();
     }
 }`,
+py:`class ZigzagIterator:
+    def __init__(self, v1, v2):
+        self.i1 = iter(v1)
+        self.i2 = iter(v2)
+        self.next1 = None
+        self.next2 = None
+        self.has1 = False
+        self.has2 = False
+        self.turn = True
+        self._advance1()
+        self._advance2()
+        if not self.has1 and self.has2:
+            self.turn = False
+
+    def _advance1(self):
+        try:
+            self.next1 = next(self.i1)
+            self.has1 = True
+        except StopIteration:
+            self.next1 = None
+            self.has1 = False
+
+    def _advance2(self):
+        try:
+            self.next2 = next(self.i2)
+            self.has2 = True
+        except StopIteration:
+            self.next2 = None
+            self.has2 = False
+
+    def next(self):
+        if (self.turn and self.has1) or not self.has2:
+            result = self.next1
+            self._advance1()
+            self.turn = self.has2
+            return result
+        else:
+            result = self.next2
+            self._advance2()
+            self.turn = self.has1
+            return result
+
+    def hasNext(self):
+        return self.has1 or self.has2`,
 complexity:`Время: O(1) на вызов next/hasNext (константное число операций с итераторами), Память: O(1) доп. (две ссылки на Iterator + boolean turn; сами списки v1/v2 — вход)`,
 complexityExpl:`Каждый вызов next/hasNext делает константное число проверок и переходов по итераторам. Храним только два итератора и флаг turn — O(1) памяти.`,
 expl:`Здесь важно не просто склеить два списка, а честно чередовать их, причём один источник может закончиться раньше другого. Поэтому код хранит оба итератора и флаг очереди, но берёт элемент из "текущего" только если у того ещё есть данные; иначе сразу переключается на другой источник. То есть реальная идея не в boolean как таковом, а в round-robin по непустым итераторам. Именно поэтому follow-up для k списков естественно обобщается в очередь итераторов.`,
@@ -7855,6 +11228,28 @@ code:`class Solution {
         return from + "->" + to;
     }
 }`,
+py:`class Solution:
+    def findMissingRanges(self, nums, lower, upper):
+        result = []
+        expect = lower
+        idx = 0
+
+        while idx < len(nums):
+            current = nums[idx]
+            if current > expect:
+                result.append(self.formatRange(expect, current - 1))
+            expect = current + 1
+            idx += 1
+
+        if expect <= upper:
+            result.append(self.formatRange(expect, upper))
+
+        return result
+
+    def formatRange(self, start, end):
+        if start == end:
+            return str(start)
+        return f"{start}->{end}"`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по nums с expect — O(n). Список строк — O(1) доп. памяти кроме вывода.`,
 expl:`Ожидаемое значение expect; при разрыве добавляем диапазон через formatRange (как в Summary Ranges). O(n).`,
@@ -7888,6 +11283,22 @@ code:`class Solution {
         return list;
     }
 }`,
+py:`class Solution:
+    def summaryRanges(self, nums):
+        result = []
+        i = 0
+
+        while i < len(nums):
+            start = nums[i]
+            while i + 1 < len(nums) and nums[i + 1] == nums[i] + 1:
+                i += 1
+            if start == nums[i]:
+                result.append(str(start))
+            else:
+                result.append(f"{start}->{nums[i]}")
+            i += 1
+
+        return result`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Указатель с расширением непрерывных отрезков — O(n). Список строк — O(1) доп. памяти.`,
 expl:`Группируем последовательные числа (nums[i+1] == nums[i] + 1). Одиночные — как число, диапазоны — как "start->end". O(n) время, O(1) доп. память.`,
@@ -7930,6 +11341,25 @@ code:`class Solution {
         return result.toArray(new int[result.size()][]);
     }
 }`,
+py:`class Solution:
+    def intervalIntersection(self, firstList, secondList):
+        result = []
+        i = 0
+        j = 0
+
+        while i < len(firstList) and j < len(secondList):
+            lo = max(firstList[i][0], secondList[j][0])
+            hi = min(firstList[i][1], secondList[j][1])
+
+            if lo <= hi:
+                result.append([lo, hi])
+
+            if firstList[i][1] < secondList[j][1]:
+                i += 1
+            else:
+                j += 1
+
+        return result`,
 complexity:`Время: O(n + m), Память: O(1)`,
 complexityExpl:`Два указателя по спискам интервалов — O(n+m). Указатели — O(1) памяти.`,
 expl:`Два указателя по спискам. Пересечение = [max(starts), min(ends)], если lo <= hi. Двигаем указатель, чей интервал заканчивается раньше. O(n+m) время.`},
@@ -7969,6 +11399,24 @@ class Solution {
         return out.toArray(new int[0][]);
     }
 }`,
+py:`class Solution:
+    def intersectSegments(self, segments1, segments2):
+        out = []
+        i = 0
+        j = 0
+
+        while i < len(segments1) and j < len(segments2):
+            lo = max(segments1[i][0], segments2[j][0])
+            hi = min(segments1[i][1], segments2[j][1])
+            if lo <= hi:
+                out.append([lo, hi])
+
+            if segments1[i][1] < segments2[j][1]:
+                i += 1
+            else:
+                j += 1
+
+        return out`,
 complexity:`Время: O(n + m), Память: O(1) доп. кроме ответа`,
 complexityExpl:`Каждый указатель двигается только вперёд — суммарно O(n+m). Константное число переменных — O(1) доп. памяти.`,
 expl:`Инвариант как у слияния двух отсортированных списков интервалов: текущая пара — единственная кандидатура на ненулевое пересечение на этом шаге. После обработки отбрасываем отрезок, который раньше заканчивается — он уже не пересечётся с «хвостом» другого.`,
@@ -8008,6 +11456,25 @@ code:`class Solution {
         return C;
     }
 }`,
+py:`class Solution:
+    def findThePrefixCommonArray(self, A, B):
+        n = len(A)
+        freq = [0] * (n + 1)
+        result = [0] * n
+        common = 0
+
+        for i in range(n):
+            freq[A[i]] += 1
+            if freq[A[i]] == 2:
+                common += 1
+
+            freq[B[i]] += 1
+            if freq[B[i]] == 2:
+                common += 1
+
+            result[i] = common
+
+        return result`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один цикл с обновлением freq и счётчика общих — O(n). Массивы freq и C — O(n) памяти.`,
 expl:`Перестановки содержат числа 1..n по одному разу. freq[v] считает суммарные вхождения. Когда freq == 2 — число встречено в обоих массивах. O(n) время и память.`},
@@ -8040,6 +11507,22 @@ code:`class Solution {
         return maxLen;
     }
 }`,
+py:`class Solution:
+    def findLengthOfLCIS(self, nums):
+        if not nums:
+            return 0
+
+        max_len = 1
+        cur_len = 1
+
+        for i in range(1, len(nums)):
+            if nums[i] > nums[i - 1]:
+                cur_len += 1
+                max_len = max(max_len, cur_len)
+            else:
+                cur_len = 1
+
+        return max_len`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с curLen — O(n). Несколько переменных — O(1) памяти.`,
 expl:`Один проход: если nums[i] > nums[i-1] — увеличиваем текущую длину. Иначе сбрасываем в 1. Отслеживаем максимум. O(n) время, O(1) память.`,
@@ -8073,6 +11556,16 @@ code:`class Solution {
         return (double) maxSum / k;
     }
 }`,
+py:`class Solution:
+    def findMaxAverage(self, nums, k):
+        current_sum = sum(nums[:k])
+        max_sum = current_sum
+
+        for right in range(k, len(nums)):
+            current_sum += nums[right] - nums[right - k]
+            max_sum = max(max_sum, current_sum)
+
+        return max_sum / k`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход по массиву с фиксированным окном — O(n). Только несколько переменных — O(1) памяти.`,
 expl:`Фиксированное окно длины k. Инициализируем сумму первых k элементов, затем сдвигаем окно за один проход: прибавляем правый, вычитаем левый. Отслеживаем максимальную сумму, делим на k.`,
@@ -8109,6 +11602,21 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def numOfSubarrays(self, arr, k, threshold):
+        current_sum = sum(arr[:k])
+        count = 0
+        target = threshold * k
+
+        if current_sum > target:
+            count += 1
+
+        for right in range(k, len(arr)):
+            current_sum += arr[right] - arr[right - k]
+            if current_sum > target:
+                count += 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Один проход с фиксированным окном — O(n). Только несколько переменных — O(1) памяти.`,
 expl:`Вместо сравнения среднего (sum/k > threshold) умножаем порог: sum > threshold*k — избегаем деления. Фиксированное окно длины k сдвигается за один проход.`,
@@ -8179,6 +11687,20 @@ class Solution {
         return maxLength;
     }
 }`,
+py:`class Solution:
+    def lengthOfLongestSubstring(self, s):
+        last_index = [-1] * 128
+        left = 0
+        result = 0
+
+        for right, ch in enumerate(s):
+            idx = ord(ch)
+            if last_index[idx] >= left:
+                left = last_index[idx] + 1
+            last_index[idx] = right
+            result = max(result, right - left + 1)
+
+        return result`,
 complexity:`Время: O(n), Память: O(min(n, m))`,
 complexityExpl:`Каждый символ добавляется и удаляется из set не более одного раза — O(n). Set хранит символы текущего окна — O(min(n,m)), где m — размер алфавита.`,
 expl:`Скользящее окно: расширяем right. При повторном символе наивно сжимали бы left по одному, но зная последнюю позицию символа можно прыгнуть сразу: left = lastIndex[c] + 1. Прыгаем только вперёд — если lastIndex[c] < left, символ уже вне окна, прыгать не нужно.
@@ -8217,6 +11739,19 @@ code:`public long countSubstrings(String s) {
 
     return count;
 }`,
+py:`class Solution:
+    def countSubstrings(self, s):
+        last_seen_plus_one = [0] * 128
+        count = 0
+        left = 0
+
+        for right, ch in enumerate(s):
+            idx = ord(ch)
+            left = max(left, last_seen_plus_one[idx])
+            last_seen_plus_one[idx] = right + 1
+            count += right - left + 1
+
+        return count`,
 complexity:`Время: O(n), Память: O(min(n, |Σ|))`,
 complexityExpl:`Каждый индекс входит в окно и выходит из него не более одного раза — O(n) по времени. В множестве не больше уникальных символов алфавита — O(min(n, |Σ|)) памяти.`,
 expl:`Максимально расширяем окно вправо без повторов. Для фиксированного l любая подстрока s[l..k] при l ≤ k ≤ r уже уникальна по построению — ровно (r−l+1) штук. Сдвигаем l и повторяем.`,
@@ -8276,6 +11811,28 @@ code:`class Solution {
         return maxLen;
     }
 }`,
+py:`class Solution:
+    def lengthOfLongestSubstringKDistinct(self, s, k):
+        if k == 0 or not s:
+            return 0
+
+        freq = {}
+        left = 0
+        max_len = 0
+
+        for right, ch in enumerate(s):
+            freq[ch] = freq.get(ch, 0) + 1
+
+            while len(freq) > k:
+                left_ch = s[left]
+                freq[left_ch] -= 1
+                if freq[left_ch] == 0:
+                    del freq[left_ch]
+                left += 1
+
+            max_len = max(max_len, right - left + 1)
+
+        return max_len`,
 complexity:`Время: O(n) (|s| = n; каждый символ входит/выходит из окна ≤1 раз), Память: O(min(n, |Σ|)) (|Σ| — размер алфавита в условии; в map не больше числа различных символов в текущем окне)`,
 complexityExpl:`Каждый символ добавляется в окно и удаляется из него не более одного раза, поэтому оба указателя проходят строку линейно — O(n). HashMap хранит частоты символов текущего окна, максимум по числу разных символов в строке — O(min(n, |Σ|)).`,
 expl:`В лоб можно проверять все подстроки, но код опирается на более сильный инвариант: текущее окно всегда содержит не более k различных символов. Пока это условие выполняется, right можно спокойно расширять. Как только разных символов стало слишком много, нужно сдвигать left и уменьшать частоты, пока окно снова не станет валидным. После каждого такого восстановления инварианта длина окна становится кандидатом в ответ.`,
@@ -8320,6 +11877,28 @@ code:`class Solution {
         return sb.length() == 0 ? "0" : sb.toString();
     }
 }`,
+py:`class Solution:
+    def multiply(self, num1, num2):
+        m = len(num1)
+        n = len(num2)
+        result = [0] * (m + n)
+
+        for i in range(m - 1, -1, -1):
+            for j in range(n - 1, -1, -1):
+                mul = (ord(num1[i]) - ord('0')) * (ord(num2[j]) - ord('0'))
+                p1 = i + j
+                p2 = i + j + 1
+                total = mul + result[p2]
+
+                result[p2] = total % 10
+                result[p1] += total // 10
+
+        out = []
+        for digit in result:
+            if not (not out and digit == 0):
+                out.append(str(digit))
+
+        return '0' if not out else ''.join(out)`,
 complexity:`Время: O(m·n), Память: O(m+n)`,
 complexityExpl:`Вложенные циклы по парам цифр — O(m·n). Массив result[m+n] — O(m+n) памяти.`,
 expl:`Умножение столбиком: произведение цифр num1[i] и num2[j] попадает в позиции [i+j] и [i+j+1]. Обработка переноса встроена. Ведущие нули удаляются. O(m×n) время.`},
@@ -8356,6 +11935,23 @@ code:`class Solution {
         return sb.reverse().toString();
     }
 }`,
+py:`class Solution:
+    def addStrings(self, num1, num2):
+        out = []
+        i = len(num1) - 1
+        j = len(num2) - 1
+        carry = 0
+
+        while i >= 0 or j >= 0 or carry > 0:
+            a = ord(num1[i]) - ord('0') if i >= 0 else 0
+            b = ord(num2[j]) - ord('0') if j >= 0 else 0
+            total = a + b + carry
+            out.append(str(total % 10))
+            carry = total // 10
+            i -= 1
+            j -= 1
+
+        return ''.join(reversed(out))`,
 complexity:`Время: O(max(n, m)), Память: O(max(n, m))`,
 complexityExpl:`Один проход по цифрам справа налево с переносом — O(max(n,m)). StringBuilder хранит итоговую строку длины до max(n,m)+1 — O(max(n,m)).`,
 expl:`Складываем числа как в столбик: берём текущие цифры справа, прибавляем carry, пишем младший разряд в результат и обновляем carry. Так как цифры добавляются с конца, в финале разворачиваем StringBuilder.`,
@@ -8402,6 +11998,22 @@ code:`class Solution {
         return maxDist;
     }
 }`,
+py:`class Solution:
+    def maxDistToClosest(self, spots):
+        n = len(spots)
+        max_dist = 0
+        last_occupied = -1
+
+        for i, spot in enumerate(spots):
+            if spot == 1:
+                if last_occupied == -1:
+                    max_dist = i
+                else:
+                    max_dist = max(max_dist, (i - last_occupied) // 2)
+                last_occupied = i
+
+        max_dist = max(max_dist, n - 1 - last_occupied)
+        return max_dist`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при движении l и r — O(n). Только несколько целых — O(1) доп. памяти.`,
 expl:`Свободные места разбиты на непрерывные блоки нулей. У левого или правого края оптимально встать в край блока — расстояние до ближайшей единицы равно длине блока. Между двумя единицами оптимум в середине: минимальное из двух расстояний максимизируется как ⌈длина/2⌉, что для целых длин совпадает с (r−l+2)/2.`,
@@ -8456,6 +12068,35 @@ public class Solution {
         return result;
     }
 }`,
+py:`class Solution:
+    def merge(self, nums1, nums2):
+        nums1.sort(key=lambda pair: pair[0])
+        nums2.sort(key=lambda pair: pair[0])
+
+        p1 = 0
+        p2 = 0
+        current_value1 = 0
+        current_value2 = 0
+        result = []
+
+        while p1 < len(nums1) or p2 < len(nums2):
+            has1 = p1 < len(nums1)
+            has2 = p2 < len(nums2)
+
+            time1 = nums1[p1][0] if has1 else float('inf')
+            time2 = nums2[p2][0] if has2 else float('inf')
+            time = min(time1, time2)
+
+            if time1 == time:
+                current_value1 = nums1[p1][1]
+                p1 += 1
+            if time2 == time:
+                current_value2 = nums2[p2][1]
+                p2 += 1
+
+            result.append([time, current_value1 + current_value2])
+
+        return result`,
 complexity:`Время: O(n log n + m log m), Память: O(n + m)`,
 complexityExpl:`Сортировка — O(n log n) и O(m log m). Слияние указателями — O(n+m). Список результата — O(n+m) пар.`,
 expl:`Каждый график — кусочно-постоянная функция времени. После сортировки сливаем уникальные моменты времени как при merge двух отсортированных последовательностей: при совпадении времени с очередной точкой графика обновляем его текущее значение и сдвигаем указатель; в ответ всегда пишем сумму двух текущих значений.`,
@@ -8585,6 +12226,48 @@ class UserStatistics {
 }
 
 `,
+py:`from collections import deque
+
+
+class Event:
+    def __init__(self, time, user_id):
+        self.time = time
+        self.user_id = user_id
+
+
+class UserStatistics:
+    def __init__(self, k, limit):
+        self.k = k
+        self.limit = limit
+        self.queue = deque()
+        self.freq = {}
+        self.hot_count = 0
+
+    def event(self, now, user_id):
+        self.expire(now)
+        self.queue.append(Event(now, user_id))
+        count = self.freq.get(user_id, 0) + 1
+        self.freq[user_id] = count
+        if count == self.limit:
+            self.hot_count += 1
+
+    def robotCount(self, now):
+        self.expire(now)
+        return self.hot_count
+
+    def expire(self, now):
+        window_start = now - self.k
+        while self.queue and self.queue[0].time < window_start:
+            oldest = self.queue.popleft()
+            user_id = oldest.user_id
+            count = self.freq[user_id]
+            if count == self.limit:
+                self.hot_count -= 1
+
+            if count == 1:
+                del self.freq[user_id]
+            else:
+                self.freq[user_id] = count - 1`,
 complexity:`Время: амортизированно O(1) на вызов, Память: O(число событий в окне)`,
 complexityExpl:`Каждое событие один раз попадает в дек и один раз из него удаляется — за всю последовательность линейно по числу событий.`,
 expl:`Скользящее окно по времени: дек хранит события в порядке прихода. Карта — сколько запросов у каждого userId внутри окна. hotCount увеличивается, когда частота пользователя впервые становится >= limit, и уменьшается, когда после удаления устаревших событий она падает ниже limit.`,
@@ -8636,6 +12319,22 @@ code:`class Solution {
         return maxDist;
     }
 }`,
+py:`class Solution:
+    def maxDistToClosest(self, seats):
+        n = len(seats)
+        max_dist = 0
+        last_occupied = -1
+
+        for i, seat in enumerate(seats):
+            if seat == 1:
+                if last_occupied == -1:
+                    max_dist = i
+                else:
+                    max_dist = max(max_dist, (i - last_occupied) // 2)
+                last_occupied = i
+
+        max_dist = max(max_dist, n - 1 - last_occupied)
+        return max_dist`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при одном проходе по массиву.`,
 expl:`Группируем подряд идущие нули в блоки. Крайние блоки дают полный размер как расстояние до ближайшей единицы. Внутренний блок между единицами даёт максимум в середине: ceil(len/2).`,
@@ -8691,6 +12390,33 @@ private void validateUppercaseLetter(char c) {
         throw new IllegalArgumentException();
     }
 }`,
+py:`class Solution:
+    def rle(self, s):
+        if s is None or not s:
+            raise ValueError()
+
+        out = []
+        i = 0
+        while i < len(s):
+            ch = s[i]
+            self.validateUppercaseLetter(ch)
+
+            count = 1
+            i += 1
+            while i < len(s) and s[i] == ch:
+                self.validateUppercaseLetter(s[i])
+                count += 1
+                i += 1
+
+            out.append(ch)
+            if count > 1:
+                out.append(str(count))
+
+        return ''.join(out)
+
+    def validateUppercaseLetter(self, ch):
+        if ch < 'A' or ch > 'Z':
+            raise ValueError()`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один линейный проход по строке. Дополнительная память — под результирующую строку.`,
 expl:`Сначала валидируем вход: строка считается невалидной, если содержит любой символ вне диапазона A-Z (а также если null/пустая). После этого группируем одинаковые соседние символы в блоки. Для каждого блока добавляем символ и, если длина блока больше 1, его размер.`,
@@ -8737,6 +12463,36 @@ code:` public int findPermutation(String t, String s) {
 
       return -1;
   }`,
+py:`class Solution:
+    def findPermutation(self, t, s):
+        if len(s) > len(t):
+            return -1
+
+        freq = [0] * 26
+        for ch in s:
+            freq[ord(ch) - ord('a')] += 1
+
+        window_len = len(s)
+        need = len(s)
+        left = 0
+
+        for right, ch in enumerate(t):
+            in_idx = ord(ch) - ord('a')
+            if freq[in_idx] > 0:
+                need -= 1
+            freq[in_idx] -= 1
+
+            if right - left + 1 > window_len:
+                out_idx = ord(t[left]) - ord('a')
+                if freq[out_idx] >= 0:
+                    need += 1
+                freq[out_idx] += 1
+                left += 1
+
+            if need == 0:
+                return left
+
+        return -1`,
 complexity:`Время: O(|T| + |S|), Память: O(1)`,
 complexityExpl:`Сначала заполняем freq по строке S за O(|S|), затем один раз проводим окно по T. Каждый символ T не более одного раза входит в окно и одного раза выходит, поэтому суммарно O(|T|). Массив freq[26] фиксированного размера — O(1) памяти.`,
 expl:`Подстрока длины |S| может быть перестановкой S только при совпадении частот. Вместо полного сравнения массивов на каждом шаге храним freq и счётчик need: при добавлении правого символа и удалении левого обновляем его за O(1). Поэтому после инициализации по S получаем один линейный проход по T: O(|T| + |S|), память O(1).`,
@@ -8796,6 +12552,37 @@ code:`public String searchPangram(String text, String alphabet) {
     
     return bestLeft == -1 ? "" : text.substring(bestLeft, bestLeft + minLen);
 }`,
+py:`class Solution:
+    def searchPangram(self, text, alphabet):
+        count = [0] * 128
+        for ch in alphabet:
+            count[ord(ch)] += 1
+
+        required = len(alphabet)
+        left = 0
+        min_len = float('inf')
+        best_left = -1
+
+        for right, ch in enumerate(text):
+            idx = ord(ch)
+            if count[idx] > 0:
+                required -= 1
+            count[idx] -= 1
+
+            while required == 0:
+                if right - left + 1 < min_len:
+                    min_len = right - left + 1
+                    best_left = left
+
+                left_idx = ord(text[left])
+                count[left_idx] += 1
+                if count[left_idx] > 0:
+                    required += 1
+                left += 1
+
+        if best_left == -1:
+            return ''
+        return text[best_left:best_left + min_len]`,
 complexity:`Время: O(n), Память: O(A), где A = размер алфавита (здесь 256)`,
 complexityExpl:`Каждый указатель (left/right) проходит строку не более одного раза. Доп. память — массивы частот/флагов фиксированного размера.`,
 expl:`Поддерживаем окно [left..right]. Когда окно покрывает все символы alphabet, сжимаем его слева до потери покрытия и обновляем лучший ответ. Первое найденное окно минимальной длины автоматически будет левейшим.`,
@@ -8847,6 +12634,26 @@ class Solution {
         return new ArrayList<>();
     }
 }`,
+py:`class Solution:
+    def findMeetingTime(self, nums1, nums2, duration):
+        i = 0
+        j = 0
+
+        while i < len(nums1) and j < len(nums2):
+            start1, end1 = nums1[i]
+            start2, end2 = nums2[j]
+
+            overlap = min(end1, end2) - max(start1, start2)
+            if overlap >= duration:
+                start = max(start1, start2)
+                return [start, start + duration]
+
+            if end1 < end2:
+                i += 1
+            else:
+                j += 1
+
+        return []`,
 complexity:`Время: O(n + m), Память: O(1)`,
 complexityExpl:`Каждый указатель проходит свой список не более одного раза — O(n+m). Храним только индексы и константное число целых — O(1).`,
 expl:`Пересечение двух текущих свободных отрезков — [max(start1,start2), min(end1,end2)]. Если его длина ≥ duration, самое раннее подходящее окно начинается в max(start1,start2). Если нет — отбрасываем интервал с меньшим end: он уже не даст более раннего пересечения с текущим партнёром.`,
@@ -8881,6 +12688,23 @@ code:`class Solution {
         return ans;
     }
 }`,
+py:`class Solution:
+    def minAbsDiff(self, a, b):
+        a.sort()
+        b.sort()
+
+        i = 0
+        j = 0
+        ans = float('inf')
+
+        while i < len(a) and j < len(b):
+            ans = min(ans, abs(a[i] - b[j]))
+            if a[i] < b[j]:
+                i += 1
+            else:
+                j += 1
+
+        return ans`,
 complexity:`Время: O(n log n + m log m) доминирует сортировка a и b + O(n+m) два указателя, Память: O(1) доп. к входу (только индексы i, j и ans; сортировка in-place — стек O(log n)+O(log m), обычно не выделяют отдельно)`,
 complexityExpl:`Доминирует сортировка двух массивов. После сортировки два указателя проходят массивы линейно за O(n+m).`,
 expl:`Без сортировки хочется сравнивать почти всё со всем, но это лишняя работа. После сортировки в каждый момент мы сравниваем текущие a[i] и b[j] и понимаем: улучшить ответ можно только двигая указатель у меньшего числа, потому что второй указатель и так стоит на ближайшем кандидате справа. Именно поэтому два указателя здесь проходят массивы линейно после сортировки.`,
@@ -8932,6 +12756,20 @@ code:`public class HitCounter {
         return queue.size();
     }
 }`,
+py:`from collections import deque
+
+
+class HitCounter:
+    def __init__(self):
+        self.queue = deque()
+
+    def hit(self, timestamp):
+        self.queue.append(timestamp)
+
+    def getHits(self, timestamp):
+        while self.queue and timestamp - self.queue[0] >= 300:
+            self.queue.popleft()
+        return len(self.queue)`,
 complexity:`Время: O(1) hit (одна операция с очередью), O(q) getHits в худшем (q — число устаревших записей в очереди; суммарно по жизни объекта O(число hit)), Память: O(q_max) (очередь хранит метки в окне 300 с)`,
 complexityExpl:`В базовой реализации очередь хранит все запросы из окна. hit — одна вставка O(1). getHits может удалить много устаревших элементов, в худшем O(n).`,
 expl:`По коду видно, что нас интересует не вся история запросов, а только скользящее окно последних 300 секунд. Для такой модели очередь подходит идеально: новые hit добавляются в хвост, а при getHits из головы выкидывается всё, что уже вышло из окна. После этой очистки размер очереди и есть правильный ответ. В follow-up мысль остаётся той же, просто события агрегируются по секундам в фиксированном кольце из 300 бакетов.`,
@@ -8987,6 +12825,18 @@ code2:`class RecentCounter {
         return queue.size();
     }
 }`,
+py:`class RecentCounter:
+    def __init__(self):
+        self.records = [0] * 10000
+        self.start = 0
+        self.end = 0
+
+    def ping(self, t):
+        while self.start < self.end and t - self.records[self.start] > 3000:
+            self.start += 1
+        self.records[self.end] = t
+        self.end += 1
+        return self.end - self.start`,
 complexity:`Решение 1 (массив+2 указателя): Время: O(1) амортизированно на ping, Память: O(n) (records хранит все добавленные времена; start/end — константное число индексов). Решение 2 (очередь): Время: O(1) амортизированно на ping, Память: O(w) (в очереди только окно [t-3000,t], где w — число запросов в окне)`,
 complexityExpl:`В обоих подходах каждый timestamp добавляется один раз и удаляется (или пропускается указателем) не более одного раза, поэтому суммарно линейно по числу вызовов, а на один ping — амортизированно O(1).`,
 expl:`Инвариант одинаковый: структура хранит только времена из актуального окна [t-3000, t]. После добавления нового t удаляем (или сдвигаем head) все значения < t-3000, затем размер структуры и есть ответ.`,
@@ -9031,6 +12881,27 @@ code:`class Solution {
         route.addFirst(airport);
     }
 }`,
+py:`import heapq
+
+class Solution:
+    def findItinerary(self, tickets):
+        graph = {}
+        for start, end in tickets:
+            graph.setdefault(start, []).append(end)
+
+        for start in graph:
+            heapq.heapify(graph[start])
+
+        route = []
+        self.dfs('JFK', graph, route)
+        route.reverse()
+        return route
+
+    def dfs(self, airport, graph, route):
+        next_airports = graph.get(airport)
+        while next_airports and next_airports:
+            self.dfs(heapq.heappop(next_airports), graph, route)
+        route.append(airport)`,
 complexity:`Время: O(E log D) (E — число билетов; из каждого аэропорта poll из min-heap степени исхода D; суммарно E извлечений из куч), Память: O(E) (граф из очередей + маршрут)`,
 complexityExpl:`Каждое ребро удаляется из min-heap ровно один раз, операции с кучей дают логарифм. Храним граф и маршрут из O(E) элементов.`,
 expl:`Если идти обычным DFS и жадно выбирать соседей без структуры, легко либо потерять лексикографический минимум, либо неправильно использовать все билеты. На самом деле задача про путь Эйлера: каждое ребро нужно пройти ровно один раз. Поэтому код хранит исходящие рейсы в min-heap, чтобы всегда брать минимальный по лексикографическому порядку, а сам маршрут собирает на выходе из DFS. Это и есть логика алгоритма Хиерхольцера.`,
@@ -9064,6 +12935,21 @@ code:`public class Solution {
         rightView(curr.left, result, currDepth + 1);
     }
 }`,
+py:`class Solution:
+    def rightSideView(self, root):
+        result = []
+        self.rightView(root, result, 0)
+        return result
+
+    def rightView(self, curr, result, curr_depth):
+        if curr is None:
+            return
+
+        if curr_depth == len(result):
+            result.append(curr.val)
+
+        self.rightView(curr.right, result, curr_depth + 1)
+        self.rightView(curr.left, result, curr_depth + 1)`,
 complexity:`Время: O(n) (каждый узел один раз), Память: O(w) (очередь BFS; w — максимальная ширина уровня, т.е. макс. число узлов в очереди одновременно)`,
 complexityExpl:`Каждый узел посещается один раз. В очереди максимум узлы одного уровня, где w — максимальная ширина дерева.`,
 expl:`Смысл решения в том, чтобы на каждой глубине первым увидеть именно тот узел, который виден справа. Поэтому код идёт не по уровням, а DFS сначала в правого ребёнка, потом в левого. Если глубина встречается впервые, значит мы дошли до самого правого узла на этом уровне и его значение нужно записать в ответ.`},
@@ -9150,6 +13036,36 @@ code:`class RandomizedSet {
         return values.get(random.nextInt(values.size()));
     }
 }`,
+py:`import random
+
+class RandomizedSet:
+    def __init__(self):
+        self.values = []
+        self.index = {}
+
+    def insert(self, val):
+        if val in self.index:
+            return False
+        self.index[val] = len(self.values)
+        self.values.append(val)
+        return True
+
+    def remove(self, val):
+        if val not in self.index:
+            return False
+
+        i = self.index[val]
+        last_idx = len(self.values) - 1
+        last_val = self.values[last_idx]
+
+        self.values[i] = last_val
+        self.index[last_val] = i
+        self.values.pop()
+        del self.index[val]
+        return True
+
+    def getRandom(self):
+        return self.values[random.randrange(len(self.values))]`,
 complexity:`Время: O(1) амортизированно на операцию, Память: O(n)`,
 complexityExpl:`HashMap даёт O(1) доступ к позиции, динамический массив — O(1) доступ по индексу и O(1) удаление с конца.`,
 expl:`Трюк remove: вместо удаления из середины массива переносим последний элемент на место удаляемого и обновляем индекс в карте.`,
@@ -9176,6 +13092,20 @@ code:`class Solution {
         }
     }
 }`,
+py:`class Solution:
+    def merge(self, nums1, m, nums2, n):
+        i = m - 1
+        j = n - 1
+        k = m + n - 1
+
+        while j >= 0:
+            if i >= 0 and nums1[i] > nums2[j]:
+                nums1[k] = nums1[i]
+                i -= 1
+            else:
+                nums1[k] = nums2[j]
+                j -= 1
+            k -= 1`,
 complexity:`Время: O(m+n) (каждый из m+n слотов nums1 обрабатывается один раз), Память: O(1) доп. (три индекса i, j, k; слияние в nums1 на месте)`,
 complexityExpl:`Каждый элемент переносится ровно один раз. Используются только три индекса.`,
 expl:`Если сливать массивы с начала, мы быстро начнём перезаписывать значения в nums1, которые ещё сами не успели сравнить. Поэтому код идёт с конца, где в nums1 уже есть свободное место под результат. На каждом шаге выбирается больший из двух хвостов и ставится в конец. Так ничего полезного не затирается, и дополнительный массив не нужен.`,
@@ -9204,6 +13134,17 @@ code:`class Solution {
         return left != null ? left : right;
     }
 }`,
+py:`class Solution:
+    def lowestCommonAncestor(self, root, p, q):
+        if root is None or root is p or root is q:
+            return root
+
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+
+        if left is not None and right is not None:
+            return root
+        return left if left is not None else right`,
 complexity:`Время: O(n) (каждый узел один раз), Память: O(h) (стек рекурсии DFS; h — высота дерева)`,
 complexityExpl:`Каждый узел посещаем один раз. Память — глубина стека рекурсии h.`,
 expl:`Здесь удобно мыслить не глобально, а по возвращаемому значению рекурсии. Если поддерево содержит p или q, оно возвращает найденный узел наверх. Если непустой ответ пришёл и слева, и справа, значит именно в текущем узле пути к p и q сходятся впервые, и он и есть LCA. Если ответ пришёл только с одной стороны, его просто нужно протащить выше.`,
@@ -9316,6 +13257,37 @@ code:`class Solution {
         throw new IllegalStateException("Binary Search invariant violated...");
     }
 }`,
+py:`class Solution:
+    def findMedianSortedArrays(self, nums1, nums2):
+        m = len(nums1)
+        n = len(nums2)
+
+        if m > n:
+            return self.findMedianSortedArrays(nums2, nums1)
+
+        half = (m + n + 1) // 2
+        lo = 0
+        hi = m
+
+        while lo <= hi:
+            i = lo + (hi - lo) // 2
+            j = half - i
+
+            left1 = float('-inf') if i == 0 else nums1[i - 1]
+            right1 = float('inf') if i == m else nums1[i]
+            left2 = float('-inf') if j == 0 else nums2[j - 1]
+            right2 = float('inf') if j == n else nums2[j]
+
+            if left1 <= right2 and left2 <= right1:
+                if (m + n) % 2 == 0:
+                    return (max(left1, left2) + min(right1, right2)) / 2.0
+                return max(left1, left2)
+            if left1 > right2:
+                hi = i - 1
+            else:
+                lo = i + 1
+
+        raise ValueError('Binary search invariant violated')`,
 complexity:`Время: O(log(min(m,n))), Память: O(1)`,
 complexityExpl:`Ищем позицию разреза бинарным поиском только по меньшему массиву.`,
 expl:`Правильный разрез удовлетворяет условиям l1<=r2 и l2<=r1. После этого медиана берётся из границ разрезов.`,
@@ -9374,6 +13346,36 @@ code:`class Solution {
         return false;
     }
 }`,
+py:`class Solution:
+    def checkInclusion(self, s1, s2):
+        if len(s1) > len(s2):
+            return False
+
+        freq = [0] * 26
+        for ch in s1:
+            freq[ord(ch) - ord('a')] += 1
+
+        need_count = len(s1)
+        window_len = len(s1)
+        left = 0
+
+        for right, ch in enumerate(s2):
+            in_idx = ord(ch) - ord('a')
+            if freq[in_idx] > 0:
+                need_count -= 1
+            freq[in_idx] -= 1
+
+            if right - left + 1 > window_len:
+                out_idx = ord(s2[left]) - ord('a')
+                if freq[out_idx] >= 0:
+                    need_count += 1
+                freq[out_idx] += 1
+                left += 1
+
+            if need_count == 0:
+                return True
+
+        return False`,
 complexity:`Время: O(|s2|) (окно скользит по s2), Память: O(1) доп. (два массива need[26] и win[26] — |Σ|=26 строчных латинских букв; сравнение массивов O(26)=O(1))`,
 complexityExpl:`На каждом сдвиге окна обновляем две позиции массива частот длины 26.`,
 expl:`Перебирать все перестановки строки s1 бессмысленно. Гораздо важнее заметить, что любая перестановка имеет ту же длину и те же частоты букв. Значит, вместо генерации перестановок нужно просто пройти по s2 окном фиксированного размера и для каждого окна сравнить частоты символов с эталоном из s1. Именно эту идею и реализует код.`,
@@ -9407,6 +13409,26 @@ code:`class Solution {
         return dummy.next;
     }
 }`,
+py:`class Solution:
+    def addTwoNumbers(self, l1, l2):
+        dummy = ListNode(0)
+        cur = dummy
+        carry = 0
+
+        while l1 is not None or l2 is not None or carry != 0:
+            a = l1.val if l1 is not None else 0
+            b = l2.val if l2 is not None else 0
+            total = a + b + carry
+            carry = total // 10
+            cur.next = ListNode(total % 10)
+
+            cur = cur.next
+            if l1 is not None:
+                l1 = l1.next
+            if l2 is not None:
+                l2 = l2.next
+
+        return dummy.next`,
 complexity:`Время: O(max(m,n)), Память: O(max(m,n))`,
 complexityExpl:`Обходим каждый список один раз, создаём столько же узлов результата.`,
 expl:`Побитовое (по разрядам) сложение с переносом, как в столбик.`,
@@ -9449,6 +13471,26 @@ code:`class MinStack {
         return mins.peek(); // текущий минимум всегда на вершине mins
     }
 }`,
+py:`class MinStack:
+    def __init__(self):
+        self.stack = []
+        self.mins = []
+
+    def push(self, val):
+        self.stack.append(val)
+        if not self.mins or val <= self.mins[-1]:
+            self.mins.append(val)
+
+    def pop(self):
+        x = self.stack.pop()
+        if x == self.mins[-1]:
+            self.mins.pop()
+
+    def top(self):
+        return self.stack[-1]
+
+    def getMin(self):
+        return self.mins[-1]`,
 complexity:`Время: O(1) на операцию (push/pop/peek с deque), Память: O(n) (основной стек до n значений; mins — не больше числа «новых минимумов», в худшем O(n) дубликатов на вершине mins)`,
 complexityExpl:`Все операции — push/pop/peek на deque. Дополнительный стек минимумов хранит кандидатов минимумов.`,
 expl:`Обычный стек умеет быстро работать только с вершиной, но не с минимумом по всему содержимому. Значит, минимум нужно сопровождать отдельно. Код держит второй стек mins, куда кладутся только те значения, которые в момент вставки стали новым минимумом. Тогда текущий минимум всегда лежит на вершине mins, а при pop его нужно убирать синхронно только если удаляется именно этот минимум.`,
@@ -9477,6 +13519,16 @@ code:`class Solution {
         return "";
     }
 }`,
+py:`class Solution:
+    def destCity(self, paths):
+        starts = set()
+        for start, _ in paths:
+            starts.add(start)
+
+        for _, end in paths:
+            if end not in starts:
+                return end
+        return ""`,
 complexity:`Время: O(p) (p — число путей; два прохода по списку), Память: O(p) (HashSet городов-источников from; до p строк)`,
 complexityExpl:`Один проход для источников и один для проверки назначения.`,
 expl:`Если представить билеты как ориентированные рёбра, конечный город выделяется сразу: в него можно приехать, но из него нельзя уехать дальше. Поэтому код сначала собирает все города-источники from в set, а потом ищет такой город назначения to, которого в этом множестве нет. Это и будет точка окончания маршрута.`,
@@ -9512,6 +13564,20 @@ code:`class Solution {
         return count;
     }
 }`,
+py:`class Solution:
+    def maxPower(self, s):
+        best = 0
+        current = 1
+        n = len(s)
+
+        for i in range(n):
+            if i < n - 1 and s[i] == s[i + 1]:
+                current += 1
+            else:
+                best = max(best, current)
+                current = 1
+
+        return best`,
 complexity:`Время: O(n) (один проход по s длины n), Память: O(1) доп. (два счётчика count/curr и индекс i — константное число переменных)`,
 complexityExpl:`Каждый символ строки обрабатывается один раз. Дополнительные структуры не используются.`,
 expl:`Поддерживаем длину текущего блока одинаковых символов (curr). Если следующий символ такой же — увеличиваем curr, иначе фиксируем максимум (count) и начинаем новый блок с 1. Ответ — наибольшая длина блока.`,
@@ -9542,6 +13608,14 @@ code:`class Solution {
         return num;
     }
 }`,
+py:`class Solution:
+    def numJewelsInStones(self, jewels, stones):
+        jewel_set = set(jewels)
+        count = 0
+        for ch in stones:
+            if ch in jewel_set:
+                count += 1
+        return count`,
 complexity:`Время: O(n·m) в худшем (n = |stones|, m = |jewels|; на каждом из n символов stones вызывается jewels.indexOf с линейным поиском по m), Память: O(1) доп. (только счётчик и индекс цикла)`,
 complexityExpl:`Внешний цикл идёт по stones. Проверка indexOf для строки jewels — линейная по её длине. Дополнительных структур данных нет.`,
 expl:`Идея прямая: считаем только те символы stones, которые присутствуют в jewels. Так как indexOf учитывает точный символ, регистр автоматически обрабатывается корректно.`,
@@ -9585,6 +13659,21 @@ code:`class Solution {
         return left;
     }
 }`,
+py:`class Solution:
+    def searchInsert(self, nums, target):
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            mid = left + (right - left) // 2
+            if nums[mid] == target:
+                return mid
+            if nums[mid] > target:
+                right = mid - 1
+            else:
+                left = mid + 1
+
+        return left`,
 complexity:`Время: O(log n) (каждая итерация отбрасывает половину диапазона), Память: O(1) доп. (три индекса left/right/mid)`,
 complexityExpl:`Бинарный поиск на диапазоне индексов [0..n-1] делает логарифмическое число шагов. Дополнительных структур данных нет.`,
 expl:`Если target найден, сразу возвращаем mid. Если не найден, цикл завершается при left > right, и left становится первой позицией, где элемент не меньше target — это и есть корректный индекс вставки.`,
@@ -9629,6 +13718,24 @@ code:`class Solution {
         return ans;
     }
 }`,
+py:`class Solution:
+    def mySqrt(self, x):
+        if x < 2:
+            return x
+
+        left = 1
+        right = x // 2
+        ans = 0
+
+        while left <= right:
+            mid = left + (right - left) // 2
+            if mid <= x // mid:
+                ans = mid
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        return ans`,
 complexity:`Время: O(log x) (бинпоиск по диапазону [1..x/2]), Память: O(1) доп. (константное число переменных left/right/mid/ans)`,
 complexityExpl:`На каждом шаге бинарный поиск отбрасывает половину диапазона. Используем только несколько целочисленных переменных.`,
 expl:`Ищем целый корень как «правую границу истинности»: предикат mid*mid <= x истинен до некоторой точки, потом ложен. Последний истинный mid и есть floor(sqrt(x)).`,
@@ -9673,6 +13780,23 @@ code:`public class Solution extends GuessGame {
         return -1; // для корректного ввода не достигается
     }
 }`,
+py:`class Solution:
+    def guessNumber(self, n):
+        left = 1
+        right = n
+
+        while left <= right:
+            mid = left + (right - left) // 2
+            res = self.guess(mid)
+
+            if res == 0:
+                return mid
+            if res < 0:
+                right = mid - 1
+            else:
+                left = mid + 1
+
+        return -1`,
 complexity:`Время: O(log n) (каждый шаг отбрасывает половину диапазона поиска), Память: O(1) доп. (индексы left/right/mid и переменная res)`,
 complexityExpl:`Бинарный поиск делает логарифмическое число запросов к API guess. Дополнительные структуры данных не нужны.`,
 expl:`На каждом шаге берём середину диапазона. Если guess(mid) говорит, что mid больше загаданного, сужаемся влево; если меньше — вправо. При res == 0 нашли точный ответ.`,
@@ -9707,6 +13831,19 @@ code:`class Solution {
         return nums[left];
     }
 }`,
+py:`class Solution:
+    def findMin(self, nums):
+        left = 0
+        right = len(nums) - 1
+
+        while left < right:
+            mid = left + (right - left) // 2
+            if nums[mid] > nums[right]:
+                left = mid + 1
+            else:
+                right = mid
+
+        return nums[left]`,
 complexity:`Время: O(log n) (бинпоиск по индексам 0..n−1), Память: O(1) доп. (три индекса left, right, mid)`,
 complexityExpl:`Каждая итерация отбрасывает половину диапазона.`,
 expl:`После поворота массив состоит из двух отсортированных частей: слева большие элементы, справа маленькие. Минимум — это начало правой части. Я сравниваю nums[mid] с nums[right], чтобы понять, в какой части находится mid. Если nums[mid] > nums[right], значит mid ещё в левой большой части, минимум правее. Иначе mid уже в правой отсортированной части, значит минимум не правее mid, а в mid или левее. Так каждый раз отбрасываю половину и в конце left указывает на минимум.`,
@@ -9737,6 +13874,21 @@ code:`class Solution {
         return dummy.next;
     }
 }`,
+py:`class Solution:
+    def swapPairs(self, head):
+        dummy = ListNode(0)
+        dummy.next = head
+        prev = dummy
+
+        while prev.next is not None and prev.next.next is not None:
+            a = prev.next
+            b = a.next
+            a.next = b.next
+            b.next = a
+            prev.next = b
+            prev = a
+
+        return dummy.next`,
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый узел участвует в перестановке не более одного раза.`,
 expl:`Мы не меняем значения, только ссылки между узлами.`},
@@ -9757,6 +13909,12 @@ code:`class Solution extends SolBase {
         }
     }
 }`,
+py:`class Solution:
+    def rand10(self):
+        while True:
+            num = (self.rand7() - 1) * 7 + self.rand7()
+            if num <= 40:
+                return 1 + (num - 1) % 10`,
 complexity:`Время: O(1) в среднем, Память: O(1)`,
 complexityExpl:`Отбраковка срабатывает редко: принимаем 40 из 49 исходов.`,
 expl:`Чтобы сохранить равномерность, нельзя брать модуль от 49 напрямую. Нужно отбрасывать «лишний хвост» 41..49.`},
@@ -9792,6 +13950,18 @@ code:`class Solution {
         return "/" + String.join("/", stack);
     }
 }`,
+py:`class Solution:
+    def simplifyPath(self, path):
+        stack = []
+        for part in path.split('/'):
+            if not part or part == '.':
+                continue
+            if part == '..':
+                if stack:
+                    stack.pop()
+            else:
+                stack.append(part)
+        return '/' + '/'.join(stack)`,
 complexity:`Время: O(n), Память: O(n)`,
 complexityExpl:`Один проход по сегментам пути, стек хранит валидные директории.`,
 expl:`Стек отражает текущий абсолютный путь: ".." удаляет последний сегмент, "." игнорируется.`},
@@ -9826,6 +13996,22 @@ code:`class Solution {
         return dummy.next; // голова реального списка
     }
 }`,
+py:`class Solution:
+    def mergeTwoLists(self, list1, list2):
+        dummy = ListNode(0)
+        cur = dummy
+
+        while list1 is not None and list2 is not None:
+            if list1.val <= list2.val:
+                cur.next = list1
+                list1 = list1.next
+            else:
+                cur.next = list2
+                list2 = list2.next
+            cur = cur.next
+
+        cur.next = list1 if list1 is not None else list2
+        return dummy.next`,
 complexity:`Время: O(m+n) (каждый узел list1/list2 рассматривается один раз), Память: O(1) доп. (указатели dummy, cur и два указателя на головы; новые узлы не создаём — только переставляем ссылки входных списков)`,
 complexityExpl:`Каждый узел из обоих списков проходит через указатель cur один раз.`,
 expl:`Здесь основная мысль очень прямолинейная: пока у обоих списков есть голова, в ответ безопасно брать меньшую из двух, потому что она точно должна стоять раньше в отсортированном результате. После этого двигаем тот список, из которого взяли узел, и продолжаем. dummy нужен только для удобной сборки результата без отдельного случая для первого элемента.`,
@@ -9856,6 +14042,33 @@ code:`SELECT
 FROM employees
 WHERE fired = FALSE   -- в MySQL часто: fired = 0
 GROUP BY unit_id;`,
+py:`class Solution:
+    def minMaxSalaryByUnit(self, employees):
+        stats = {}
+
+        for employee in employees:
+            fired = employee.get('fired', False)
+            if fired:
+                continue
+
+            unit_id = employee['unit_id']
+            salary = employee['salary']
+            if unit_id not in stats:
+                stats[unit_id] = [salary, salary]
+            else:
+                stats[unit_id][0] = min(stats[unit_id][0], salary)
+                stats[unit_id][1] = max(stats[unit_id][1], salary)
+
+        result = []
+        for unit_id in sorted(stats):
+            min_salary, max_salary = stats[unit_id]
+            result.append({
+                'unit_id': unit_id,
+                'min_salary': min_salary,
+                'max_salary': max_salary,
+            })
+
+        return result`,
 complexity:`Время: O(n log n) при сортировке/хэш-группировке по плану СУБД, Память: O(u)`,
 complexityExpl:`Один проход по employees с группировкой по unit_id — типично O(n) работы плюс стоимость группировки. Доп. память — по числу отделов u в группах.`,
 expl:`Сначала отбрасываем уволенных (fired), затем для каждого unit_id считаем MIN и MAX по salary. Если fired хранится как 0/1, замените условие на fired = 0 или NOT fired.`}

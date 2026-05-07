@@ -106,31 +106,7 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .enter-btn-inline:active{background:var(--purple);color:#fff}
 .enter-btn-inline{min-width:72px;text-align:center;line-height:1}
 .enter-btn-inline.active{box-shadow:0 0 0 2px rgba(124,58,237,.25)}
-.mascot-layer{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden}
-.fly-overlay{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
-.peek-cat{position:fixed;z-index:400;pointer-events:none;transition:transform .8s cubic-bezier(.34,1.56,.64,1);font-size:40px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
-.peek-cat.from-right{right:-50px;bottom:15%;transform:translateX(0)}
-.peek-cat.from-right.visible{transform:translateX(-45px)}
-.peek-cat.from-left{left:-50px;bottom:25%;transform:translateX(0) scaleX(-1)}
-.peek-cat.from-left.visible{transform:translateX(45px) scaleX(-1)}
-.peek-cat.from-bottom{bottom:-45px;right:20%;transform:translateY(0)}
-.peek-cat.from-bottom.visible{transform:translateY(-40px)}
-.peek-cat-face{display:block;line-height:1}
-.peek-cat-paws{display:block;font-size:24px;text-align:center;margin-top:-8px}
 /* SVG бабочки */
-.butterfly-svg{position:fixed;pointer-events:none;z-index:50;animation:butterflyFly var(--dur,12s) ease-in-out forwards}
-.bfly-wl{transform-box:fill-box;transform-origin:100% 50%;animation:flapClose var(--flap,.28s) ease-in-out infinite alternate}
-.bfly-wr{transform-box:fill-box;transform-origin:0% 50%;animation:flapClose var(--flap,.28s) ease-in-out infinite alternate-reverse}
-@keyframes flapClose{from{transform:scaleX(1)}to{transform:scaleX(0.07)}}
-@keyframes butterflyFly{
-  0%{transform:translate(0px,0px);opacity:0}
-  8%{opacity:.82}
-  38%{transform:translate(var(--tx1),var(--ty1))}
-  72%{transform:translate(var(--tx2),var(--ty2))}
-  90%{opacity:.82}
-  100%{transform:translate(var(--tx3),var(--ty3));opacity:0}
-}
-@media(prefers-reduced-motion:reduce){.butterfly-svg{display:none !important}}
 .solution-editor{position:relative;border-radius:10px;overflow:hidden}
 .code-wrap:has(.solution-editor),.code-wrap:has(.solution-pre){animation:codeBreathe 6s ease-in-out infinite}
 @keyframes codeBreathe{0%,100%{box-shadow:0 0 15px rgba(124,58,237,0.2)}50%{box-shadow:0 0 25px rgba(124,58,237,0.4),0 0 40px rgba(236,72,153,0.2)}}
@@ -581,11 +557,6 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 <body>
 
 <h1>AlgoCards</h1>
-<div id="flyOverlay" class="fly-overlay" aria-hidden="true"></div>
-<div id="peekCat" class="peek-cat from-right" aria-hidden="true">
-  <span class="peek-cat-face">🐱</span>
-  <span class="peek-cat-paws">🐾</span>
-</div>
 <div class="subtitle" id="info"></div>
 <button id="simLaunchBtn" class="sim-launch-btn" onclick="openInterviewSimulation()">🎯 Интервью-режим</button>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()" onkeydown="if(event.key==='Enter')applySearchEnter()">
@@ -1561,7 +1532,6 @@ let mascotTimer=null;
 let mascotTyping=false;
 let mascotProfile=null;
 let lastSwipeAt=0;
-let peekCatTimer=null;
 let simState={
   open:false,
   problem:null,
@@ -1571,122 +1541,6 @@ let simState={
   timerId:null,
   running:false
 };
-
-// Рыжий кот выглядывает из-за края экрана
-function initPeekCat(){
-  const cat=document.getElementById('peekCat');
-  if(!cat)return;
-  const positions=['from-right','from-left','from-bottom'];
-  function peekOnce(){
-    const pos=positions[Math.floor(Math.random()*positions.length)];
-    cat.className='peek-cat '+pos;
-    setTimeout(()=>cat.classList.add('visible'),50);
-    setTimeout(()=>cat.classList.remove('visible'),2500);
-  }
-  // Первое появление через 3-6 сек, потом каждые 10-20 сек
-  setTimeout(()=>{
-    peekOnce();
-    peekCatTimer=setInterval(peekOnce,10000+Math.random()*10000);
-  },3000+Math.random()*3000);
-}
-initPeekCat();
-
-// SVG бабочки
-const BF_PALETTES=[
-  {w1:'#c084fc',w2:'#7c3aed',body:'#4c1d95'},
-  {w1:'#f9a8d4',w2:'#ec4899',body:'#831843'},
-  {w1:'#fcd34d',w2:'#f59e0b',body:'#92400e'},
-  {w1:'#6ee7b7',w2:'#059669',body:'#064e3b'},
-  {w1:'#93c5fd',w2:'#3b82f6',body:'#1e3a8a'},
-  {w1:'#fca5a5',w2:'#ef4444',body:'#7f1d1d'},
-];
-
-function spawnButterfly(){
-  const pal=BF_PALETTES[Math.floor(Math.random()*BF_PALETTES.length)];
-  const vw=window.innerWidth,vh=window.innerHeight;
-  const edge=Math.floor(Math.random()*4);
-  let x0,y0;
-  if(edge===0){x0=Math.random()*vw;y0=-50;}
-  else if(edge===1){x0=vw+50;y0=Math.random()*vh;}
-  else if(edge===2){x0=Math.random()*vw;y0=vh+50;}
-  else{x0=-50;y0=Math.random()*vh;}
-  const p1x=vw*(0.15+Math.random()*0.7), p1y=vh*(0.1+Math.random()*0.8);
-  const p2x=vw*(0.15+Math.random()*0.7), p2y=vh*(0.1+Math.random()*0.8);
-  const p3x=vw*(0.1+Math.random()*0.8),  p3y=vh*(0.1+Math.random()*0.8);
-  const size=26+Math.random()*18;
-  const dur=10+Math.random()*8;
-  const flap=(0.22+Math.random()*0.14).toFixed(2);
-  const uid=Math.random().toString(36).slice(2,7);
-  const N='http://www.w3.org/2000/svg';
-  const svg=document.createElementNS(N,'svg');
-  svg.setAttribute('viewBox','0 0 60 44');
-  svg.setAttribute('width',size);
-  svg.setAttribute('height',(size*0.73).toFixed(1));
-  svg.classList.add('butterfly-svg');
-  svg.style.left=x0.toFixed(0)+'px';
-  svg.style.top=y0.toFixed(0)+'px';
-  svg.style.setProperty('--dur',dur+'s');
-  svg.style.setProperty('--flap',flap+'s');
-  svg.style.setProperty('--tx1',(p1x-x0).toFixed(0)+'px');
-  svg.style.setProperty('--ty1',(p1y-y0).toFixed(0)+'px');
-  svg.style.setProperty('--tx2',(p2x-x0).toFixed(0)+'px');
-  svg.style.setProperty('--ty2',(p2y-y0).toFixed(0)+'px');
-  svg.style.setProperty('--tx3',(p3x-x0).toFixed(0)+'px');
-  svg.style.setProperty('--ty3',(p3y-y0).toFixed(0)+'px');
-  function grad(id,cx){
-    const g=document.createElementNS(N,'radialGradient');
-    g.id=id;g.setAttribute('cx',cx);g.setAttribute('cy','35%');g.setAttribute('r','65%');
-    [[pal.w1,'0%','0.95'],[pal.w2,'100%','0.55']].forEach(([c,o,op])=>{
-      const s=document.createElementNS(N,'stop');
-      s.setAttribute('offset',o);s.setAttribute('stop-color',c);s.setAttribute('stop-opacity',op);g.appendChild(s);
-    });
-    return g;
-  }
-  const defs=document.createElementNS(N,'defs');
-  defs.appendChild(grad('gl'+uid,'65%'));defs.appendChild(grad('gr'+uid,'35%'));
-  svg.appendChild(defs);
-  function wing(d,fill,op){
-    const p=document.createElementNS(N,'path');
-    p.setAttribute('d',d);p.setAttribute('fill',fill);
-    if(op!=null)p.setAttribute('opacity',String(op));
-    return p;
-  }
-  const lG=document.createElementNS(N,'g');lG.setAttribute('class','bfly-wl');
-  lG.appendChild(wing('M 30 18 C 22 4,4 3,6 17 C 8 28,26 30,30 18 Z','url(#gl'+uid+')'));
-  lG.appendChild(wing('M 30 22 C 19 25,8 31,10 37 C 12 42,28 38,30 22 Z','url(#gl'+uid+')',0.8));
-  const rG=document.createElementNS(N,'g');rG.setAttribute('class','bfly-wr');
-  rG.appendChild(wing('M 30 18 C 38 4,56 3,54 17 C 52 28,34 30,30 18 Z','url(#gr'+uid+')'));
-  rG.appendChild(wing('M 30 22 C 41 25,52 31,50 37 C 48 42,32 38,30 22 Z','url(#gr'+uid+')',0.8));
-  const body=document.createElementNS(N,'ellipse');
-  body.setAttribute('cx','30');body.setAttribute('cy','20');
-  body.setAttribute('rx','1.5');body.setAttribute('ry','8');
-  body.setAttribute('fill',pal.body);body.setAttribute('opacity','0.7');
-  function ant(d,tx,ty){
-    const path=document.createElementNS(N,'path');
-    path.setAttribute('d',d);path.setAttribute('stroke',pal.body);
-    path.setAttribute('stroke-width','0.9');path.setAttribute('fill','none');path.setAttribute('opacity','0.5');
-    const tip=document.createElementNS(N,'circle');
-    tip.setAttribute('cx',String(tx));tip.setAttribute('cy',String(ty));tip.setAttribute('r','1.5');
-    tip.setAttribute('fill',pal.body);tip.setAttribute('opacity','0.5');
-    return [path,tip];
-  }
-  svg.appendChild(lG);svg.appendChild(rG);svg.appendChild(body);
-  ant('M 30 12 Q 25 6,22 3',22,3).forEach(el=>svg.appendChild(el));
-  ant('M 30 12 Q 35 6,38 3',38,3).forEach(el=>svg.appendChild(el));
-  document.body.appendChild(svg);
-  setTimeout(()=>{try{svg.remove();}catch(e){}},Math.ceil(dur+1)*1000);
-}
-
-function initButterflies(){
-  setTimeout(()=>{
-    spawnButterfly();
-    setInterval(()=>{
-      const n=Math.random()<0.28?2:1;
-      for(let i=0;i<n;i++)setTimeout(spawnButterfly,i*1400+Math.random()*600);
-    },7000+Math.random()*6000);
-  },2000+Math.random()*2000);
-}
-initButterflies();
 
 function setupSwipeNav(){
   if(editMode)return;

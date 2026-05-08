@@ -5802,7 +5802,7 @@ expl:`Наибольшие квадраты — на краях массива (
 lcSimilar:[{"t":"Squares of a Sorted Array","h":"squares-of-a-sorted-array"},{"t":"Merge Sorted Array","h":"merge-sorted-array"}]},
 
 // ===== UNION-FIND =====
-{id:"88",t:"Объединение графиков",p:"Union-Find",d:"средне",
+{id:"88",t:"Объединение графиков",p:"Heap / PQ",d:"средне",
 desc:`Дан массив графиков, где каждый график — список пар [время, значение], отсортированный по времени. ==Объединить все графики в один==: [время, сумма значений].
 
 Пример:
@@ -5892,7 +5892,7 @@ complexity:`Время: O(N log k), Память: O(k)`,
 complexityExpl:`В куче O(k) элементов, всего N извлечений по O(log k) — O(N log k). Куча и currentValues — O(k) памяти.`,
 expl:`Min-heap обрабатывает события по времени. Все события одного момента — за раз. Поддерживаем текущие значения каждого графика и их сумму. O(N log k) где N — суммарное число точек.`},
 
-{id:"89",t:"Объединение нескольких графиков",p:"Union-Find",d:"средне",
+{id:"89",t:"Объединение нескольких графиков",p:"Heap / PQ",d:"средне",
 desc:`Дан массив графиков [время, значение]. ==Объединить в один суммарный==.
 
 Пример:
@@ -6109,7 +6109,7 @@ lcSimilar:[{"t":"Find First and Last Position of Element in Sorted Array","h":"f
 diagram:{"type":"multi","data":[8,2,4,7],"steps":[{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[0]},{"type":"Deque","name":"maxD (убыв.)","data":[8],"hl":[0]},{"type":"Deque","name":"minD (возр.)","data":[8],"hl":[0]}],"desc":"[8]: max=8, min=8, размах=0 ≤ limit"},{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[0,1]},{"type":"Deque","name":"maxD (убыв.)","data":[8,2]},{"type":"Deque","name":"minD (возр.)","data":[2],"hl":[0]}],"desc":"[8,2]: max=8, min=2, размах=6 > limit!"},{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[1,2]},{"type":"Deque","name":"maxD (убыв.)","data":[4],"hl":[0]},{"type":"Deque","name":"minD (возр.)","data":[2,4]}],"desc":"Сжали → [2,4]: max=4, min=2, размах=2 ✓"},{"structs":[{"type":"int[]","name":"nums","data":[8,2,4,7],"active":[2,3]},{"type":"Deque","name":"maxD (убыв.)","data":[7],"hl":[0]},{"type":"Deque","name":"minD (возр.)","data":[4,7],"hl":[0]}],"desc":"[4,7]: max=7, min=4, размах=3. Ответ: 2"}]}},
 
 // ===== DYNAMIC PROGRAMMING =====
-{id:"92",t:"Longest Palindromic Substring",p:"Dynamic Programming",d:"средне",
+{id:"92",t:"Longest Palindromic Substring",p:"String",d:"средне",
 desc:`Дана строка s. Найти самую длинную ==подстроку-палиндром==.
 
 Пример:
@@ -6964,7 +6964,7 @@ complexityExpl:`Один проход с обновлением freq — O(n). �
 expl:`Так как A и B — перестановки, каждое число встречается ровно по 1 разу в каждом. freq[v] считает сколько раз v встретилось суммарно. Когда freq == 2 — число есть и в A[0..i], и в B[0..i]. O(n) время, O(n) память.`},
 
 // ===== TWO POINTERS =====
-{id:"103",t:"LC 1331. Rank Transform of an Array",p:"Two Pointers",d:"легко",
+{id:"103",t:"LC 1331. Rank Transform of an Array",p:"HashMap",d:"легко",
 desc:`Дан массив целых чисел arr (не отсортированный). Заменить каждый элемент его рангом. Ранг — это позиция элемента среди уникальных значений отсортированного массива, начиная с 1.
 
 Пример:
@@ -7142,7 +7142,7 @@ complexity:`Время: O(n log n), Память: O(1)`,
 complexityExpl:`Сортировка O(n log n), два указателя O(n) — доминирует сортировка. In-place — O(1) доп. памяти.`,
 expl:`Сортируем массив. Если nums[l] + nums[r] >= k, то все элементы между l и r в паре с r тоже подойдут (массив отсортирован) → count += (r-l). O(n log n).`},
 
-{id:"106",t:"LC 658. Find K Closest Elements",p:"Two Pointers",d:"сложно",
+{id:"106",t:"LC 658. Find K Closest Elements",p:"Binary Search",d:"сложно",
 desc:`Дан ==отсортированный массив== arr и два числа k и x. Найти ==k ближайших к x элементов==. Вернуть в отсортированном порядке.
 
 Пример:
@@ -9515,7 +9515,7 @@ complexityExpl:`Два прохода слева/справа для расст�
 expl:`Два прохода: слева→ записываем расстояние от последнего c. Справа→ обновляем минимумом с расстоянием от ближайшего c справа. O(n) время, O(1) доп. память.`,
 lcSimilar:[{"n":238,"t":"Product of Array Except Self","h":"product-of-array-except-self"},{"n":42,"t":"Trapping Rain Water","h":"trapping-rain-water"},{"n":845,"t":"Longest Mountain in Array","h":"longest-mountain-in-array"}]},
 
-{id:"141",t:"Product of Array Except Self",p:"Two Pointers",d:"средне",
+{id:"141",t:"Product of Array Except Self",p:"Prefix Sum Ext.",d:"средне",
 desc:`Дан массив nums. Вернуть массив result, где result[i] = ==произведение всех элементов кроме nums[i]==.
 Без деления, за O(n).
 
@@ -10536,7 +10536,7 @@ complexityExpl:`Два прохода по списку — O(n). Только �
 expl:`Массив как связный список: индекс i ведёт в nums[i]. Дубликат создаёт цикл. Алгоритм Флойда находит вход в цикл = дублирующее число. O(n), O(1).`,
 lcSimilar:[{"n":142,"t":"Linked List Cycle II","h":"linked-list-cycle-ii"}]},
 
-{id:"159",t:"Longest Repeating Character Replacement",p:"Two Pointers",d:"средне",
+{id:"159",t:"Longest Repeating Character Replacement",p:"Sliding Window",d:"средне",
 desc:`Дана строка s и число k. Можно заменить ==не более k символов==. Найти длину самой длинной подстроки, состоящей из одного символа.
 
 Пример:
@@ -10582,7 +10582,7 @@ complexityExpl:`Один проход — O(n). Массив из 26 симво�
 expl:`Заменять нужно все символы кроме самого частого. Если замен больше k — сужаем окно. maxCount не уменьшаем (нас интересует максимальное окно). O(n) время, O(1) память.`,
 lcSimilar:[{"n":3,"t":"Longest Substring Without Repeating Characters","h":"longest-substring-without-repeating-characters"}]},
 
-{id:"160",t:"Subarray Product Less Than K",p:"Two Pointers",d:"средне",
+{id:"160",t:"Subarray Product Less Than K",p:"Sliding Window",d:"средне",
 desc:`Дан массив nums и число k. Найти количество ==непрерывных подмассивов==, произведение элементов которых строго меньше k.
 
 Пример:
@@ -11959,7 +11959,7 @@ lcSimilar:[{"n":415,"t":"Add Strings","h":"add-strings"}],
 repoSimilar:["181"]},
 
 // ===== SLIDING WINDOW =====
-{id:"183",t:"Лучшее место на парковке",p:"Sliding Window",d:"средне",
+{id:"183",t:"Лучшее место на парковке",p:"One Pass with State",d:"средне",
 desc:`Дан массив spots, где spots[i] = 1 — ==занятое место==, spots[i] = 0 — ==свободное==. Нужно выбрать свободное место так, чтобы ==расстояние до ближайшей занятой машины== было ==максимальным==. Вернуть это максимальное расстояние.
 Важно: ==гарантировано== есть хотя бы одно свободное и хотя бы одно занятое место.
 
@@ -12276,7 +12276,7 @@ repoSimilar:["183"],
 diagram:{"type":"userstats","now":1000,"from":400,"k":600,"limit":3,"users":[{"name":"A","color":"#22d3ee","events":[100,350,600,900]},{"name":"B","color":"#94a3b8","events":[200,500,700]},{"name":"C","color":"#d9f943","events":[400,550,750,950]}],"inWindowCount":[3,2,4],"robots":["A","C"]}},
 
 // ===== SLIDING WINDOW =====
-{id:"186",t:"LC 849 · Maximize Distance to Closest Person",p:"Sliding Window",d:"средне",
+{id:"186",t:"LC 849 · Maximize Distance to Closest Person",p:"One Pass with State",d:"средне",
 desc:`Места в кинотеатре расположены в один ряд. Новый зритель хочет сесть так, чтобы ==расстояние до ближайшего занятого места== было ==максимальным==.
 Дан массив seats:
 - seats[i] = 1 — место занято

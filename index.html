@@ -505,18 +505,6 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .theory-when-item{background:rgba(0,204,255,0.15);color:var(--purple);padding:4px 10px;border-radius:6px;font-size:12px}
 .tag.clickable{cursor:pointer;transition:.2s}
 .tag.clickable:hover{filter:brightness(1.2);transform:scale(1.05)}
-.sim-launch-btn{
-  width:100%;
-  margin:6px 0 10px;
-  background:linear-gradient(135deg,#ff4d4d,#ffff33);
-  border:none;
-  color:#fff;
-  border-radius:12px;
-  padding:11px 14px;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-}
 .sim-modal{
   position:fixed;inset:0;z-index:500;
   background:#0b1020;
@@ -565,7 +553,6 @@ pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 
 <h1>AlgoCards</h1>
 <div class="subtitle" id="info"></div>
-<button id="simLaunchBtn" class="sim-launch-btn" onclick="openInterviewSimulation()">🎯 Интервью-режим</button>
 <input type="text" id="search" placeholder="Поиск по условию..." oninput="applySearch()" onkeydown="if(event.key==='Enter')applySearchEnter()">
 <div class="filter-row" id="filters"></div>
 <div id="cardsArea"></div>

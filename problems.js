@@ -11958,67 +11958,6 @@ expl:`Складываем числа как в столбик: берём те�
 lcSimilar:[{"n":415,"t":"Add Strings","h":"add-strings"}],
 repoSimilar:["181"]},
 
-// ===== SLIDING WINDOW =====
-{id:"183",t:"Лучшее место на парковке",p:"One Pass with State",d:"средне",
-desc:`Дан массив spots, где spots[i] = 1 — ==занятое место==, spots[i] = 0 — ==свободное==. Нужно выбрать свободное место так, чтобы ==расстояние до ближайшей занятой машины== было ==максимальным==. Вернуть это максимальное расстояние.
-Важно: ==гарантировано== есть хотя бы одно свободное и хотя бы одно занятое место.
-
-Пример 1:
-Ввод: spots = [0,1,0,0,0,1,0,1,0]
-Вывод: 2
-Объяснение: лучшее место — индекс 3. Слева ближайшая машина на индексе 1 (расстояние 2), справа — на индексе 5 (расстояние 2). Минимум = 2. Для остальных свободных мест минимальное расстояние меньше.
-
-Пример 2:
-Ввод: spots = [0,0,0,1,0,1]
-Вывод: 3
-Объяснение: лучшее место — индекс 0. Машин слева нет, справа ближайшая на индексе 3 (расстояние 3).`,
-hint:`Отслеживаем lastOccupied = -1. При каждой занятой позиции i: если это первая занятая — расстояние = i (левый край). Иначе — (i − lastOccupied) / 2. После цикла проверяем правый край: n − 1 − lastOccupied.`,
-code:`class Solution {
-    public int maxDistToClosest(int[] spots) {
-        int n = spots.length;
-        int maxDist = 0;
-        int lastOccupied = -1;
-        for (int i = 0; i < n; i++) {
-            if (spots[i] == 1) {
-                if (lastOccupied == -1) {
-                    // Левый край: расстояние от начала до первой занятой позиции
-                    maxDist = i;
-                } else {
-                    // Между двумя занятыми: оптимально сесть посередине
-                    maxDist = Math.max(maxDist, (i - lastOccupied) / 2);
-                }
-
-                lastOccupied = i;
-            }
-        }
-        
-        // Правый край: расстояние от последней занятой позиции до конца
-        maxDist = Math.max(maxDist, n - 1 - lastOccupied);
-        
-        return maxDist;
-    }
-}`,
-py:`class Solution:
-    def maxDistToClosest(self, spots):
-        n = len(spots)
-        max_dist = 0
-        last_occupied = -1
-
-        for i, spot in enumerate(spots):
-            if spot == 1:
-                if last_occupied == -1:
-                    max_dist = i
-                else:
-                    max_dist = max(max_dist, (i - last_occupied) // 2)
-                last_occupied = i
-
-        max_dist = max(max_dist, n - 1 - last_occupied)
-        return max_dist`,
-complexity:`Время: O(n), Память: O(1)`,
-complexityExpl:`Каждый индекс посещается константное число раз при движении l и r — O(n). Только несколько целых — O(1) доп. памяти.`,
-expl:`Свободные места разбиты на непрерывные блоки нулей. У левого или правого края оптимально встать в край блока — расстояние до ближайшей единицы равно длине блока. Между двумя единицами оптимум в середине: минимальное из двух расстояний максимизируется как ⌈длина/2⌉, что для целых длин совпадает с (r−l+2)/2.`,
-lcSimilar:[{"n":849,"t":"Maximize Distance to Closest Person","h":"maximize-distance-to-closest-person"}]},
-
 // ===== TWO POINTERS =====
 {id:"184",t:"Сложение графиков",p:"Two Pointers",d:"средне",
 desc:`Даны два массива nums1 и nums2, каждый — список пар [время, значение]. Нужно ==сложить два графика== в один и вернуть итоговый график в виде списка пар [время, сумма значений], ==отсортированный по времени==.
@@ -12272,7 +12211,6 @@ complexity:`Время: амортизированно O(1) на вызов, П�
 complexityExpl:`Каждое событие один раз попадает в дек и один раз из него удаляется — за всю последовательность линейно по числу событий.`,
 expl:`Скользящее окно по времени: дек хранит события в порядке прихода. Карта — сколько запросов у каждого userId внутри окна. hotCount увеличивается, когда частота пользователя впервые становится >= limit, и уменьшается, когда после удаления устаревших событий она падает ниже limit.`,
 lcSimilar:[{"n":362,"t":"Design Hit Counter","h":"design-hit-counter"}],
-repoSimilar:["183"],
 diagram:{"type":"userstats","now":1000,"from":400,"k":600,"limit":3,"users":[{"name":"A","color":"#22d3ee","events":[100,350,600,900]},{"name":"B","color":"#94a3b8","events":[200,500,700]},{"name":"C","color":"#d9f943","events":[400,550,750,950]}],"inWindowCount":[3,2,4],"robots":["A","C"]}},
 
 // ===== SLIDING WINDOW =====
@@ -12338,8 +12276,7 @@ py:`class Solution:
 complexity:`Время: O(n), Память: O(1)`,
 complexityExpl:`Каждый индекс посещается константное число раз при одном проходе по массиву.`,
 expl:`Группируем подряд идущие нули в блоки. Крайние блоки дают полный размер как расстояние до ближайшей единицы. Внутренний блок между единицами даёт максимум в середине: ceil(len/2).`,
-lcSimilar:[{"n":849,"t":"Maximize Distance to Closest Person","h":"maximize-distance-to-closest-person"}],
-repoSimilar:["183"]},
+lcSimilar:[{"n":849,"t":"Maximize Distance to Closest Person","h":"maximize-distance-to-closest-person"}]},
 
 // ===== TWO POINTERS =====
 {id:"187",t:"RLE с валидацией строки A-Z",p:"Two Pointers",d:"средне",

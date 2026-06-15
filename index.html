@@ -77,9 +77,9 @@ pre code.hljs{background:var(--card2);padding:12px;border-radius:10px;border:1px
 .code-zoom-title{color:#00C8FF;font-size:13px;font-weight:600;letter-spacing:.05em}
 .code-zoom-close{background:var(--card2);border:none;color:var(--dim);width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
 .code-zoom-close:hover{color:#fff;background:#333}
-.code-zoom-body{flex:1;overflow:auto;padding:16px}
-.code-zoom-body pre{margin:0}
-.code-zoom-body pre code.hljs{font-size:14px!important;line-height:1.65!important;border-radius:12px!important}
+.code-zoom-body{flex:1;overflow:auto;padding:24px;display:flex;justify-content:center;align-items:flex-start}
+.code-zoom-body pre{margin:0;width:min(860px,100%)}
+.code-zoom-body pre code.hljs{font-size:14px;line-height:1.65!important;border-radius:12px!important}
 pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .desc-display{padding-top:32px}
@@ -2194,6 +2194,7 @@ function openCodeZoom(btn, label) {
   modal.innerHTML = `
     <div class="code-zoom-header">
       <span class="code-zoom-title">${label || 'Код'}</span>
+      <span class="code-zoom-hint" style="color:#ffffff40;font-size:11px">колёсико мыши — зум</span>
       <button class="code-zoom-close" onclick="document.getElementById('codeZoomModal').remove()">×</button>
     </div>
     <div class="code-zoom-body">
@@ -2201,6 +2202,12 @@ function openCodeZoom(btn, label) {
     </div>
   `;
   modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  let fontSize = 14;
+  modal.querySelector('.code-zoom-body').addEventListener('wheel', e => {
+    e.preventDefault();
+    fontSize = Math.max(9, Math.min(36, fontSize + (e.deltaY < 0 ? 1 : -1)));
+    modal.querySelector('pre code').style.fontSize = fontSize + 'px';
+  }, { passive: false });
   document.body.appendChild(modal);
 }
 

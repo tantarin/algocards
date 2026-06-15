@@ -57,6 +57,29 @@ h1{font-size:26px;margin:8px 0 4px;text-align:center;font-family:'ALS Gorizont',
 .filter-btn{background:var(--card);border:1px solid #ffffff15;color:var(--dim);padding:6px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:.2s}
 .filter-btn.active{background:var(--purple);color:#000;border-color:var(--purple);font-weight:600}
 pre code.hljs{background:var(--card2);padding:12px;border-radius:10px;border:1px solid rgba(0,204,255,0.1)}
+/* ITMO color theme for hljs */
+.hljs{background:#1a1a1a!important;color:#fff!important}
+.hljs-keyword,.hljs-operator,.hljs-reserved{color:#FFF200!important}
+.hljs-title.class_,.hljs-type,.hljs-attr{color:#00C8FF!important}
+.hljs-title.function_,.hljs-built_in{color:#B8FF00!important}
+.hljs-string,.hljs-template-literal,.hljs-regexp{color:#00C8FF!important}
+.hljs-number,.hljs-literal{color:#FFF200!important}
+.hljs-comment,.hljs-doctag{color:#A8A8A8!important;font-style:italic!important}
+.hljs-variable,.hljs-params,.hljs-punctuation,.hljs-tag{color:#fff!important}
+.hljs-meta{color:#A8A8A8!important}
+/* Zoom button */
+.zoom-btn{position:absolute;top:8px;right:64px;background:rgba(0,204,255,0.15);border:none;color:#7de8ff;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;z-index:1;transition:.2s;display:flex;align-items:center;justify-content:center;line-height:1}
+.zoom-btn:hover{background:rgba(0,204,255,0.3);box-shadow:0 0 10px rgba(0,204,255,0.3)}
+.zoom-btn:active{transform:scale(.93)}
+/* Code zoom modal */
+.code-zoom-modal{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:600;display:flex;flex-direction:column;padding:0;padding-top:env(safe-area-inset-top,0px)}
+.code-zoom-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#111;border-bottom:1px solid rgba(0,204,255,0.2);flex-shrink:0}
+.code-zoom-title{color:#00C8FF;font-size:13px;font-weight:600;letter-spacing:.05em}
+.code-zoom-close{background:var(--card2);border:none;color:var(--dim);width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.code-zoom-close:hover{color:#fff;background:#333}
+.code-zoom-body{flex:1;overflow:auto;padding:16px}
+.code-zoom-body pre{margin:0}
+.code-zoom-body pre code.hljs{font-size:14px!important;line-height:1.65!important;border-radius:12px!important}
 pre,pre *{-webkit-user-select:text;user-select:text;cursor:text}
 .code-wrap{position:relative;margin-top:10px}
 .desc-display{padding-top:32px}
@@ -1104,6 +1127,13 @@ document.addEventListener('click', function(e) {
   const modal = document.getElementById('theoryModal');
   if (e.target === modal) closeTheory();
 });
+// Закрытие zoom по Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const zm = document.getElementById('codeZoomModal');
+    if (zm) zm.remove();
+  }
+});
 
 // --- Список карточек fcList ---
 // Без поиска: все задачи из getFiltered() (весь пул или с учётом фильтров).
@@ -2115,11 +2145,13 @@ function renderCard(){
         <div class="fc-cx-band fc-cx-band--solo" style="margin-top:10px">Java</div>
         <div class="code-wrap" style="margin-top:8px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <button class="zoom-btn" onclick="event.stopPropagation();openCodeZoom(this,'Java')" title="На весь экран">🔍</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code)}</code></pre>
         </div>
         ${pyCode?`<div class="fc-cx-band fc-cx-band--solo" style="margin-top:14px">Python</div>
         <div class="code-wrap" style="margin-top:8px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <button class="zoom-btn" onclick="event.stopPropagation();openCodeZoom(this,'Python')" title="На весь экран">🔍</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-python" style="font-size:11px;line-height:1.5">${escCode(pyCode)}</code></pre>
         </div>
         `:''}
@@ -2127,12 +2159,14 @@ function renderCard(){
         ${p.code2?`<div class="fc-cx-band fc-cx-band--solo" style="margin-top:14px">Java 2</div>
         <div class="code-wrap" style="margin-top:8px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <button class="zoom-btn" onclick="event.stopPropagation();openCodeZoom(this,'Java 2')" title="На весь экран">🔍</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-java" style="font-size:11px;line-height:1.5">${escCode(p.code2)}</code></pre>
         </div>
         `:''}
         ${pyCode2?`<div class="fc-cx-band fc-cx-band--solo" style="margin-top:14px">Python 2</div>
         <div class="code-wrap" style="margin-top:8px">
           <button class="copy-btn solution-copy" onclick="event.stopPropagation();copyProblemBundle(this)">Copy</button>
+          <button class="zoom-btn" onclick="event.stopPropagation();openCodeZoom(this,'Python 2')" title="На весь экран">🔍</button>
           <pre class="solution-pre" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><code class="language-python" style="font-size:11px;line-height:1.5">${escCode(pyCode2)}</code></pre>
         </div>
         `:''}
@@ -2146,6 +2180,28 @@ function renderCard(){
   setupMascots();
   setupSwipeNav();
   syncBrowserUrlToProblem(p.id);
+}
+
+function openCodeZoom(btn, label) {
+  const wrap = btn.closest('.code-wrap');
+  const codeEl = wrap.querySelector('pre code');
+  if (!codeEl) return;
+  const existing = document.getElementById('codeZoomModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.className = 'code-zoom-modal';
+  modal.id = 'codeZoomModal';
+  modal.innerHTML = `
+    <div class="code-zoom-header">
+      <span class="code-zoom-title">${label || 'Код'}</span>
+      <button class="code-zoom-close" onclick="document.getElementById('codeZoomModal').remove()">×</button>
+    </div>
+    <div class="code-zoom-body">
+      <pre><code class="${codeEl.className}">${codeEl.innerHTML}</code></pre>
+    </div>
+  `;
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
 }
 
 function copyProblemBundle(btn){
